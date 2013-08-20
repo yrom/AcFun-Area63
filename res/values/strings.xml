@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Ac文章区</string>
+    <string name="app_name_open">Acfun 63 - 文章区</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_section1">综合</string>
+    <string name="title_section2">工作·情感</string>
+    <string name="title_section3">动漫文化</string>
+    <string name="title_section4">漫画·轻小说</string>
+	<string-array name="planets">
+	    <item>Home</item>
+        <item>Profile</item>
+        <item>Message</item>
+        <item>Favorite</item>
+        <item>Search</item>
+	</string-array>
+</resources>
