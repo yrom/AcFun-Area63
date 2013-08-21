@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">AcFun63区</string>
-    <string name="app_name_open">AcFun 63 - 文章区</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">Ac文章区</string>
+    <string name="app_name_open">AcFun - 文章区</string>
+    <string name="action_settings">设置</string>
 	<string-array name="planets">
-	    <item>Home</item>
-        <item>Profile</item>
-        <item>Message</item>
-        <item>Favorite</item>
-        <item>Search</item>
+	    <item>主页</item>
+        <item>推送</item>
+        <item>收藏</item>
 	</string-array>
 	<string-array name="titles">
 	    <item>综合</item>
@@ -21,6 +19,6 @@
 	    <item>所有</item>
         <item>今日最热</item>
         <item>最新回复</item>
-        <item>推荐</item>
+        <item>本区推荐</item>
 	</string-array>
 </resources>

@@ -2,12 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" xmlns:app="http://schemas.android.com/apk/res/tv.acfun.a63">
 
     <com.astuetz.viewpager.extensions.PagerSlidingTabStrip
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="48dip"
+        android:textSize="13sp"
+        app:indicatorColor="@color/main_color"
+        android:textColor="@color/primary_text_color"
         android:background="@drawable/background_tabs" />
 
     <android.support.v4.view.ViewPager

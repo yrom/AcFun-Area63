@@ -1,6 +1,8 @@
 package tv.acfun.a63;
 
+import tv.acfun.a63.util.ActionBarUtil;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -12,12 +14,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
@@ -27,7 +33,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 
 public class MainActivity extends SherlockFragmentActivity implements
-        OnItemClickListener, OnNavigationListener {
+        OnItemClickListener, OnNavigationListener, OnClickListener {
     private static final String TAG = "MainActivity";
 
     private static String[] mPlanetTitles;
@@ -44,10 +50,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     private ActionBar mBar;
 
+    private View mDrawer;
+
+    private View mAvatarFrame;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ActionBarUtil.forceShowActionBarOverflowMenu(this);
         mBar = getSupportActionBar();
         mBar.setDisplayOptions(
                 ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_HOME
@@ -55,22 +66,26 @@ public class MainActivity extends SherlockFragmentActivity implements
         mTitle = getTitle();
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawer = findViewById(R.id.left_drawer);
+        mAvatarFrame = findViewById(R.id.avatar_frame);
+        mAvatarFrame.setOnClickListener(this);
+        mDrawerList = (ListView) findViewById(R.id.list);
 
         // set a custom shadow that overlays the main content when the drawer
         // opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
                 GravityCompat.START);
+        
+        int[] iconIds = {R.drawable.ic_home, R.drawable.ic_bell,R.drawable.ic_heart};
         // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, mPlanetTitles));
+        mDrawerList.setAdapter(new NavigationAdapter(mPlanetTitles, iconIds ));
         mDrawerList.setOnItemClickListener(this);
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
         mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
             mDrawerLayout, /* DrawerLayout object */
-            R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
+            R.drawable.ic_navigation_drawer, /* nav drawer image to replace 'Up' caret */
             R.string.app_name_open, /* "open drawer" description for accessibility */
             R.string.app_name /* "close drawer" description for accessibility */
             ) {
@@ -102,7 +117,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             args.putStringArray(PlanetFragment.ARG_TITLES, mTitles);
             mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(mBar.getThemedContext(),
-                android.R.layout.simple_list_item_2,
+                R.layout.list_item_2,
                 android.R.id.text2, getResources().getStringArray(R.array.modes)){
     
                     @Override
@@ -115,8 +130,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                     }
             
                 };
-                // FIXME: 
-//            adapter.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+            adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
             mBar.setListNavigationCallbacks(adapter, this);
             
         }else{
@@ -132,7 +146,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
         setTitle(mPlanetTitles[position]);
-        mDrawerLayout.closeDrawer(mDrawerList);
+        mDrawerLayout.closeDrawer(mDrawer);
     }
 
     /* Called whenever we call invalidateOptionsMenu() */
@@ -140,7 +154,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content
         // view
-        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawer);
         // menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
@@ -151,10 +165,10 @@ public class MainActivity extends SherlockFragmentActivity implements
         // ActionBarDrawerToggle will take care of this.
         if (item.getItemId() == android.R.id.home) {
 
-            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
-                mDrawerLayout.closeDrawer(mDrawerList);
+            if (mDrawerLayout.isDrawerOpen(mDrawer)) {
+                mDrawerLayout.closeDrawer(mDrawer);
             } else {
-                mDrawerLayout.openDrawer(mDrawerList);
+                mDrawerLayout.openDrawer(mDrawer);
             }
             return true;
         }
@@ -256,8 +270,8 @@ public class MainActivity extends SherlockFragmentActivity implements
                 // Set up the ViewPager with the sections adapter.
                 mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
                 mViewPager.setAdapter(mSectionsPagerAdapter);
-                mTabs.setIndicatorColorResource(R.color.main_color);
-                mTabs.setTextColorResource(R.color.primary_text_color);
+//                mTabs.setIndicatorColorResource(R.color.main_color);
+//                mTabs.setTextColorResource(R.color.primary_text_color);
                 mTabs.setViewPager(mViewPager);
             } else {
                 rootView = inflater.inflate(R.layout.fragment_planet,
@@ -295,7 +309,51 @@ public class MainActivity extends SherlockFragmentActivity implements
             return rootView;
         }
     }
+    static class NavigationItem{
+        String title;
+        Drawable icon;
+    }
+    public class NavigationAdapter extends BaseAdapter{
+        NavigationItem[] navs;
+        public NavigationAdapter(String[] titles, int[] iconIds) {
+            navs = new NavigationItem[titles.length];
+            for(int i=0;i<titles.length && i< iconIds.length;i++){
+                navs[i] = new NavigationItem();
+                navs[i].title = titles[i];
+                navs[i].icon = getResources().getDrawable(iconIds[i]);
+            }
+        }
 
+        @Override
+        public int getCount() {
+            return navs.length;
+        }
+
+        @Override
+        public NavigationItem getItem(int position) {
+            return navs[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            NavigationItem item = getItem(position);
+            if(convertView == null){
+                convertView = getLayoutInflater().inflate(R.layout.navigation_list_item, parent, false);
+            }
+            ImageView iconView = (ImageView) convertView.findViewById(R.id.icon);
+            TextView titleView = (TextView) convertView.findViewById(R.id.text);
+            iconView.setImageDrawable(item.icon);
+            titleView.setText(item.title);
+            return convertView;
+        }
+        
+    }
+    
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int position,
             long arg3) {
@@ -308,6 +366,15 @@ public class MainActivity extends SherlockFragmentActivity implements
         Log.i(TAG, "click position = "+itemPosition);
         
         return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v == mAvatarFrame){
+            Toast.makeText(this, "TODO: goto signin", 0).show();
+            
+        }
+        
     }
 
 }
