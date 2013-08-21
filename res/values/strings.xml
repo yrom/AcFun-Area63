@@ -17,4 +17,10 @@
         <item>动漫文化</item>
         <item>漫画·轻小说</item>
 	</string-array>
+	<string-array name="modes">
+	    <item>所有</item>
+        <item>今日最热</item>
+        <item>最新回复</item>
+        <item>推荐</item>
+	</string-array>
 </resources>

@@ -1,7 +1,5 @@
 package tv.acfun.a63;
 
-import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -11,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +19,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 
-@SuppressLint("NewApi")
-public class MainActivity extends SherlockFragmentActivity implements OnItemClickListener {
+public class MainActivity extends SherlockFragmentActivity implements
+        OnItemClickListener, OnNavigationListener {
+    private static final String TAG = "MainActivity";
+
     private static String[] mPlanetTitles;
 
     private DrawerLayout mDrawerLayout;
@@ -34,53 +37,53 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
     private ListView mDrawerList;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private CharSequence mTitle;
 
+    private CharSequence mTitle;
 
     private String[] mTitles;
 
-    
+    private ActionBar mBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE 
-                | ActionBar.DISPLAY_SHOW_HOME 
-                | ActionBar.DISPLAY_HOME_AS_UP);
-        mTitle  = getTitle();
-        //xxx 
-        
+        mBar = getSupportActionBar();
+        mBar.setDisplayOptions(
+                ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_HOME
+                        | ActionBar.DISPLAY_HOME_AS_UP);
+        mTitle = getTitle();
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        // set a custom shadow that overlays the main content when the drawer opens
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        // set a custom shadow that overlays the main content when the drawer
+        // opens
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+                GravityCompat.START);
         // set up the drawer's list view with items and click listener
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_list_item, mPlanetTitles));
         mDrawerList.setOnItemClickListener(this);
 
-        
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
-                R.string.app_name_open,  /* "open drawer" description for accessibility */
-                R.string.app_name  /* "close drawer" description for accessibility */
-                ) {
-
-
+        mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
+            mDrawerLayout, /* DrawerLayout object */
+            R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
+            R.string.app_name_open, /* "open drawer" description for accessibility */
+            R.string.app_name /* "close drawer" description for accessibility */
+            ) {
             public void onDrawerClosed(View view) {
-                getSupportActionBar().setTitle(mTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                mBar.setTitle(mTitle);
+                supportInvalidateOptionsMenu(); // creates call to
+                                                // onPrepareOptionsMenu()
             }
 
             public void onDrawerOpened(View drawerView) {
-                getSupportActionBar().setTitle(R.string.app_name_open);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                mBar.setTitle(R.string.app_name_open);
+                supportInvalidateOptionsMenu(); // creates call to
+                                                // onPrepareOptionsMenu()
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -89,39 +92,65 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
             selectItem(0);
         }
     }
-        
 
     private void selectItem(int position) {
         Fragment fragment = new PlanetFragment();
         Bundle args = new Bundle();
         args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-        if(position == 0) args.putStringArray(PlanetFragment.ARG_TITLES, mTitles);
+        if (position == 0){
+            mBar.setDisplayShowTitleEnabled(false);
+            args.putStringArray(PlanetFragment.ARG_TITLES, mTitles);
+            mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(mBar.getThemedContext(),
+                android.R.layout.simple_list_item_2,
+                android.R.id.text2, getResources().getStringArray(R.array.modes)){
+    
+                    @Override
+                    public View getView(int position, View convertView,
+                            ViewGroup parent) {
+                        View view = super.getView(position, convertView, parent);
+                        TextView text = (TextView) view.findViewById(android.R.id.text1);
+                        text.setText(mPlanetTitles[0]);
+                        return view;
+                    }
+            
+                };
+                // FIXME: 
+//            adapter.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+            mBar.setListNavigationCallbacks(adapter, this);
+            
+        }else{
+            mBar.setDisplayShowTitleEnabled(true);
+            mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        }
         fragment.setArguments(args);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, fragment).commit();
 
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
         setTitle(mPlanetTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
-    
+
     /* Called whenever we call invalidateOptionsMenu() */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        // If the nav drawer is open, hide action items related to the content view
+        // If the nav drawer is open, hide action items related to the content
+        // view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-//        menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        // menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
         // ActionBarDrawerToggle will take care of this.
         if (item.getItemId() == android.R.id.home) {
-            
+
             if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
                 mDrawerLayout.closeDrawer(mDrawerList);
             } else {
@@ -131,11 +160,13 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
-        getSupportActionBar().setTitle(mTitle);
+        mBar.setTitle(mTitle);
     }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -159,7 +190,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
 
     public static class SectionsPagerAdapter extends FragmentPagerAdapter {
         String[] titles;
-        public SectionsPagerAdapter(FragmentManager fragmentManager,String[] titles) {
+
+        public SectionsPagerAdapter(FragmentManager fragmentManager,
+                String[] titles) {
             super(fragmentManager);
             this.titles = titles;
         }
@@ -183,13 +216,13 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
 
         @Override
         public CharSequence getPageTitle(int position) {
-            
-            if(position<titles.length)
+
+            if (position < titles.length)
                 return titles[position];
             return null;
         }
     }
-    
+
     /**
      * Fragment that appears in the "content_frame", shows a planet
      */
@@ -201,8 +234,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
         private SectionsPagerAdapter mSectionsPagerAdapter;
 
         private ViewPager mViewPager;
-        
+
         private PagerSlidingTabStrip mTabs;
+
         public PlanetFragment() {
             // Empty constructor required for fragment subclasses
         }
@@ -212,10 +246,12 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
                 Bundle savedInstanceState) {
             int i = getArguments().getInt(ARG_PLANET_NUMBER);
             View rootView = null;
-            if(i == 0){
-                rootView = inflater.inflate(R.layout.fragment_home, container, false);
-                mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager(),
-                        getArguments().getStringArray(ARG_TITLES));
+            if (i == 0) {
+                rootView = inflater.inflate(R.layout.fragment_home, container,
+                        false);
+                mSectionsPagerAdapter = new SectionsPagerAdapter(
+                        getChildFragmentManager(), getArguments()
+                                .getStringArray(ARG_TITLES));
                 mTabs = (PagerSlidingTabStrip) rootView.findViewById(R.id.tabs);
                 // Set up the ViewPager with the sections adapter.
                 mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
@@ -223,14 +259,15 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
                 mTabs.setIndicatorColorResource(R.color.main_color);
                 mTabs.setTextColorResource(R.color.primary_text_color);
                 mTabs.setViewPager(mViewPager);
-            }else{
-                rootView = inflater.inflate(R.layout.fragment_planet, container, false);
-                ((TextView)rootView).setText(mPlanetTitles[i]);
+            } else {
+                rootView = inflater.inflate(R.layout.fragment_planet,
+                        container, false);
+                ((TextView) rootView).setText(mPlanetTitles[i]);
             }
             return rootView;
         }
     }
-    
+
     /**
      * A dummy fragment representing a section of the app, but that simply
      * displays dummy text.
@@ -258,10 +295,19 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
             return rootView;
         }
     }
-    
+
     @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+    public void onItemClick(AdapterView<?> arg0, View arg1, int position,
+            long arg3) {
         selectItem(position);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        
+        Log.i(TAG, "click position = "+itemPosition);
+        
+        return false;
     }
 
 }
