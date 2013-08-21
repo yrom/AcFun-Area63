@@ -1,7 +1,6 @@
 package tv.acfun.a63;
 
-import java.util.Locale;
-
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -20,30 +19,15 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 
+@SuppressLint("NewApi")
 public class MainActivity extends SherlockFragmentActivity implements OnItemClickListener {
-
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link android.support.v4.app.FragmentPagerAdapter} derivative, which
-     * will keep every loaded fragment in memory. If this becomes too memory
-     * intensive, it may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    ViewPager mViewPager;
-
-    private String[] mPlanetTitles;
+    private static String[] mPlanetTitles;
 
     private DrawerLayout mDrawerLayout;
 
@@ -52,24 +36,20 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
     private ActionBarDrawerToggle mDrawerToggle;
     private CharSequence mTitle;
 
-    private CharSequence mDrawerTitle;
+
+    private String[] mTitles;
+
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // enable ActionBar app icon to behave as action to toggle nav drawer
-//        getSupportActionBar().setIcon(null);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mTitle = mDrawerTitle = getTitle();
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the app.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(
-                getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE 
+                | ActionBar.DISPLAY_SHOW_HOME 
+                | ActionBar.DISPLAY_HOME_AS_UP);
+        mTitle  = getTitle();
+        //xxx 
+        
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -94,17 +74,17 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
 
 
             public void onDrawerClosed(View view) {
-                getActionBar().setTitle(R.string.app_name);
+                getSupportActionBar().setTitle(mTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             public void onDrawerOpened(View drawerView) {
-                getActionBar().setTitle(R.string.app_name_open);
+                getSupportActionBar().setTitle(R.string.app_name_open);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
+        mTitles = getResources().getStringArray(R.array.titles);
         if (savedInstanceState == null) {
             selectItem(0);
         }
@@ -112,14 +92,30 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
         
 
     private void selectItem(int position) {
-        // TODO Auto-generated method stub
-        if(position != 0){
-            Toast.makeText(getApplicationContext(), mPlanetTitles[position], 0).show();
-        }
-        mDrawerList.setItemChecked(position, true);
-        mDrawerLayout.closeDrawer(mDrawerList);
+        Fragment fragment = new PlanetFragment();
+        Bundle args = new Bundle();
+        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
+        if(position == 0) args.putStringArray(PlanetFragment.ARG_TITLES, mTitles);
+        fragment.setArguments(args);
 
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+        // update selected item and title, then close the drawer
+        mDrawerList.setItemChecked(position, true);
+        setTitle(mPlanetTitles[position]);
+        mDrawerLayout.closeDrawer(mDrawerList);
     }
+    
+    /* Called whenever we call invalidateOptionsMenu() */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+//        menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
+    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
@@ -138,7 +134,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
-        getActionBar().setTitle(mTitle);
+        getSupportActionBar().setTitle(mTitle);
     }
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -161,14 +157,11 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
         return true;
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fragmentManager) {
+    public static class SectionsPagerAdapter extends FragmentPagerAdapter {
+        String[] titles;
+        public SectionsPagerAdapter(FragmentManager fragmentManager,String[] titles) {
             super(fragmentManager);
+            this.titles = titles;
         }
 
         @Override
@@ -176,48 +169,80 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
             // getItem is called to instantiate the fragment for the given page.
             // Return a DummySectionFragment (defined as a static inner class
             // below) with the page number as its lone argument.
-            Fragment fragment = new DummySectionFragment();
+            Fragment fragment = new DummyCardFragment();
             Bundle args = new Bundle();
-            args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+            args.putInt(DummyCardFragment.ARG_SECTION_NUMBER, position + 1);
             fragment.setArguments(args);
             return fragment;
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 4;
+            return titles.length;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            Locale l = Locale.getDefault();
-            switch (position) {
-            case 0:
-                return getString(R.string.title_section1);
-            case 1:
-                return getString(R.string.title_section2);
-            case 2:
-                return getString(R.string.title_section3);
-            case 3:
-                return getString(R.string.title_section4);
-            }
+            
+            if(position<titles.length)
+                return titles[position];
             return null;
         }
     }
+    
+    /**
+     * Fragment that appears in the "content_frame", shows a planet
+     */
+    public static class PlanetFragment extends Fragment {
+        public static final String ARG_TITLES = "titles";
 
+        public static final String ARG_PLANET_NUMBER = "planet_number";
+
+        private SectionsPagerAdapter mSectionsPagerAdapter;
+
+        private ViewPager mViewPager;
+        
+        private PagerSlidingTabStrip mTabs;
+        public PlanetFragment() {
+            // Empty constructor required for fragment subclasses
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                Bundle savedInstanceState) {
+            int i = getArguments().getInt(ARG_PLANET_NUMBER);
+            View rootView = null;
+            if(i == 0){
+                rootView = inflater.inflate(R.layout.fragment_home, container, false);
+                mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager(),
+                        getArguments().getStringArray(ARG_TITLES));
+                mTabs = (PagerSlidingTabStrip) rootView.findViewById(R.id.tabs);
+                // Set up the ViewPager with the sections adapter.
+                mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
+                mViewPager.setAdapter(mSectionsPagerAdapter);
+                mTabs.setIndicatorColorResource(R.color.main_color);
+                mTabs.setTextColorResource(R.color.primary_text_color);
+                mTabs.setViewPager(mViewPager);
+            }else{
+                rootView = inflater.inflate(R.layout.fragment_planet, container, false);
+                ((TextView)rootView).setText(mPlanetTitles[i]);
+            }
+            return rootView;
+        }
+    }
+    
     /**
      * A dummy fragment representing a section of the app, but that simply
      * displays dummy text.
      */
-    public static class DummySectionFragment extends Fragment {
+    public static class DummyCardFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
         public static final String ARG_SECTION_NUMBER = "section_number";
 
-        public DummySectionFragment() {
+        public DummyCardFragment() {
         }
 
         @Override
@@ -229,10 +254,11 @@ public class MainActivity extends SherlockFragmentActivity implements OnItemClic
                     .findViewById(R.id.section_label);
             dummyTextView.setText(Integer.toString(getArguments().getInt(
                     ARG_SECTION_NUMBER)));
+
             return rootView;
         }
     }
-
+    
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
         selectItem(position);
