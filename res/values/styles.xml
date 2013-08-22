@@ -3,13 +3,61 @@
     <style name="AppTheme" parent="@style/Theme.Sherlock.Light.DarkActionBar">
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
+        
+        <item name="actionBarItemBackground">?attr/selectableItemBackground</item>
+        <item name="android:actionBarItemBackground">?attr/selectableItemBackground</item>
+        
+        <item name="actionButtonStyle">@style/Widget.Styled.ActionButton</item>
+        <item name="android:actionButtonStyle">@style/Widget.Styled.ActionButton</item>
+        
+        <item name="android:listSelector">@drawable/abs__list_selector_holo_dark</item>
+        
+        <item name="spinnerDropDownItemStyle">@style/Widget.Sherlock.Light.DropDownItem.Spinner</item>
+        <item name="android:spinnerDropDownItemStyle">@style/Widget.Sherlock.Light.DropDownItem.Spinner</item>
+        
+        <item name="selectableItemBackground">@drawable/item_background</item>
+        <item name="android:selectableItemBackground">@drawable/item_background</item>
+        
+        <item name="actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
+        <item name="android:actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
+        
+        <item name="dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
+        <item name="android:dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
+        
+        <item name="popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
+        <item name="actionBarWidgetTheme">@style/Widget.Styled</item>
+        <item name="android:actionBarWidgetTheme">@style/Widget.Styled</item>
+    </style>
+	<style name="Widget.Styled" parent="Theme.Sherlock">
+        <item name="popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
+        
+        <item name="dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
+        <item name="android:dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
     </style>
 
     <style name="Widget.Styled.ActionBar" parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
         <item name="background">@color/main_color</item>
         <item name="android:background">@color/main_color</item>
     </style>
-
+    
+    <style name="Widget.Styled.Spinner.DropDown.ActionBar" parent="Widget.Sherlock.Spinner.DropDown.ActionBar">
+        <item name="android:background">@drawable/spinner_ab</item>
+    </style>
+    
+    <style name="Widget.Styled.PopupMenu" parent="Widget.Sherlock.ListPopupWindow">
+        <item name="android:dropDownSelector">@drawable/item_background</item>
+    </style>
+    
+    <style name="Widget.Styled.ActionButton" parent="Widget.Sherlock.ActionButton">
+        <item name="android:background">?attr/actionBarItemBackground</item>
+    </style>
+    
+    <style name="Widget.Styled.ListView.DropDown" parent="Widget.Sherlock.ListView.DropDown">
+        <item name="android:listSelector">@drawable/abs__list_selector_holo_dark</item>
+    </style>
+    
     <style name="divider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>

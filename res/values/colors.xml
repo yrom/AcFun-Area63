@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="main_color">#33B5E5</color>
+    <color name="main_color_dark">#0099cc</color>
     <color name="primary_text_color">#333</color>
     <color name="nav_text_color">#f3f3f3</color>
     <color name="text_color_pressed">@color/main_color</color>

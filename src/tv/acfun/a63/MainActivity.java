@@ -1,6 +1,8 @@
 package tv.acfun.a63;
 
 import tv.acfun.a63.util.ActionBarUtil;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
