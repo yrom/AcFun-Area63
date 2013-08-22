@@ -10,4 +10,9 @@
         <item name="android:background">@color/main_color</item>
     </style>
 
+    <style name="divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@drawable/divider_light</item>
+    </style>
 </resources>

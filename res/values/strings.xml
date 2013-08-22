@@ -21,4 +21,7 @@
         <item>最新回复</item>
         <item>本区推荐</item>
 	</string-array>
+	<string name="user_name">用户名</string>
+	<string name="signin">登录</string>
+	<string name="password">密码</string>
 </resources>

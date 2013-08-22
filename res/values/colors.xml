@@ -3,5 +3,7 @@
     <color name="main_color">#33B5E5</color>
     <color name="primary_text_color">#333</color>
     <color name="nav_text_color">#f3f3f3</color>
-    
+    <color name="text_color_pressed">@color/main_color</color>
+    <color name="text_color_default">@color/primary_text_color</color>
+    <color name="background_dark">#aa000000</color>
 </resources>

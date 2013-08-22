@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:paddingTop="16dp"
     android:paddingBottom="16dp"
+    android:drawSelectorOnTop="true"
     android:background="?attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
@@ -10,8 +11,8 @@
         android:id="@+id/avatar"
         android:layout_centerHorizontal="true"
         android:src="@drawable/account_avatar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="60dp"
+        android:layout_height="60dp" />
 
     <TextView
         android:id="@+id/user_name"
@@ -20,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/avatar"
         android:layout_marginTop="8dp"
-        android:text="JOVI"
+        android:text="尚未登录"
         android:textColor="@color/nav_text_color"
         android:textSize="13sp" />
     <TextView
@@ -30,8 +31,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/user_name"
         android:layout_marginTop="4dp"
-        android:text="蛋黄党头顶青天！！！！！！"
         android:maxLines="2"
         android:textColor="@color/nav_text_color"
+        android:visibility="gone"
         android:textSize="12sp" />
 </RelativeLayout>

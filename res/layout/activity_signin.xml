@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <EditText
+        android:id="@+id/user_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/password"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="26dp"
+        android:ems="10"
+        android:hint="@string/user_name"
+        android:imeOptions="actionNext" 
+        android:nextFocusDown="@+id/password"
+        android:singleLine="true"
+        >
+    </EditText>
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="26dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        android:ems="10"
+        android:hint="@string/password"
+        android:inputType="textPassword" />
+
+    <View
+        style="@style/divider"
+        android:layout_above="@+id/btn_signin" />
+
+    <TextView
+        android:id="@+id/btn_signin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="@string/signin"
+        android:textColor="@color/button_text_color_selector"
+        
+        android:textSize="18sp" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="120dp"
+        android:layout_height="140dp"
+        android:scaleType="center"
+        
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/user_name"
+        android:src="@drawable/logo" />
+
+</RelativeLayout>

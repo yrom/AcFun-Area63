@@ -1,6 +1,7 @@
 package tv.acfun.a63;
 
 import tv.acfun.a63.util.ActionBarUtil;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -60,9 +61,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         setContentView(R.layout.activity_main);
         ActionBarUtil.forceShowActionBarOverflowMenu(this);
         mBar = getSupportActionBar();
-        mBar.setDisplayOptions(
-                ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_HOME
-                        | ActionBar.DISPLAY_HOME_AS_UP);
+        ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), true);
         mTitle = getTitle();
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -371,10 +370,14 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onClick(View v) {
         if(v == mAvatarFrame){
-            Toast.makeText(this, "TODO: goto signin", 0).show();
-            
+            startActivityForResult(SigninActivity.createIntent(getApplicationContext()),SigninActivity.REQUEST_SIGN_IN);
         }
         
     }
-
+    @Override
+    protected void onActivityResult(int request, int result, Intent data) {
+        Log.i(TAG, String.format("request=%d,result=%d", request,result));
+        
+        
+    }
 }
