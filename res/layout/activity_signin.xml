@@ -15,6 +15,7 @@
         android:imeOptions="actionNext" 
         android:nextFocusDown="@+id/password"
         android:singleLine="true"
+        android:background="@drawable/edit_text_holo_light"
         >
     </EditText>
 
@@ -28,6 +29,7 @@
         android:singleLine="true"
         android:imeOptions="actionDone"
         android:ems="10"
+        android:background="@drawable/edit_text_holo_light"
         android:hint="@string/password"
         android:inputType="textPassword" />
 
