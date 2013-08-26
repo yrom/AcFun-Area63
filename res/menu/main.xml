@@ -5,5 +5,29 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
+    <item android:id="@+id/action_search"
+        android:title="@string/action_search"
+        android:showAsAction="collapseActionView|always"
+        android:icon="@drawable/ic_action_search"
+        />
+    <item
+        android:id="@+id/action_view_mode"
+        android:showAsAction="always"
+        android:title="@string/action_view_mode">
+        <menu>
+            <item
+                android:id="@+id/mode_mix"
+                android:showAsAction="always|withText"
+                android:title="@string/view_mode_mix"/>
+            <item
+                android:id="@+id/mode_no_image"
+                android:showAsAction="always|withText"
+                android:title="@string/view_mode_no_image"/>
+            <item
+                android:id="@+id/mode_comic"
+                android:showAsAction="always|withText"
+                android:title="@string/view_mode_comic"/>
+        </menu>
+    </item>
 
 </menu>

@@ -1,8 +1,6 @@
 package tv.acfun.a63;
 
 import tv.acfun.a63.util.ActionBarUtil;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -56,6 +54,10 @@ public class MainActivity extends SherlockFragmentActivity implements
     private View mDrawer;
 
     private View mAvatarFrame;
+
+    private static int mode_code;
+
+    private MenuItem mModeMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,23 +161,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         // menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // The action bar home/up action should open or close the drawer.
-        // ActionBarDrawerToggle will take care of this.
-        if (item.getItemId() == android.R.id.home) {
-
-            if (mDrawerLayout.isDrawerOpen(mDrawer)) {
-                mDrawerLayout.closeDrawer(mDrawer);
-            } else {
-                mDrawerLayout.openDrawer(mDrawer);
-            }
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
+    
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
@@ -197,9 +183,51 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+    
+            if (mDrawerLayout.isDrawerOpen(mDrawer)) {
+                mDrawerLayout.closeDrawer(mDrawer);
+            } else {
+                mDrawerLayout.openDrawer(mDrawer);
+            }
+            return true;
+        case R.id.mode_mix:
+            mode_code = 0;
+            Toast.makeText(this, "图文模式", Toast.LENGTH_SHORT).show();
+            break;
+        case R.id.mode_no_image:
+            mode_code = 1;
+            Toast.makeText(this, "文本模式", Toast.LENGTH_SHORT).show();
+            break;
+        case R.id.mode_comic:
+            mode_code = 2;
+            Toast.makeText(this, "漫画模式", Toast.LENGTH_SHORT).show();
+            break;
+        } 
+        setMenuIcon();
+        return super.onOptionsItemSelected(item);
+    }
+    private void setMenuIcon(){
+        switch (mode_code) {
+        case 1:
+            mModeMenu.setIcon(R.drawable.mode_no_pic);
+            break;
+        case 2:
+            mModeMenu.setIcon(R.drawable.mode_comic);
+            break;
+        case 0:
+        default:
+            mModeMenu.setIcon(R.drawable.mode_mix);
+            break;
+        }
+    }
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getSupportMenuInflater().inflate(R.menu.main, menu);
+        mModeMenu = menu.findItem(R.id.action_view_mode);
+        setMenuIcon();
         return true;
     }
 
