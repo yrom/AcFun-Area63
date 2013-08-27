@@ -227,9 +227,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a DummySectionFragment (defined as a static inner class
-            // below) with the page number as its lone argument.
             Fragment fragment = new DummyCardFragment();
             Bundle args = new Bundle();
             args.putInt(DummyCardFragment.ARG_SECTION_NUMBER, position + 1);
@@ -339,15 +336,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
     }
 
-    /**
-     * A dummy fragment representing a section of the app, but that simply
-     * displays dummy text.
-     */
     public static class DummyCardFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
+
         public static final String ARG_SECTION_NUMBER = "section_number";
 
         public DummyCardFragment() {
@@ -358,14 +348,43 @@ public class MainActivity extends SherlockFragmentActivity implements
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main_dummy,
                     container, false);
-            TextView dummyTextView = (TextView) rootView
-                    .findViewById(R.id.section_label);
-            dummyTextView.setText(Integer.toString(getArguments().getInt(
-                    ARG_SECTION_NUMBER)));
-
+            ListView list = (ListView) rootView.findViewById(R.id.list);
+            list.setAdapter(new ArticleListAdapter());
+            // TODO : parse artile titile list
+            
+            
             return rootView;
         }
     }
+    
+    static class ArticleListAdapter extends BaseAdapter{
+
+        @Override
+        public int getCount() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+    }
+    
     static class NavigationItem{
         String title;
         Drawable icon;

@@ -3,13 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-
-    <TextView
-        android:id="@+id/section_label"
-        android:layout_margin="8dp"
-        android:gravity="center"
+	<ListView 
+	    android:id="@+id/list"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
         android:background="@drawable/background_card"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_margin="8dp"
+	    />
 
 </RelativeLayout>

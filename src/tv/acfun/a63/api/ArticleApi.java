@@ -1,5 +1,7 @@
 package tv.acfun.a63.api;
 
+import tv.acfun.a63.api.entity.Article;
+
 
 public final class ArticleApi {
 
@@ -43,4 +45,16 @@ public final class ArticleApi {
         return getUrl(Constants.TYPE_LATEST_REPLY, channelId, 15, 1);
     }
 
+    public static String getContentUrl(int aid){
+        if(aid <=0)
+            return null;
+        return String.format(Constants.URL_CONTENT, aid);
+    }
+    
+    public static Article getArticle(int aid) throws Exception {
+        Article article = new Article();
+        //TODO : article parse
+        String url = getContentUrl(aid);
+        return article;
+    }
 }
