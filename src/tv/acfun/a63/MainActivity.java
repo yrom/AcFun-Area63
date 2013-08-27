@@ -28,8 +28,10 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 
@@ -55,9 +57,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     private View mAvatarFrame;
 
-    private static int mode_code;
+    private int mCurrentNavPosition;
 
-    private MenuItem mModeMenu;
+    private static int mode_code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), true);
         mTitle = getTitle();
         mPlanetTitles = getResources().getStringArray(R.array.planets);
+        mode_code = AcApp.getViewMode();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawer = findViewById(R.id.left_drawer);
         mAvatarFrame = findViewById(R.id.avatar_frame);
@@ -93,15 +96,20 @@ public class MainActivity extends SherlockFragmentActivity implements
             R.string.app_name /* "close drawer" description for accessibility */
             ) {
             public void onDrawerClosed(View view) {
-                mBar.setTitle(mTitle);
-                supportInvalidateOptionsMenu(); // creates call to
-                                                // onPrepareOptionsMenu()
+                if (mCurrentNavPosition == 0){
+                    mBar.setDisplayShowTitleEnabled(false);
+                    mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+                } else mBar.setTitle(mTitle);
+                supportInvalidateOptionsMenu(); 
             }
 
             public void onDrawerOpened(View drawerView) {
+                if (mCurrentNavPosition == 0){
+                    mBar.setDisplayShowTitleEnabled(true);
+                    mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                }
                 mBar.setTitle(R.string.app_name_open);
-                supportInvalidateOptionsMenu(); // creates call to
-                                                // onPrepareOptionsMenu()
+                supportInvalidateOptionsMenu(); 
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -109,6 +117,11 @@ public class MainActivity extends SherlockFragmentActivity implements
         if (savedInstanceState == null) {
             selectItem(0);
         }
+        if ( AcApp.getConfig().getBoolean("is_first_open", true)){
+            mDrawerLayout.openDrawer(mDrawer);
+            AcApp.putBoolean("is_first_open", false);
+        }
+        
     }
 
     private void selectItem(int position) {
@@ -117,8 +130,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
         if (position == 0){
             mBar.setDisplayShowTitleEnabled(false);
-            args.putStringArray(PlanetFragment.ARG_TITLES, mTitles);
             mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            args.putStringArray(PlanetFragment.ARG_TITLES, mTitles);
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(mBar.getThemedContext(),
                 R.layout.list_item_2,
                 android.R.id.text2, getResources().getStringArray(R.array.modes)){
@@ -136,10 +149,8 @@ public class MainActivity extends SherlockFragmentActivity implements
             adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
             mBar.setListNavigationCallbacks(adapter, this);
             
-        }else{
-            mBar.setDisplayShowTitleEnabled(true);
-            mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        }
+      }
+        
         fragment.setArguments(args);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -150,6 +161,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         mDrawerList.setItemChecked(position, true);
         setTitle(mPlanetTitles[position]);
         mDrawerLayout.closeDrawer(mDrawer);
+        mCurrentNavPosition = position;
     }
 
     /* Called whenever we call invalidateOptionsMenu() */
@@ -158,7 +170,9 @@ public class MainActivity extends SherlockFragmentActivity implements
         // If the nav drawer is open, hide action items related to the content
         // view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawer);
-        // menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        MenuItem findItem = menu.findItem(R.id.action_view_mode);
+        if(findItem != null)
+            findItem.setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
     
@@ -193,41 +207,12 @@ public class MainActivity extends SherlockFragmentActivity implements
                 mDrawerLayout.openDrawer(mDrawer);
             }
             return true;
-        case R.id.mode_mix:
-            mode_code = 0;
-            Toast.makeText(this, "图文模式", Toast.LENGTH_SHORT).show();
-            break;
-        case R.id.mode_no_image:
-            mode_code = 1;
-            Toast.makeText(this, "文本模式", Toast.LENGTH_SHORT).show();
-            break;
-        case R.id.mode_comic:
-            mode_code = 2;
-            Toast.makeText(this, "漫画模式", Toast.LENGTH_SHORT).show();
-            break;
-        } 
-        setMenuIcon();
-        return super.onOptionsItemSelected(item);
-    }
-    private void setMenuIcon(){
-        switch (mode_code) {
-        case 1:
-            mModeMenu.setIcon(R.drawable.mode_no_pic);
-            break;
-        case 2:
-            mModeMenu.setIcon(R.drawable.mode_comic);
-            break;
-        case 0:
-        default:
-            mModeMenu.setIcon(R.drawable.mode_mix);
-            break;
         }
+        return super.onOptionsItemSelected(item);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getSupportMenuInflater().inflate(R.menu.main, menu);
-        mModeMenu = menu.findItem(R.id.action_view_mode);
-        setMenuIcon();
         return true;
     }
 
@@ -269,11 +254,12 @@ public class MainActivity extends SherlockFragmentActivity implements
     /**
      * Fragment that appears in the "content_frame", shows a planet
      */
-    public static class PlanetFragment extends Fragment {
+    public static class PlanetFragment extends SherlockFragment {
         public static final String ARG_TITLES = "titles";
 
         public static final String ARG_PLANET_NUMBER = "planet_number";
-
+        private MenuItem mModeMenu;
+        
         private SectionsPagerAdapter mSectionsPagerAdapter;
 
         private ViewPager mViewPager;
@@ -283,13 +269,54 @@ public class MainActivity extends SherlockFragmentActivity implements
         public PlanetFragment() {
             // Empty constructor required for fragment subclasses
         }
-
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+            case R.id.mode_mix:
+                mode_code = 0;
+                Toast.makeText(getActivity(), "图文模式", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.mode_no_image:
+                mode_code = 1;
+                Toast.makeText(getActivity(), "文本模式", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.mode_comic:
+                mode_code = 2;
+                Toast.makeText(getActivity(), "漫画模式", Toast.LENGTH_SHORT).show();
+                break;
+            } 
+            setMenuIcon();
+            return super.onOptionsItemSelected(item);
+        }
+        private void setMenuIcon(){
+            switch (mode_code) {
+            case 1:
+                mModeMenu.setIcon(R.drawable.mode_no_pic);
+                break;
+            case 2:
+                mModeMenu.setIcon(R.drawable.mode_comic);
+                break;
+            case 0:
+            default:
+                mModeMenu.setIcon(R.drawable.mode_mix);
+                break;
+            }
+        }
+        @Override
+        public void onCreateOptionsMenu(Menu menu,
+                MenuInflater inflater) {
+            inflater.inflate(R.menu.view_mode, menu);
+            mModeMenu = menu.findItem(R.id.action_view_mode);
+            setMenuIcon();
+            super.onCreateOptionsMenu(menu, inflater);
+        }
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             int i = getArguments().getInt(ARG_PLANET_NUMBER);
             View rootView = null;
             if (i == 0) {
+                setHasOptionsMenu(true);
                 rootView = inflater.inflate(R.layout.fragment_home, container,
                         false);
                 mSectionsPagerAdapter = new SectionsPagerAdapter(
@@ -303,6 +330,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 //                mTabs.setTextColorResource(R.color.primary_text_color);
                 mTabs.setViewPager(mViewPager);
             } else {
+                setHasOptionsMenu(false);
                 rootView = inflater.inflate(R.layout.fragment_planet,
                         container, false);
                 ((TextView) rootView).setText(mPlanetTitles[i]);
@@ -386,7 +414,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int position,
             long arg3) {
-        selectItem(position);
+        if(mCurrentNavPosition != position)
+            selectItem(position);
     }
 
     @Override

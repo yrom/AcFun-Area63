@@ -9,6 +9,7 @@
         android:targetSdkVersion="17" />
 
     <application
+        android:name="tv.acfun.a63.AcApp"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:logo="@drawable/icon"

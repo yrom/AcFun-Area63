@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+        <item
+        android:id="@+id/action_view_mode"
+        android:showAsAction="always"
+        android:title="@string/action_view_mode">
+        <menu>
+            <item
+                android:id="@+id/mode_mix"
+                android:showAsAction="always|withText"
+                android:title="@string/view_mode_mix"/>
+            <item
+                android:id="@+id/mode_no_image"
+                android:showAsAction="always|withText"
+                android:title="@string/view_mode_no_image"/>
+            <item
+                android:id="@+id/mode_comic"
+                android:showAsAction="always|withText"
+                android:title="@string/view_mode_comic"/>
+        </menu>
+    </item>
+
+</menu>
