@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <color name="main_color">#33B5E5</color>
     <color name="main_color_dark">#0099cc</color>
     <color name="primary_text_color">#333</color>
@@ -7,4 +8,7 @@
     <color name="text_color_pressed">@color/main_color</color>
     <color name="text_color_default">@color/primary_text_color</color>
     <color name="background_dark">#aa000000</color>
+    <color name="article_info_bg_green">#5BB75B</color>
+    <color name="article_info_bg_blue">#08c</color>
+
 </resources>

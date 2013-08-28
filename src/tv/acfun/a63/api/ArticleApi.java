@@ -1,7 +1,12 @@
 package tv.acfun.a63.api;
 
-import tv.acfun.a63.api.entity.Article;
+import java.util.List;
 
+import org.json.JSONObject;
+
+import com.alibaba.fastjson.JSON;
+
+import tv.acfun.a63.api.entity.Content;
 
 public final class ArticleApi {
 
@@ -51,10 +56,9 @@ public final class ArticleApi {
         return String.format(Constants.URL_CONTENT, aid);
     }
     
-    public static Article getArticle(int aid) throws Exception {
-        Article article = new Article();
-        //TODO : article parse
-        String url = getContentUrl(aid);
-        return article;
+    
+    public static List<Content> getChannelContents(String json){
+        return JSON.parseArray(json, Content.class);
     }
+    
 }

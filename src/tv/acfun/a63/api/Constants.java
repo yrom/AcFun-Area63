@@ -10,7 +10,7 @@ public interface Constants {
     int CAT_WORK_EMOTION = 73;
     int CAT_AN_CULTURE = 74;
     int CAT_COMIC_LIGHT_NOVEL = 75;
-
+    int[] CAT_IDS = {CAT_COLLECTION,CAT_WORK_EMOTION,CAT_AN_CULTURE,CAT_COMIC_LIGHT_NOVEL};
     int TYPE_DEFAULT = 0;
     int TYPE_HOT = 6;
     int TYPE_LATEST_REPLY = 22;

@@ -16,9 +16,14 @@
 package tv.acfun.a63.api.entity;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
 
 public class Article {
     public int id;
@@ -34,9 +39,8 @@ public class Article {
         public String subTitle;
         public String content;
     }
-    
-    
-    
+    private static String TAG = "Article";
+    private static Pattern imageReg = Pattern.compile("<img.+?src=[\"|'](.+?)[\"|']");
     public static Article newArticle(JSONObject articleJson){
         if(!articleJson.optBoolean("success")){
             return null;
@@ -44,27 +48,40 @@ public class Article {
         Article article = null;
         try {
             article = new Article();
+            // parse info
             JSONObject info = articleJson.getJSONObject("info");
             article.title = info.getString("title");
             article.postTime = info.getLong("posttime");
             article.id = info.getInt("id");
             article.poster = parseUser(info);
-            //TODO : parse contents
+            // statistics
+            JSONArray statistics = info.getJSONArray("statistics");
+            article.views = statistics.getInt(0);
+            article.comments = statistics.getInt(1);
+            article.stows = statistics.getInt(5);
+            // sub contents and images
+            JSONArray contentArray = articleJson.getJSONArray("content");
+            article.contents = new ArrayList<Article.SubContent>(contentArray.length());
+            article.imgUrls = new ArrayList<String>();
             
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            for(int i=0 ; i<contentArray.length();i++){
+                SubContent content = new SubContent();
+                JSONObject sub = contentArray.getJSONObject(i);
+                content.content = sub.optString("content");
+                content.subTitle = sub.optString("subtitle");
+                Matcher matcher = imageReg.matcher(content.content);
+                while(matcher.find()){
+                    article.imgUrls.add(matcher.group(1));
+                }
+                article.contents.add(content);
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "parsing article error", e);
         }
-        
-        
-        
-        
         
         return article;
     }
-
-
-
     private static User parseUser(JSONObject info)
             throws JSONException {
         JSONObject postuser = info.getJSONObject("postuser");
