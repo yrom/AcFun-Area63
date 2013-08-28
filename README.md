@@ -21,3 +21,9 @@ Acfun 63区（文章区），来，战个痛～
 12. 查看个人信息、所发文章和评论及follow功能  
 13. 搜索功能（关键词、id），按需检索排序，如相关性、评论数、阅读数等等
 14. etc... 
+
+依赖库
+===========
+1. Actionbar Sherlock
+2. Volley
+3. PagerSlidingTabStrip
