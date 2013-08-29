@@ -7,8 +7,10 @@ import java.util.List;
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Content;
+import tv.acfun.a63.api.entity.Contents;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.Connectivity;
+import tv.acfun.a63.util.FastJsonRequest;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -21,6 +23,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,13 +45,15 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.handmark.pulltorefresh.library.ILoadingLayout;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class MainActivity extends SherlockFragmentActivity implements
         OnItemClickListener, OnNavigationListener, OnClickListener {
@@ -373,44 +378,92 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         public static final String ARG_SECTION_NUMBER = "section_number";
         int DEFAULT_COUT = 20;
-        ListView list;
+        int page;
+        PullToRefreshListView list;
         LayoutInflater inflater;
+        
+        private FastJsonRequest<Contents> request;
+        private ILoadingLayout loadingLayout;
         public DummyCardFragment() {
         }
-
+        
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             this.inflater = inflater;
             View rootView = inflater.inflate(R.layout.fragment_main_dummy,
                     container, false);
-            list = (ListView) rootView.findViewById(R.id.list);
+            list = (PullToRefreshListView) rootView.findViewById(R.id.list);
+            loadingLayout = list.getLoadingLayoutProxy(true, false);
+            list.setOnRefreshListener(new OnRefreshListener<ListView>() {
+                @Override
+                public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+                    // Do work to refresh the list here.
+                    String label = DateUtils.formatDateTime(getActivity(), System.currentTimeMillis(),
+                            DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
+
+                    // Update the LastUpdatedLabel
+                    refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+                    loadData(true);
+                }
+            });
+            list.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
+
+                @Override
+                public void onLastItemVisible() {
+                    loadData(false);
+                }
+            });
+            
             return rootView;
         }
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
-            String url = ArticleApi.getDefaultUrl(Constants.CAT_IDS[getArguments().getInt(ARG_SECTION_NUMBER)], DEFAULT_COUT, 1);
-            mQueue.add(new StringRequest(url, new Response.Listener<String>(){
+            loadData(true);
+            list.setRefreshing(true);
+        }
+        
+        private ArticleListAdapter adapter;
+        private void loadData(boolean newData) {
+            page = newData?1:page+1;
+            String url = ArticleApi.getDefaultUrl(Constants.CAT_IDS[getArguments().getInt(ARG_SECTION_NUMBER)], DEFAULT_COUT, page);
+            request = new FastJsonRequest<Contents>(
+                    url, Contents.class, new Response.Listener<Contents>() {
+                        @Override
+                        public void onResponse(Contents response) {
+                            if(page == 1){
+                                adapter = new ArticleListAdapter(inflater,
+                                        response.getContents());
+                                list.setAdapter(adapter);
+                            }else{
+                                adapter.addData(response.getContents());
+                                adapter.notifyDataSetChanged();
+                            }
+                            list.onRefreshComplete();
+                        }
 
-                @Override
-                public void onResponse(String response) {
-                    JSONArray jsonArray = JSON.parseObject(response).getJSONArray("contents");
-                    List<Content> contents = JSON.parseArray(jsonArray.toString(),  Content.class);
-                    list.setAdapter(new ArticleListAdapter(inflater, contents));
-                }
-                
-            }, new Response.ErrorListener(){
+                    }, new Response.ErrorListener() {
 
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e(TAG, "load list error", error);
-                    AcApp.showToast("加载失败");
-                }
-            }
-                ));
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.e(TAG, "load list error", error);
+                            AcApp.showToast("加载失败");
+                            list.onRefreshComplete();
+                        }
+                    });
+            Log.i(TAG, "new request:"+request.getUrl());
+            mQueue.add(request);
             mQueue.start();
-            
+        }
+        @Override
+        public void onDestroyView() {
+            super.onDestroyView();
+            if(request != null && !request.hasHadResponseDelivered() && !request.isCanceled()){
+                request.cancel();
+                Log.w(TAG, "request canceled");
+                request = null;
+            }
         }
     }
 
@@ -426,7 +479,9 @@ public class MainActivity extends SherlockFragmentActivity implements
         public int getCount() {
             return contents.size();
         }
-
+        public void addData(List<Content> contents){
+            this.contents.addAll(contents);
+        }
         @Override
         public Content getItem(int position) {
             return contents.get(position);
@@ -531,7 +586,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 
         Log.i(TAG, "click position = " + itemPosition);
-
+        
         return false;
     }
 

@@ -41,7 +41,9 @@ public class FastJsonRequest<T> extends Request<T> {
         this.listener = listener;
         
     }
-
+    public FastJsonRequest(String url, Class<T> clazz,Listener<T> listener, ErrorListener errorListner) {
+        this(Method.GET, url, clazz, listener, errorListner);
+    }
     /* (non-Javadoc)
      * @see com.android.volley.Request#parseNetworkResponse(com.android.volley.NetworkResponse)
      */
@@ -64,5 +66,5 @@ public class FastJsonRequest<T> extends Request<T> {
         // TODO Auto-generated method stub
         listener.onResponse(response);
     }
-
+    
 }
