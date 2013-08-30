@@ -25,6 +25,59 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+/***
+{
+  "content": [
+    {
+      "content": "<span style=\"font-size:16px;font-family:微软雅黑, sans-serif;\"> 作者：兄贵解说老王&larr;他是A站UP：今天我路过<\/span>",
+      "subtitle": "【DOTA】随着中国战队的落败，一股风暴加地震正在袭来"
+    }
+  ],
+  "tags": [
+    {
+      "id": 1503,
+      "name": "DOTA"
+    },
+    {
+      "id": 228485,
+      "name": "兄贵解说"
+    },
+    {
+      "id": 533,
+      "name": "原创"
+    }
+  ],
+  "success": true,
+  "info": {
+    "id": 797651,
+    "title": "【DOTA】随着中国战队的落败，一股风暴加地震正在袭来",
+    "posttime": 1377511408000,
+    "description": "折戟了，而随着中国战队的落败，一股风暴加地震正在袭来。一个普通看客眼中的发展史",
+    "postuser": {
+      "uid": 319714,
+      "name": "续-R",
+      "avastar": "http://w5cdn.ranktv.cn/dotnet/artemis/u/cms/www/201308/29154301mql6.jpg",
+      "signature": "要开学了混蛋！\n衝動を解き放て！\n駆け巡り積もる意志 \nその眼を忘れはしない"
+    },
+    "titleimage": "http://w5cdn.ranktv.cn/dotnet/20120923/style/image/cover.png",
+    "channel": {
+      "channelName": "综合",
+      "channelID": 110,
+      "channelURL": "/a/list110/index.htm"
+    },
+    "statistics": [
+      29260,
+      451,
+      0,
+      0,
+      0,
+      11
+    ]
+  }
+}
+ * @author Yrom
+ * 
+ */
 public class Article {
     public int id;
     public String title;
@@ -32,17 +85,22 @@ public class Article {
     public int views;
     public int comments;
     public int stows;
+    public int channelId;
+    public String channelName;
     public ArrayList<String> imgUrls;
     public ArrayList<SubContent> contents;
     public User poster;
-    public static class SubContent{
+
+    public static class SubContent {
         public String subTitle;
         public String content;
     }
+
     private static String TAG = "Article";
     private static Pattern imageReg = Pattern.compile("<img.+?src=[\"|'](.+?)[\"|']");
-    public static Article newArticle(JSONObject articleJson){
-        if(!articleJson.optBoolean("success")){
+
+    public static Article newArticle(JSONObject articleJson) {
+        if (!articleJson.optBoolean("success")) {
             return null;
         }
         Article article = null;
@@ -63,27 +121,31 @@ public class Article {
             JSONArray contentArray = articleJson.getJSONArray("content");
             article.contents = new ArrayList<Article.SubContent>(contentArray.length());
             article.imgUrls = new ArrayList<String>();
-            
-            for(int i=0 ; i<contentArray.length();i++){
+
+            for (int i = 0; i < contentArray.length(); i++) {
                 SubContent content = new SubContent();
                 JSONObject sub = contentArray.getJSONObject(i);
                 content.content = sub.optString("content");
                 content.subTitle = sub.optString("subtitle");
                 Matcher matcher = imageReg.matcher(content.content);
-                while(matcher.find()){
+                while (matcher.find()) {
                     article.imgUrls.add(matcher.group(1));
                 }
                 article.contents.add(content);
             }
-            
+            // channel
+            JSONObject channel = articleJson.getJSONObject("channel");
+            article.channelId = channel.getInt("channelID");
+            article.channelName = channel.getString("channelName");
+
         } catch (Exception e) {
             Log.e(TAG, "parsing article error", e);
         }
-        
+
         return article;
     }
-    private static User parseUser(JSONObject info)
-            throws JSONException {
+
+    private static User parseUser(JSONObject info) throws JSONException {
         JSONObject postuser = info.getJSONObject("postuser");
         User poster = new User();
         poster.name = postuser.getString("name");
@@ -92,5 +154,5 @@ public class Article {
         poster.avatar = postuser.optString("avastar");
         return poster;
     }
-    
+
 }

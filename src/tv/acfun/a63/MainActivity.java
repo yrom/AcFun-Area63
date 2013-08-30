@@ -45,6 +45,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.alibaba.fastjson.JSON;
+import com.android.volley.Cache;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -89,13 +91,12 @@ public class MainActivity extends SherlockFragmentActivity implements
         setContentView(R.layout.activity_main);
         ActionBarUtil.forceShowActionBarOverflowMenu(this);
         mBar = getSupportActionBar();
-        ActionBarUtil
-                .setXiaomiFilterDisplayOptions(getSupportActionBar(), true);
+        ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), true);
         mTitle = getTitle();
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         mode_code = AcApp.getViewMode();
         initDrawerLayout(savedInstanceState);
-        mQueue = Connectivity.newRequestQueue();
+        mQueue = AcApp.getGloableQueue();
 
     }
 
@@ -291,10 +292,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         private SectionsPagerAdapter mSectionsPagerAdapter;
 
-        private ViewPager mViewPager;
-
-        private PagerSlidingTabStrip mTabs;
-
         public PlanetFragment() {
             // Empty constructor required for fragment subclasses
         }
@@ -354,16 +351,14 @@ public class MainActivity extends SherlockFragmentActivity implements
                 setHasOptionsMenu(true);
                 rootView = inflater.inflate(R.layout.fragment_home, container,
                         false);
+                if(mSectionsPagerAdapter == null)
                 mSectionsPagerAdapter = new SectionsPagerAdapter(
-                        getChildFragmentManager(), getArguments()
-                                .getStringArray(ARG_TITLES));
-                mTabs = (PagerSlidingTabStrip) rootView.findViewById(R.id.tabs);
-                // Set up the ViewPager with the sections adapter.
-                mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
-                mViewPager.setAdapter(mSectionsPagerAdapter);
-                // mTabs.setIndicatorColorResource(R.color.main_color);
-                // mTabs.setTextColorResource(R.color.primary_text_color);
-                mTabs.setViewPager(mViewPager);
+                        getChildFragmentManager(), getArguments().getStringArray(ARG_TITLES));
+                PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) rootView.findViewById(R.id.tabs);
+                ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.pager);
+                viewPager.setOffscreenPageLimit(1);
+                viewPager.setAdapter(mSectionsPagerAdapter);
+                tabs.setViewPager(viewPager);
             } else {
                 setHasOptionsMenu(false);
                 rootView = inflater.inflate(R.layout.fragment_planet,
@@ -374,7 +369,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
     }
 
-    public static class DummyCardFragment extends Fragment {
+    public static class DummyCardFragment extends Fragment implements OnItemClickListener {
 
         public static final String ARG_SECTION_NUMBER = "section_number";
         int DEFAULT_COUT = 20;
@@ -401,45 +396,75 @@ public class MainActivity extends SherlockFragmentActivity implements
                     // Do work to refresh the list here.
                     String label = DateUtils.formatDateTime(getActivity(), System.currentTimeMillis(),
                             DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
-
-                    // Update the LastUpdatedLabel
-                    refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-                    loadData(true);
+                    loadingLayout.setLastUpdatedLabel(label);
+                    loadData(true,false);
                 }
             });
             list.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
 
                 @Override
                 public void onLastItemVisible() {
-                    loadData(false);
+                    loadData(false,false);
                 }
             });
-            
+            list.setOnItemClickListener(this);
             return rootView;
         }
+
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
-            loadData(true);
-            list.setRefreshing(true);
+            loadData(true, true);
         }
         
         private ArticleListAdapter adapter;
-        private void loadData(boolean newData) {
-            page = newData?1:page+1;
+
+        private void loadData(boolean newData, boolean loadCache) {
+            page = newData ? 1 : page + 1;
             String url = ArticleApi.getDefaultUrl(Constants.CAT_IDS[getArguments().getInt(ARG_SECTION_NUMBER)], DEFAULT_COUT, page);
+            if(loadCache){
+                // 缓存数据
+                final Cache.Entry entry = mQueue.getCache().get(url);
+                if(entry != null && entry.data!=null && entry.data.length>0){
+                    if (newData) {
+                        entry.softTtl = System.currentTimeMillis() - 1000;
+                        Log.i(TAG, "强制刷新");
+                    }
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            Contents contens = JSON.parseObject(new String(entry.data),Contents.class);
+                            if(contens != null && contens.getContents() !=null){
+                                adapter = new ArticleListAdapter(inflater, contens.getContents());
+                                list.post(new Runnable() {
+                                    
+                                    @Override
+                                    public void run() {
+                                        list.setAdapter(adapter);
+                                        list.setRefreshing();
+                                    }
+                                });
+                            }
+                        }
+                        
+                    }.start();
+                }
+                return;
+            }
             request = new FastJsonRequest<Contents>(
                     url, Contents.class, new Response.Listener<Contents>() {
                         @Override
                         public void onResponse(Contents response) {
-                            if(page == 1){
-                                adapter = new ArticleListAdapter(inflater,
-                                        response.getContents());
-                                list.setAdapter(adapter);
+                            if(page <= 1){
+                                if(adapter == null){
+                                    adapter = new ArticleListAdapter(inflater,response.getContents());
+                                    list.setAdapter(adapter);
+                                } else
+                                    adapter.contents = response.getContents();
                             }else{
                                 adapter.addData(response.getContents());
-                                adapter.notifyDataSetChanged();
                             }
+                            adapter.notifyDataSetChanged();
                             list.onRefreshComplete();
                         }
 
@@ -452,9 +477,10 @@ public class MainActivity extends SherlockFragmentActivity implements
                             list.onRefreshComplete();
                         }
                     });
-            Log.i(TAG, "new request:"+request.getUrl());
+            request.setShouldCache(true);
+            if(BuildConfig.DEBUG)
+                Log.d(TAG, "new request:"+request.getUrl());
             mQueue.add(request);
-            mQueue.start();
         }
         @Override
         public void onDestroyView() {
@@ -463,6 +489,17 @@ public class MainActivity extends SherlockFragmentActivity implements
                 request.cancel();
                 Log.w(TAG, "request canceled");
                 request = null;
+            }
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // TODO Auto-generated method stub
+            Object obj = parent.getItemAtPosition(position);
+            if(obj != null && obj instanceof Content){
+                Content c = (Content)obj;
+                AcApp.showToast("content: ac%d - %s", c.aid,c.title);
+                ArticleActivity.start(getActivity(), c.aid);
             }
         }
     }

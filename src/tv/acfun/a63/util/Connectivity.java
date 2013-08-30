@@ -1,12 +1,13 @@
 package tv.acfun.a63.util;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import org.json.JSONObject;
 
 import tv.acfun.a63.AcApp;
-
-import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.Build;
 import android.util.Log;
@@ -29,7 +30,11 @@ import com.android.volley.toolbox.JsonObjectRequest;
  */
 public class Connectivity {
     private static final String DEFAULT_CACHE_DIR = "acfun";
-
+    public static final String UA = "acfun/1.0 (Linux; U; Android "+Build.VERSION.RELEASE+"; "+Build.MODEL+"; "+Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry().toLowerCase()+") AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 ";
+    public static final Map<String,String> UA_MAP = new HashMap<String, String>();
+    static{
+        UA_MAP.put("User-Agent", UA);
+    }
     /**
      * Creates a default instance of the worker pool and calls
      * {@link RequestQueue#start()} on it.
@@ -45,17 +50,16 @@ public class Connectivity {
                 .getExternalCacheDir(DEFAULT_CACHE_DIR) : new File(AcApp
                 .context().getCacheDir(), DEFAULT_CACHE_DIR);
         Log.i(DEFAULT_CACHE_DIR, cacheDir.getAbsolutePath());
-        String userAgent = "acfun/1.0";
 
         if (stack == null) {
             if (Build.VERSION.SDK_INT >= 9) {
                 stack = new HurlStack();
             } else {
+                // FIXME: dead code
                 // Prior to Gingerbread, HttpUrlConnection was unreliable.
                 // See:
                 // http://android-developers.blogspot.com/2011/09/androids-http-clients.html
-                stack = new HttpClientStack(
-                        AndroidHttpClient.newInstance(userAgent));
+                stack = new HttpClientStack(AndroidHttpClient.newInstance(UA));
             }
         }
 
@@ -77,7 +81,7 @@ public class Connectivity {
     public static RequestQueue newRequestQueue() {
         return newRequestQueue(null);
     }
-
+    
     public static JsonObjectRequest newJsonObjectRequest(String url,
             Listener<JSONObject> listener, ErrorListener errorListener) {
         return new JsonObjectRequest(url, null, listener, errorListener);

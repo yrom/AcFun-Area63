@@ -17,6 +17,7 @@
 package tv.acfun.a63.util;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.android.volley.NetworkResponse;
@@ -63,8 +64,10 @@ public class FastJsonRequest<T> extends Request<T> {
      */
     @Override
     protected void deliverResponse(T response) {
-        // TODO Auto-generated method stub
         listener.onResponse(response);
     }
-    
+    @Override
+    public Map<String, String> getHeaders() {
+        return Connectivity.UA_MAP;
+    }
 }

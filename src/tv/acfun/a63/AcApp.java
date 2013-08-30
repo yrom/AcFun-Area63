@@ -2,6 +2,8 @@ package tv.acfun.a63;
 
 import java.io.File;
 
+import tv.acfun.a63.util.Connectivity;
+
 import android.app.Activity;
 import android.app.Application;
 import android.app.Notification;
@@ -18,10 +20,14 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.RequestQueue.RequestFilter;
 
 /**
  * 自定义Application
@@ -39,7 +45,7 @@ public class AcApp extends Application {
     public static final String IMAGE = "Images";
     public static float density = 1f;
     private static NotificationManager mNotiManager;
-
+    private static RequestQueue mQueue;
     /**
      * <b>NOTE:</b>在 <code>getApplicationContext()</code> 调用一次之后才能用这个方便的方法
      */
@@ -52,9 +58,31 @@ public class AcApp extends Application {
         mContext = instance = this;
         mResources = getResources();
         density = mResources.getDisplayMetrics().density;
+        mQueue = Connectivity.newRequestQueue();
         sp = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
-
+    
+    public static void addRequest(Request<?> request){
+        mQueue.add(request);
+    }
+    
+    public static void cancelAllRequest(RequestFilter filter){
+        mQueue.cancelAll(filter);
+    }
+    
+    public static void cancelAllRequest(Object tag){
+        if (BuildConfig.DEBUG) {
+            Log.i("AC", "cancel all by tag: "+tag);
+        }
+        mQueue.cancelAll(tag);
+    }
+    
+    public static RequestQueue getGloableQueue(){
+        if(mQueue == null)
+            mQueue = Connectivity.newRequestQueue();
+        return mQueue;
+    }
+    
     @Override
     public void onLowMemory() {
         System.gc();
@@ -171,9 +199,13 @@ public class AcApp extends Application {
      * @return
      */
     public static String getCurDateTime() {
-        return getCurDateTime("yyyyMMdd-kkmmss");
+        return getCurDateTime("yyyyMMdd-kkmmss", System.currentTimeMillis());
     }
-
+    
+    public static String getDateTime(long msec){
+        return getCurDateTime("MM月dd日 kk:mm", msec);
+    }
+    
     /**
      * 获取当前日期时间
      * 
@@ -181,8 +213,8 @@ public class AcApp extends Application {
      *            {@link android.text.format.DateFormat}
      * @return
      */
-    public static String getCurDateTime(CharSequence format) {
-        return DateFormat.format(format, System.currentTimeMillis()).toString();
+    public static String getCurDateTime(CharSequence format, long msec) {
+        return DateFormat.format(format, msec).toString();
     }
 
     public static void showToast(String msg) {
