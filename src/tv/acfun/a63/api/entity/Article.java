@@ -134,7 +134,7 @@ public class Article {
                 article.contents.add(content);
             }
             // channel
-            JSONObject channel = articleJson.getJSONObject("channel");
+            JSONObject channel = info.getJSONObject("channel");
             article.channelId = channel.getInt("channelID");
             article.channelName = channel.getString("channelName");
 

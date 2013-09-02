@@ -18,6 +18,7 @@ package tv.acfun.a63;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.json.JSONObject;
@@ -27,12 +28,15 @@ import org.jsoup.nodes.Element;
 
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.Article;
+import tv.acfun.a63.api.entity.Article.SubContent;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.Connectivity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
@@ -40,6 +44,7 @@ import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -80,22 +85,27 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
         int aid = getIntent().getIntExtra("aid", 0);
         if (aid == 0) {
 
         } else {
             initData(aid);
-            WebView web = new WebView(this);
-            setContentView(web);
-            web.getSettings().setAllowFileAccess(true);
-            web.getSettings().setAppCachePath(
+            getSupportActionBar().setTitle("ac"+aid);
+            setSupportProgressBarIndeterminateVisibility(true);
+//            mWeb = new WebView(this);
+//            mWeb.setPadding(0, 0, 0, 0);
+            setContentView(R.layout.activity_article);
+            mWeb = (WebView) findViewById(R.id.webview);
+            mWeb.getSettings().setAllowFileAccess(true);
+            mWeb.getSettings().setAppCachePath(
                     AcApp.getExternalCacheDir("article").getAbsolutePath());
             // TODO 无图模式
             // web.getSettings().setBlockNetworkImage(true);
-            web.getSettings().setJavaScriptEnabled(true);
+            mWeb.getSettings().setJavaScriptEnabled(true);
 
-            web.setWebChromeClient(new WebChromeClient() {
+            mWeb.setWebChromeClient(new WebChromeClient() {
 
                 @Override
                 public void onProgressChanged(WebView view, int newProgress) {
@@ -110,7 +120,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                 }
 
             });
-            web.setWebViewClient(new WebViewClient() {
+            mWeb.setWebViewClient(new WebViewClient() {
 
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -119,7 +129,8 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                 }
 
             });
-            web.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
+            mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
+            mWeb.getSettings().setUserAgentString(Connectivity.UA);
             // web.loadUrl("file:///android_asset/article.html", null);
         }
     }
@@ -134,26 +145,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     }
 
     private void initData(int aid) {
-        try {
-            InputStream in = getAssets().open("article.html");
-            mDoc = Jsoup.parse(in, "utf-8", "");
-            Element title = mDoc.getElementById("title");
-            // TODO parse html data
-//            title.append(buildTitle(article));
-            /*
-             * <h1 class="article-title"></h1>
-                <div id="info" class="article-info">
-                          
-                          
-                          <span class="article-category"></span>
-                </div>
-             */
-            
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
         request = new ArticleRequest(aid, this, this);
         request.setTag(TAG);
         AcApp.addRequest(request);
@@ -164,7 +155,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         builder.append("<h1 class=\"article-title\">")
             .append(article.title).append("</h1>")
             .append("<div id=\"info\" class=\"article-info\">")
-            .append("<span class=\"article-publisher\"><i class=\"icon-slash\"></i>")
+            .append("<span class=\"article-publisher\"><img id=\"icon\" src=\"file:///android_asset/wen2.png\" width='18px' height='18px'/> ")
             .append("<a href=\"http://www.acfun.tv/member/user.aspx?uid=").append(article.poster.id).append("\" >")
             .append(article.poster.name)
             .append("</a>")
@@ -206,6 +197,8 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     }
 
     private static final String TAG = "Article";
+    private Article mArticle;
+    private WebView mWeb;
 
     static class ArticleRequest extends Request<Article> {
         Listener<Article> mListener;
@@ -248,8 +241,8 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
 
     @Override
     public void onResponse(Article response) {
-        // TODO Auto-generated method stub
-        AcApp.showToast(response.title);
+        mArticle = response;
+        new BuildDocTask().execute(mArticle);
 
     }
 
@@ -258,5 +251,53 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         // TODO Auto-generated method stub
         AcApp.showToast("加载失败");
     }
-
+    
+    private class BuildDocTask extends AsyncTask<Article, Void, Boolean>{
+        boolean hasUseMap;
+        @Override
+        protected Boolean doInBackground(Article... params) {
+            try {
+                InputStream in = getAssets().open("article.html");
+                mDoc = Jsoup.parse(in, "utf-8", "");
+                Element title = mDoc.getElementById("title");
+                title.append(buildTitle(params[0]));
+                Element content = mDoc.getElementById("content");
+                
+                ArrayList<SubContent> contents = params[0].contents;
+                
+                for(int i=0;i<contents.size();i++){
+                    SubContent sub = contents.get(i);
+                    
+                    if(!params[0].title.equals(sub.subTitle)){
+                        content.append("<h2 class=\"article-subtitle\">"+sub.subTitle +"</h2><hr>");
+                    }
+                    content.append(sub.content);
+                    if(content.select("img").hasAttr("usemap")){
+                        hasUseMap = true;
+                    }
+                }
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if(result){
+                setSupportProgressBarIndeterminateVisibility(false);
+                mWeb.loadDataWithBaseURL("http://www.acfun.tv/", mDoc.html(), "text/html", "UTF-8", null);
+                if(hasUseMap)
+                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
+                else
+                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
+                
+            }else{
+                mWeb.loadData("<h1>加载失败请重试！</h1>", "text/html", "utf-8");
+            }
+        }
+        
+        
+    };
 }
