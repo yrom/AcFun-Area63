@@ -448,8 +448,8 @@ public class MainActivity extends SherlockFragmentActivity implements
                         }
                         
                     }.start();
+                    return;
                 }
-                return;
             }
             request = new FastJsonRequest<Contents>(
                     url, Contents.class, new Response.Listener<Contents>() {
