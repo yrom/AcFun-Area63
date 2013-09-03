@@ -135,22 +135,29 @@ public class FileUtil {
         }
         return type;
     }
-    public static String getName(String url) {
+    public static String getHashName(String url){
+        return String.valueOf(url.hashCode()) + getUrlExt(url);
+    }
+    public static String getName(String url,boolean raw) {
         if (!TextUtils.isEmpty(url)) {
-          int start = url.lastIndexOf('/');
-          int end = url.lastIndexOf('?');
-          end = end <= start ? url.length() : end;
-          String name = "";
-          if (start > 0 && start < url.length() - 1) {
-              try{
-              name = url.substring(start, end).toLowerCase();
-              return name;
-              }catch (StringIndexOutOfBoundsException e) {
-                 Log.e("Util", "when get url name : "+url,e);
-              }
-          }
+            if (raw) {
+                int start = url.lastIndexOf('/');
+                int end = url.lastIndexOf('?');
+                end = end <= start ? url.length() : end;
+                String name = "";
+                if (start > 0 && start < url.length() - 1) {
+                    try {
+                        name = url.substring(start, end).toLowerCase();
+                        return name;
+                    } catch (StringIndexOutOfBoundsException e) {
+                        Log.e("Util", "when get url name : " + url, e);
+                    }
+                }
+            }
+            return getHashName(url);
+            
         }
-        return String.valueOf(url.hashCode())+".jpg";
+        return "cache";
     }
     public static void copyStream(InputStream in, OutputStream out) throws IOException {
         byte[] buf = new byte[4*_1KB];

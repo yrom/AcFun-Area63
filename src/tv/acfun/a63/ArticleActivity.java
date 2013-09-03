@@ -310,11 +310,11 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                     }else{
                         for(int imgIndex=0;imgIndex<imgs.size();imgIndex++){
                             Element img = imgs.get(imgIndex);
-                            String src = img.attr("src");
+                            String src = img.attr("src").trim();
                             if(!src.startsWith("http")){
                                 src = "http://www.acfun.tv"+src;
                             }
-                            File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE),FileUtil.getName(src));
+                            File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE+"/"+mArticle.id),FileUtil.getHashName(src));
                             imageCaches.put(src, cache);
                             imgUrls.add(src);
                             img.attr("org", src);
@@ -463,9 +463,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                 Log.i(TAG, url+" cached");
                 mWeb.loadUrl("javascript:(function(){"
                         + "var images = document.getElementsByTagName(\"img\"); "
-                        + "var imgSrc = images[" + values[0] + "].getAttribute(\"org\"); "
-                        + "if(imgSrc == \"" + url + "\"){ " 
-                        +   "images[" + values[0]+ "].setAttribute(\"src\",images[" + values[0]+"].getAttribute(\"loc\"));}"
+                        + "images[" + values[0]+ "].src = images[" + values[0]+ "].getAttribute(\"loc\");"
                         + "})()"); 
             }
         }
