@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -104,14 +105,12 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         if (aid == 0) {
 
         } else {
-            initData(aid);
             getSupportActionBar().setTitle("ac"+aid);
             setSupportProgressBarIndeterminateVisibility(true);
             setContentView(R.layout.activity_article);
             mWeb = (WebView) findViewById(R.id.webview);
             mWeb.getSettings().setAllowFileAccess(true);
             mWeb.getSettings().setAppCachePath(ARTICLE_PATH);
-            // TODO 无图模式
             mWeb.getSettings().setBlockNetworkImage(true);
             mWeb.getSettings().setJavaScriptEnabled(true);
             mWeb.addJavascriptInterface(new ACJSObject(), "AC");
@@ -134,7 +133,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
 
                 @Override
                 public void onPageFinished(WebView view, String url) {
-                    if(imgUrls == null && imgUrls.isEmpty())
+                    if(imgUrls == null || imgUrls.isEmpty()|| url.startsWith("file:///android_asset"))
                         return;
                     Log.i(TAG, "on finished:"+url);
                     String[] arr = new String[imgUrls.size()];
@@ -146,6 +145,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
             });
             mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
             mWeb.getSettings().setUserAgentString(Connectivity.UA);
+            initData(aid);
         }
     }
 
@@ -271,8 +271,13 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         AcApp.showToast("加载失败");
     }
     
+    Map<String,File> imageCaches;
     private class BuildDocTask extends AsyncTask<Article, Void, Boolean>{
         boolean hasUseMap;
+        @Override
+        protected void onPreExecute() {
+            mWeb.loadUrl("file:///android_asset/loading.html");
+        }
         @Override
         protected Boolean doInBackground(Article... params) {
             try {
@@ -282,6 +287,10 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                     imgUrls.clear();
                 else
                     imgUrls = new ArrayList<String>();
+                if(imageCaches != null) 
+                    imageCaches.clear();
+                else 
+                    imageCaches = new HashMap<String, File>();
                 Element title = mDoc.getElementById("title");
                 title.append(buildTitle(params[0]));
                 Element content = mDoc.getElementById("content");
@@ -302,10 +311,28 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                         for(int imgIndex=0;imgIndex<imgs.size();imgIndex++){
                             Element img = imgs.get(imgIndex);
                             String src = img.attr("src");
-                            imgUrls.add(src); // 
+                            if(!src.startsWith("http")){
+                                src = "http://www.acfun.tv"+src;
+                            }
+                            File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE),FileUtil.getName(src));
+                            imageCaches.put(src, cache);
+                            imgUrls.add(src);
                             img.attr("org", src);
-                            img.attr("src","file:///android_asset/loading.gif");
-                            img.attr("loc",FileUtil.getLocalFileUri(new File(AcApp.getExternalCacheDir(AcApp.IMAGE),FileUtil.getName(src))).toString());
+                            String localUri = FileUtil.getLocalFileUri(cache).toString();
+                            if(cache.exists() && cache.canRead())
+                                // set cache
+                                img.attr("src",localUri);
+                            else if(AcApp.getViewMode() != 1)
+                                img.attr("src","file:///android_asset/loading.gif");
+                            else {
+                                // 无图模式
+                                img.after("<p >[图片]</p>");
+                                img.remove();
+                                continue;
+                            }
+                            img.attr("loc",localUri);
+                            // 去掉 style
+                            img.removeAttr("style");
                             // 给 img 标签加上点击事件
                             try {
                                 if ("icon".equals(img.attr("class"))
@@ -377,10 +404,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                     break; 
                 }
                 String url = params[index];
-                if(!url.startsWith("http")){
-                    url = "http://www.acfun.tv"+url;
-                }
-                File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE),FileUtil.getName(url));
+                File cache = imageCaches.get(url);
                 if(cache.exists() && cache.canRead()){
                     publishProgress(index);
                     continue;
