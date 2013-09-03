@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +92,8 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
 
     private Request<?> request;
     private Document mDoc;
-    private List<String> imgUrls;  
+    private List<String> imgUrls;
+    protected DownloadImageTask mDownloadTask;  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,8 +107,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
             initData(aid);
             getSupportActionBar().setTitle("ac"+aid);
             setSupportProgressBarIndeterminateVisibility(true);
-//            mWeb = new WebView(this);
-//            mWeb.setPadding(0, 0, 0, 0);
             setContentView(R.layout.activity_article);
             mWeb = (WebView) findViewById(R.id.webview);
             mWeb.getSettings().setAllowFileAccess(true);
@@ -123,12 +123,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                     super.onProgressChanged(view, newProgress);
                 }
 
-                @Override
-                public void onCloseWindow(WebView window) {
-                    // TODO Auto-generated method stub
-                    super.onCloseWindow(window);
-                }
-
             });
             mWeb.setWebViewClient(new WebViewClient() {
 
@@ -140,19 +134,18 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
 
                 @Override
                 public void onPageFinished(WebView view, String url) {
-                    // TODO Auto-generated method stub
                     if(imgUrls == null && imgUrls.isEmpty())
                         return;
                     Log.i(TAG, "on finished:"+url);
                     String[] arr = new String[imgUrls.size()];
-                    new DownloadImageTask().execute(imgUrls.toArray(arr));
+                    mDownloadTask = new DownloadImageTask();
+                    mDownloadTask.execute(imgUrls.toArray(arr));
                 }
                 
 
             });
             mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
             mWeb.getSettings().setUserAgentString(Connectivity.UA);
-            // web.loadUrl("file:///android_asset/article.html", null);
         }
     }
 
@@ -258,6 +251,9 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     protected void onDestroy() {
         super.onDestroy();
         AcApp.cancelAllRequest(TAG);
+        if(mDownloadTask != null && !mDownloadTask.isDownloaded){
+            mDownloadTask.cancel(false);
+        }
     }
 
     @Override
@@ -322,14 +318,16 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                             if (src.contains("emotion/images/"))
                                 continue;
                             // 统一宽度
-                            img.attr("width", "90%");
+                            img.removeAttr("width");
+//                            img.attr("width", "90%");
+                            img.removeAttr("height");
                             // 过滤掉图片的url跳转
                             if (img.parent() != null
                                     && img.parent().tagName().equalsIgnoreCase("a")) {
                                 img.parent().attr("href",
                                         "javascript:window.AC.viewImage('" + src + "');");
                             } else {
-                                img.attr("onclick", "javascript:window.AC.viewImage(this.src);");
+                                img.attr("onclick", "javascript:window.AC.viewImage('"+src+"');");
                             }
                         }
                         
@@ -367,12 +365,17 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
      */
     private class DownloadImageTask extends AsyncTask<String, Integer, Void>{
 
-        private int timeoutMs = 3000;
-
+        int timeoutMs = 3000;
+        int tryTimes = 3;
+        boolean isDownloaded;
         @Override
         protected Void doInBackground(String... params) {
-            // TODO Auto-generated method stub
             for(int index=0;index<params.length;index++){
+                if(isCancelled()) {
+                    // cancel task on activity destory
+                    Log.w(TAG, "break download task,index="+index);
+                    break; 
+                }
                 String url = params[index];
                 if(!url.startsWith("http")){
                     url = "http://www.acfun.tv"+url;
@@ -382,28 +385,29 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                     publishProgress(index);
                     continue;
                 }else{
-                    try {
-                        cache.getParentFile().mkdirs();
-                        cache.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    
+                    cache.getParentFile().mkdirs();
                 }
                 InputStream in = null;
                 OutputStream out = null;
+                
                 try {
                     URL parsedUrl = new URL(url);
-                    HttpURLConnection connection = (HttpURLConnection) parsedUrl.openConnection();
-                    connection.setConnectTimeout(timeoutMs);
-                    connection.setReadTimeout(timeoutMs*2);
-                    connection.setUseCaches(false);
-                    int responseCode = connection.getResponseCode();
-                    if (responseCode == 200) {
-                        in = connection.getInputStream();
-                        out = new FileOutputStream(cache);
-                        FileUtil.copyStream(in,out);
-                        publishProgress(index);
+                    for(int i=0;i<tryTimes;i++){
+                        HttpURLConnection connection = (HttpURLConnection) parsedUrl.openConnection();
+                        connection.setConnectTimeout(timeoutMs+i*1500);
+                        connection.setReadTimeout(timeoutMs*(2+i));
+                        connection.setUseCaches(false);
+                        try {
+                            int responseCode = connection.getResponseCode();
+                            if (responseCode == 200) {
+                                in = connection.getInputStream();
+                                out = new FileOutputStream(cache);
+                                FileUtil.copyStream(in,out);
+                                publishProgress(index);
+                            }
+                        } catch (SocketTimeoutException e) {
+                            Log.w(TAG, "retry",e);
+                        }
                     }
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -432,7 +436,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
             if(imgUrls != null){
                 String url = imgUrls.get(values[0]);
                 if(url== null) return;
-                Log.i(TAG, url+"cached");
+                Log.i(TAG, url+" cached");
                 mWeb.loadUrl("javascript:(function(){"
                         + "var images = document.getElementsByTagName(\"img\"); "
                         + "var imgSrc = images[" + values[0] + "].getAttribute(\"org\"); "
@@ -443,7 +447,8 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         }
         @Override  
         protected void onPostExecute(Void result) {  
-            //确保所有图片都顺利的显示出来  
+            //确保所有图片都顺利的显示出来
+            isDownloaded = true;
             mWeb.loadUrl("javascript:(function(){"
                     + "var images = document.getElementsByTagName(\"img\"); "
                     + "for(var i=0;i<images.length;i++){"
