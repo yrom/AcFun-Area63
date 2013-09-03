@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
         <item
         android:id="@+id/action_view_mode"
-        android:showAsAction="always"
+        android:showAsAction="always|withText"
         android:title="@string/action_view_mode">
         <menu>
             <item

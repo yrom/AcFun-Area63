@@ -83,8 +83,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     private static RequestQueue mQueue;
 
-    private static int mode_code;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +92,6 @@ public class MainActivity extends SherlockFragmentActivity implements
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), true);
         mTitle = getTitle();
         mPlanetTitles = getResources().getStringArray(R.array.planets);
-        mode_code = AcApp.getViewMode();
         initDrawerLayout(savedInstanceState);
         mQueue = AcApp.getGloableQueue();
 
@@ -288,47 +285,47 @@ public class MainActivity extends SherlockFragmentActivity implements
         public static final String ARG_TITLES = "titles";
 
         public static final String ARG_PLANET_NUMBER = "planet_number";
+
+        private static int VIEW_MODE_CODE;
         private MenuItem mModeMenu;
 
         private SectionsPagerAdapter mSectionsPagerAdapter;
 
         public PlanetFragment() {
-            // Empty constructor required for fragment subclasses
+            VIEW_MODE_CODE = AcApp.getViewMode();
         }
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
             case R.id.mode_mix:
-                mode_code = 0;
-                Toast.makeText(getActivity(), "图文模式", Toast.LENGTH_SHORT)
-                        .show();
+                VIEW_MODE_CODE = 0;
                 break;
             case R.id.mode_no_image:
-                mode_code = 1;
-                Toast.makeText(getActivity(), "文本模式", Toast.LENGTH_SHORT)
-                        .show();
+                VIEW_MODE_CODE = 1;
                 break;
             case R.id.mode_comic:
-                mode_code = 2;
-                Toast.makeText(getActivity(), "漫画模式", Toast.LENGTH_SHORT)
-                        .show();
+                VIEW_MODE_CODE = 2;
                 break;
             }
+            AcApp.putInt("view_mode", VIEW_MODE_CODE);
             setMenuIcon();
             return super.onOptionsItemSelected(item);
         }
 
         private void setMenuIcon() {
-            switch (mode_code) {
+            switch (VIEW_MODE_CODE) {
             case 1:
                 mModeMenu.setIcon(R.drawable.mode_no_pic);
+                mModeMenu.setTitle(R.string.view_mode_no_image);
                 break;
             case 2:
+                mModeMenu.setTitle(R.string.view_mode_comic);
                 mModeMenu.setIcon(R.drawable.mode_comic);
                 break;
             case 0:
             default:
+                mModeMenu.setTitle(R.string.view_mode_mix);
                 mModeMenu.setIcon(R.drawable.mode_mix);
                 break;
             }
@@ -494,11 +491,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            // TODO Auto-generated method stub
             Object obj = parent.getItemAtPosition(position);
             if(obj != null && obj instanceof Content){
                 Content c = (Content)obj;
-                AcApp.showToast("content: ac%d - %s", c.aid,c.title);
+                // TODO 根据模式跳转
                 ArticleActivity.start(getActivity(), c.aid);
             }
         }
@@ -621,7 +617,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-
+        //TODO change content list type
         Log.i(TAG, "click position = " + itemPosition);
         
         return false;
@@ -640,6 +636,6 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     protected void onActivityResult(int request, int result, Intent data) {
         Log.i(TAG, String.format("request=%d,result=%d", request, result));
-
+        //TODO do login
     }
 }
