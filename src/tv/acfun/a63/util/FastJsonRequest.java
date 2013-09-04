@@ -17,57 +17,42 @@
 package tv.acfun.a63.util;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.HttpHeaderParser;
 
 /**
+ * using fastjson lib to parse json string 
  * @author Yrom
  *
  */
-public class FastJsonRequest<T> extends Request<T> {
-    protected final Class<T> clazz;
-    private final Listener<T> listener;
+public class FastJsonRequest<T> extends CustomUARequest<T> {
     
     public FastJsonRequest(int method, String url, Class<T> clazz,Listener<T> listener, ErrorListener errorListner) {
-        super(method, url, errorListner);
-        this.clazz = clazz;
-        this.listener = listener;
+        super(method, url, clazz,listener, errorListner);
         
     }
     public FastJsonRequest(String url, Class<T> clazz,Listener<T> listener, ErrorListener errorListner) {
         this(Method.GET, url, clazz, listener, errorListner);
     }
-    /* (non-Javadoc)
-     * @see com.android.volley.Request#parseNetworkResponse(com.android.volley.NetworkResponse)
-     */
+
     @Override
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
         try {
             String json = new String(
                     response.data, HttpHeaderParser.parseCharset(response.headers));
-            return Response.success(JSON.parseObject(json, clazz),HttpHeaderParser.parseCacheHeaders(response));
+            return Response.success(JSON.parseObject(json, mClazz),HttpHeaderParser.parseCacheHeaders(response));
         }catch (UnsupportedEncodingException e) {
+            String json = new String(response.data);
+            return Response.success(JSON.parseObject(json, mClazz),HttpHeaderParser.parseCacheHeaders(response));
+        } catch(Exception e){
             return Response.error(new ParseError(e));
         }
     }
 
-    /* (non-Javadoc)
-     * @see com.android.volley.Request#deliverResponse(java.lang.Object)
-     */
-    @Override
-    protected void deliverResponse(T response) {
-        listener.onResponse(response);
-    }
-    @Override
-    public Map<String, String> getHeaders() {
-        return Connectivity.UA_MAP;
-    }
 }

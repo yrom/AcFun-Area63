@@ -42,6 +42,7 @@ import tv.acfun.a63.api.entity.Article;
 import tv.acfun.a63.api.entity.Article.SubContent;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.Connectivity;
+import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
 import android.content.Context;
 import android.content.Intent;
@@ -214,12 +215,10 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     private Article mArticle;
     private WebView mWeb;
 
-    static class ArticleRequest extends Request<Article> {
-        Listener<Article> mListener;
+    static class ArticleRequest extends CustomUARequest<Article> {
 
         public ArticleRequest(int aid, Listener<Article> listener, ErrorListener errListener) {
-            super(Method.GET, ArticleApi.getContentUrl(aid), errListener);
-            this.mListener = listener;
+            super(ArticleApi.getContentUrl(aid), Article.class, listener, errListener);
         }
 
         @Override
@@ -233,17 +232,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                 Log.e(TAG, "parse article error", e);
                 return Response.error(new ParseError(e));
             }
-        }
-
-        @Override
-        protected void deliverResponse(Article response) {
-            mListener.onResponse(response);
-
-        }
-
-        @Override
-        public Map<String, String> getHeaders() {
-            return Connectivity.UA_MAP;
         }
     }
 
@@ -428,6 +416,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                                 out = new FileOutputStream(cache);
                                 FileUtil.copyStream(in,out);
                                 publishProgress(index);
+                                break;
                             }
                         } catch (SocketTimeoutException e) {
                             Log.w(TAG, "retry",e);
@@ -485,6 +474,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         @android.webkit.JavascriptInterface
         public void viewcomment(){
             AcApp.showToast("查看评论: ac%d",mArticle.id);
+            CommentsActivity.start(ArticleActivity.this, mArticle.id);
         }
         @android.webkit.JavascriptInterface
         public void viewImage(String url){
