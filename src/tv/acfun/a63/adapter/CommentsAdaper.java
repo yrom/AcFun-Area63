@@ -21,6 +21,7 @@ import java.util.List;
 import tv.acfun.a63.AcApp;
 import tv.acfun.a63.R;
 import tv.acfun.a63.api.entity.Comment;
+import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.TextViewUtils;
 import tv.acfun.a63.view.FloorsView;
 import android.content.Context;
@@ -99,7 +100,7 @@ public class CommentsAdaper extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Comment c = getItem(position);
-
+		
 		CommentViewHolder holder = null;
 		if (convertView == null) {
 			holder = new CommentViewHolder();
@@ -136,6 +137,12 @@ public class CommentsAdaper extends BaseAdapter {
 				.getLayoutParams();
 		userLayoutParams.addRule(RelativeLayout.BELOW,holder.quoteFrame.getChildCount()>0?frameId:R.id.requote);
 		holder.user.setLayoutParams(userLayoutParams);
+		int padding = DensityUtil.dip2px(mContext, 6);
+		if(position == 0){
+		    int paddingTop = mInflater.getContext().getResources().getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
+		    convertView.setPadding(padding, paddingTop, padding, padding);
+		}else
+		    convertView.setPadding(padding, padding, padding, padding);
 		return convertView;
 	}
 

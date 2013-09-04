@@ -3,6 +3,7 @@
 
     <color name="main_color">#33B5E5</color>
     <color name="main_color_dark">#0099cc</color>
+    <color name="main_color_trans">#8833B5E5</color>
     <color name="primary_text_color">#333</color>
     <color name="nav_text_color">#f3f3f3</color>
     <color name="text_color_pressed">@color/main_color</color>
@@ -11,5 +12,6 @@
     <color name="article_info_bg_green">#5BB75B</color>
     <color name="article_info_bg_blue">#08c</color>
     <color name="backgroud_main">#ededed</color>
-
+    
+	<drawable name="ab_bg_trans">#990099cc</drawable>
 </resources>

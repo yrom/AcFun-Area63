@@ -47,7 +47,7 @@ public class TextViewUtils {
                 try {
                     Drawable drawable = Drawable.createFromStream(comment.getContext().getAssets().open(source),source);
                     if(drawable!=null)
-                        drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*AcApp.density), (int)(drawable.getIntrinsicHeight()*AcApp.density));
+                        drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*AcApp.density+1), (int)(drawable.getIntrinsicHeight()*AcApp.density+1));
                     return drawable;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -113,7 +113,7 @@ public class TextViewUtils {
             // FIXME: id 50 以上的表情
             if(Integer.parseInt(id)>50)
                 id = "50";
-            text = text.replace(m.group(),"<img src='emotion/"+id+".png' />");
+            text = text.replace(m.group(),String.format("<img src='emotion/%02d.png' />", Integer.parseInt(id)));
         }
         reg = "\\[at\\](.*?)\\[\\/at\\]";
         m = Pattern.compile(reg).matcher(text);

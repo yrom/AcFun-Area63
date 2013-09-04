@@ -49,6 +49,8 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.android.volley.NetworkResponse;
@@ -77,19 +79,23 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     private boolean hasNextPage;
     private ImageButton mBtnSend;
     private EditText mCommentText;
+    
     public static void start(Context context, int aid){
         Intent intent = new Intent(context, CommentsActivity.class);
         intent.putExtra("aid", aid);
         context.startActivity(intent);
     }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         aid = getIntent().getIntExtra("aid",0);
         if(aid == 0) return;
         setContentView(R.layout.activity_comments);
-        mKeyboard = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         ActionBar ab = getSupportActionBar();
+        ab.setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
+        mKeyboard = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         ActionBarUtil.setXiaomiFilterDisplayOptions(ab, false);
         ab.setTitle("ac"+aid+" / 评论");
         mBtnSend = (ImageButton) findViewById(R.id.comments_send_btn);
@@ -272,7 +278,15 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             }, 200);
             
         }
-        
-        
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+            this.finish();
+            break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
