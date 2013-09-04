@@ -49,7 +49,7 @@ package tv.acfun.a63.api.entity;
 public class Content {
 
     public String title;
-    public String titleImage;
+    public String titleImg;
     public String description;
     public String username;
     public long userId;
@@ -69,13 +69,13 @@ public class Content {
     }
 
 
-    public String getTitleImage() {
-        return titleImage;
+    public String getTitleImg() {
+        return titleImg;
     }
 
 
-    public void setTitleImage(String titleImage) {
-        this.titleImage = titleImage;
+    public void setTitleImg(String titleImg) {
+        this.titleImg = titleImg;
     }
 
 

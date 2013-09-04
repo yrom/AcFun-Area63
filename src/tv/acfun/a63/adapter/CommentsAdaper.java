@@ -137,10 +137,10 @@ public class CommentsAdaper extends BaseAdapter {
 				.getLayoutParams();
 		userLayoutParams.addRule(RelativeLayout.BELOW,holder.quoteFrame.getChildCount()>0?frameId:R.id.requote);
 		holder.user.setLayoutParams(userLayoutParams);
-		int padding = DensityUtil.dip2px(mContext, 6);
+		int padding = DensityUtil.dip2px(mContext, 8);
 		if(position == 0){
 		    int paddingTop = mInflater.getContext().getResources().getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
-		    convertView.setPadding(padding, paddingTop, padding, padding);
+		    convertView.setPadding(padding, paddingTop+padding, padding, padding);
 		}else
 		    convertView.setPadding(padding, padding, padding, padding);
 		return convertView;

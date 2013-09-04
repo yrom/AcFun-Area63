@@ -205,7 +205,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
             .append("</a>")
             .append("</span>")
             .append("<span class=\"article-pubdate\">")
-            .append(getPubDate(article.postTime))
+            .append(AcApp.getPubDate(article.postTime))
             .append("发布于</span>")
             .append("<span class=\"article-category\">")
             .append(article.channelName)
@@ -217,28 +217,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         
         return builder.toString();
     }
-    static final long _1_min = 60 * 1000;
-    static final long _1_hour = 60 * _1_min;
-    static final long _24_hour = 24 * _1_hour;
-    private String getPubDate(long postTime) {
-        long delta = System.currentTimeMillis() - postTime;
-        if( delta <  _24_hour && delta >= _1_hour){
-            int time = (int) (delta / _1_hour);
-            return time+"小时前";
-        } else if( delta < _1_hour && delta >= _1_min){
-            int time = (int) (delta / _1_min);
-            return time+"分钟前";
-        } else if( delta < _1_min){
-            return "半分钟前";
-        } else {
-            int time = (int) (delta / _24_hour);
-            if(time <= 6){
-                return time+"天前" ;
-            }else{
-                return AcApp.getDateTime(postTime);
-            }
-        }
-    }
+    
 
     private static final String TAG = "Article";
     private Article mArticle;

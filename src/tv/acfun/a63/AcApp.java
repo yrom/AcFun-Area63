@@ -2,6 +2,7 @@ package tv.acfun.a63;
 
 import java.io.File;
 
+import tv.acfun.a63.util.BitmapCache;
 import tv.acfun.a63.util.Connectivity;
 
 import android.app.Activity;
@@ -28,6 +29,7 @@ import com.actionbarsherlock.widget.SearchView;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.RequestQueue.RequestFilter;
+import com.android.volley.toolbox.ImageLoader;
 
 /**
  * 自定义Application
@@ -46,6 +48,7 @@ public class AcApp extends Application {
     public static float density = 1f;
     private static NotificationManager mNotiManager;
     private static RequestQueue mQueue;
+    private static ImageLoader mImageLoader;
     /**
      * <b>NOTE:</b>在 <code>getApplicationContext()</code> 调用一次之后才能用这个方便的方法
      */
@@ -59,6 +62,7 @@ public class AcApp extends Application {
         mResources = getResources();
         density = mResources.getDisplayMetrics().density;
         mQueue = Connectivity.newRequestQueue();
+        mImageLoader = new ImageLoader(mQueue, new BitmapCache());
         sp = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
     
@@ -81,6 +85,13 @@ public class AcApp extends Application {
         if(mQueue == null)
             mQueue = Connectivity.newRequestQueue();
         return mQueue;
+    }
+    
+    public static ImageLoader getGloableLoader(){
+        if(mImageLoader == null){
+            mImageLoader = new ImageLoader(getGloableQueue(),new BitmapCache());
+        }
+        return mImageLoader;
     }
     
     @Override
@@ -264,5 +275,27 @@ public class AcApp extends Application {
                     .getSystemService(NOTIFICATION_SERVICE);
         mNotiManager.notify(notificationId, notification);
     }
-
+    
+    static final long _1_min = 60 * 1000;
+    static final long _1_hour = 60 * _1_min;
+    static final long _24_hour = 24 * _1_hour;
+    public static String getPubDate(long postTime) {
+        long delta = System.currentTimeMillis() - postTime;
+        if( delta <  _24_hour && delta >= _1_hour){
+            int time = (int) (delta / _1_hour);
+            return time+"小时前";
+        } else if( delta < _1_hour && delta >= _1_min){
+            int time = (int) (delta / _1_min);
+            return time+"分钟前";
+        } else if( delta < _1_min){
+            return "半分钟前";
+        } else {
+            int time = (int) (delta / _24_hour);
+            if(time <= 6){
+                return time+"天前" ;
+            }else{
+                return getDateTime(postTime);
+            }
+        }
+    }
 }
