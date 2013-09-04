@@ -18,17 +18,19 @@ package tv.acfun.a63.api.entity;
 import java.io.Serializable;
 
 /**
- *  "cid": 14787054,
-      "content": "专门来看大印的啊,肿么没有了,强烈要求下期大印回归[emot\u003dac,36/]",
-      "userName": "搞基稳爽不亏",
-      "userID": 418134,
-      "postDate": "2013-07-19 21:29:22",
-      "userImg": "http://w5cdn.ranktv.cn/dotnet/artemis/u/cms/www/201211/291908515y9k.jpg",
+ * {
+      "cid": 16249066,
+      "content": "[emot\u003dac,17/]我们是三个人",
+      "userName": "推倒幼女同好會",
+      "userID": 483895,
+      "postDate": "2013-09-04 09:50:56",
+      "userImg": "http://w5cdn.ranktv.cn/dotnet/artemis/u/cms/www/201306/28011055zi6g.jpg",
       "userClass": "",
-      "quoteId": 14786557,
-      "count": 223,
+      "quoteId": 16249021,
+      "count": 8,
       "ups": 0,
       "downs": 0
+    }
  * @author Yrom
  *
  */
@@ -37,8 +39,7 @@ public class Comment implements Serializable {
     public String content;
     public String userName;
     public String postDate;
-    public String userImgUrl;
-    public String userClass;
+    public String userImg;
     /** 目前来看，应该不会越界...(TODO: long)*/
     public int cid;
     public int quoteId;
@@ -46,7 +47,36 @@ public class Comment implements Serializable {
     public int ups;
     public int downs;
     public long userID;
-    
+    public void setContent(String content) {
+        this.content = content;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+    public void setPostDate(String postDate) {
+        this.postDate = postDate;
+    }
+    public void setUserImg(String userImg) {
+        this.userImg = userImg;
+    }
+    public void setCid(int cid) {
+        this.cid = cid;
+    }
+    public void setQuoteId(int quoteId) {
+        this.quoteId = quoteId;
+    }
+    public void setCount(int count) {
+        this.count = count;
+    }
+    public void setUps(int ups) {
+        this.ups = ups;
+    }
+    public void setDowns(int downs) {
+        this.downs = downs;
+    }
+    public void setUserID(long userID) {
+        this.userID = userID;
+    }
     public boolean isQuoted;
     public int beQuotedPosition;
 }

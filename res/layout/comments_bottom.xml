@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
-    android:background="@android:color/white"
+    android:background="#fdfdfd"
     android:orientation="horizontal" >
 
     <EditText
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1.0"
         android:id="@+id/comments_edit"
-        android:hint="输入评论" />
+        android:hint="@string/post_comment" />
 
     <ImageButton
         android:layout_width="wrap_content"

@@ -2,11 +2,9 @@ package tv.acfun.a63.api;
 
 import java.util.List;
 
-import org.json.JSONObject;
+import tv.acfun.a63.api.entity.Content;
 
 import com.alibaba.fastjson.JSON;
-
-import tv.acfun.a63.api.entity.Content;
 
 public final class ArticleApi {
 
@@ -59,6 +57,10 @@ public final class ArticleApi {
     
     public static List<Content> getChannelContents(String json){
         return JSON.parseArray(json, Content.class);
+    }
+    
+    public static String getCommentUrl(int aid, int page){
+        return String.format(Constants.URL_COMMENT, aid,page);
     }
     
 }
