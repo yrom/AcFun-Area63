@@ -7,8 +7,9 @@
 	    android:id="@+id/list"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
-        android:listSelector="@android:color/transparent"
-        android:dividerHeight="2dp"
+	    android:drawSelectorOnTop="true"
+        android:listSelector="@drawable/article_item_background"
+        android:dividerHeight="16dp"
         android:divider="@null"
         android:layout_margin="8dp"
 	    />

@@ -2,80 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/background_card"
-    android:padding="4dp"
-    android:orientation="vertical" >
-
-    <LinearLayout
-        android:id="@+id/article_item_info"
-        android:layout_width="wrap_content"
-        android:layout_height="66dip"
-        android:gravity="center|right"
-        android:minWidth="66dip"
-        android:orientation="vertical"
-        android:background="@drawable/article_info_bg_selector"
-        android:padding="4dip" >
-
-        <TextView
-            android:id="@+id/article_item_views"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:text="102352"
-            android:textColor="#fff"
-            android:textSize="18sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dip"
-            android:text="围观"
-            android:textColor="#fff"
-            android:textSize="12sp" />
-    </LinearLayout>
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="8dp" >
 
     <TextView
         android:id="@+id/article_item_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:layout_toRightOf="@id/article_item_info"
-        android:singleLine="true"
-        android:text="作为一个AC基佬就不能有正常的感情吗 还是我做的一直都是错的"
-        android:textColor="@color/article_title_color_selector"
-        android:textSize="14sp" />
-	<TextView 
-	    android:id="@+id/article_item_post_time"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_below="@id/article_item_title"
-	    android:textSize="12sp"
-        android:layout_marginTop="8dip"
-        android:text="5月20日 14时38分 "
-        android:layout_alignLeft="@id/article_item_title"
-	    />
+        android:text="阿联酋帅哥奥玛因为太帅曾被沙特驱逐 已到日本发展"
+        android:textColor="@color/text_color_default"
+        android:textSize="18sp" />
+
     <TextView
-        android:id="@+id/article_item_upman"
+        android:id="@+id/article_item_post_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/article_item_info"
-        android:layout_below="@+id/article_item_post_time"
-        android:layout_marginTop="4dip"
         android:layout_alignLeft="@id/article_item_title"
-        android:ellipsize="end"
+        android:layout_below="@id/article_item_title"
+        android:layout_marginTop="4dip"
         android:singleLine="true"
+        android:text="5小时前"
+        android:textColor="@color/text_color_gray"
         android:textSize="12sp" />
 
     <TextView
-        android:id="@+id/article_item_comments"
-        android:layout_marginLeft="10dip"
+        android:id="@+id/article_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/article_item_post_time"
-        android:layout_marginTop="4dip"
-        android:layout_toRightOf="@id/article_item_upman"
-        android:singleLine="true"
-        android:textSize="12sp" />
-
+        android:layout_below="@id/article_item_post_time"
+        android:layout_marginTop="4dp"
+        android:text="还记得那位因为太帅而被沙特阿拉伯驱逐的阿联酋帅哥吗？据台湾东森电视台网站报道，这位名叫奥玛（Omar Borkan Gala）的摄影师兼男模已经到了日本发展。据脸谱上的“Omar Borkan Gala”公众人物专页透露，奥玛8月30日到达东京。"
+        android:textColor="@color/text_color_gray"
+        android:textSize="13sp" />
 
 </RelativeLayout>

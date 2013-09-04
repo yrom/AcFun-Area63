@@ -8,9 +8,10 @@
     <color name="nav_text_color">#f3f3f3</color>
     <color name="text_color_pressed">@color/main_color</color>
     <color name="text_color_default">@color/primary_text_color</color>
+	<color name="text_color_gray">#ff9e9e9e</color>
     <color name="background_dark">#aa000000</color>
-    <color name="article_info_bg_green">#5BB75B</color>
-    <color name="article_info_bg_blue">#08c</color>
+    <color name="article_info_bg_green">#995BB75B</color>
+    <color name="article_info_bg_blue">#990089cc</color>
     <color name="backgroud_main">#ededed</color>
     
 	<drawable name="ab_bg_trans">#990099cc</drawable>
