@@ -10,22 +10,25 @@
 
         <ListView
             android:id="@android:id/list"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:padding="4dp"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+        	android:paddingRight="@dimen/activity_horizontal_margin"
+        	android:paddingTop="0dp"
             android:listSelector="?attr/selectableItemBackground"
             />
 
         <TextView
             android:id="@+id/time_out_text"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/time_out"
             android:textSize="18sp"
-            android:visibility="gone" />
+            android:textColor="@color/main_color"
+             />
 
         <include layout="@layout/comments_bottom" />
     </LinearLayout>

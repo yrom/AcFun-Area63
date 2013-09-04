@@ -30,6 +30,7 @@
         <item name="android:actionBarWidgetTheme">@style/Widget.Styled</item>
 		<item name="android:editTextBackground">@drawable/edit_text_holo_light</item>        
     </style>
+    
 	<style name="Widget.Styled" parent="Theme.Sherlock">
         <item name="popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
         <item name="android:popupMenuStyle">@style/Widget.Styled.PopupMenu</item>

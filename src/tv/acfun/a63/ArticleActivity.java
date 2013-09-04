@@ -55,8 +55,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
+import com.actionbarsherlock.widget.ShareActionProvider;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -86,23 +88,26 @@ import com.android.volley.toolbox.HttpHeaderParser;
  */
 public class ArticleActivity extends SherlockActivity implements Listener<Article>, ErrorListener {
     private static String ARTICLE_PATH ;
-    public static void start(Context context, int aid) {
+    public static void start(Context context, int aid, String title) {
         Intent intent = new Intent(context, ArticleActivity.class);
         intent.putExtra("aid", aid);
+        intent.putExtra("title", title);
         context.startActivity(intent);
     }
 
     private Request<?> request;
     private Document mDoc;
     private List<String> imgUrls;
-    protected DownloadImageTask mDownloadTask;  
+    protected DownloadImageTask mDownloadTask;
+    private String title;  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         ARTICLE_PATH = AcApp.getExternalCacheDir("article").getAbsolutePath();
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
-        int aid = getIntent().getIntExtra("aid", 0);
+        aid = getIntent().getIntExtra("aid", 0);
+        title = getIntent().getStringExtra("title");
         if (aid == 0) {
 
         } else {
@@ -149,12 +154,36 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
             initData(aid);
         }
     }
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getSupportMenuInflater().inflate(R.menu.article_options_menu, menu);
+        MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
+        ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
+        actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+        actionProvider.setShareIntent(createShareIntent());
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    private Intent createShareIntent() {
+        String shareurl = title + "http://www.acfun.tv/a/ac" + aid;
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "分享");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareurl);
+        return shareIntent;
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
             finish();
             return true;
+        case R.id.menu_item_comment:
+            CommentsActivity.start(ArticleActivity.this, mArticle.id);
+            return true;
+        case R.id.menu_item_fov_action_provider_action_bar:
+            AcApp.showToast("收藏");
+            break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -260,6 +289,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     }
     
     Map<String,File> imageCaches;
+    private int aid;
     private class BuildDocTask extends AsyncTask<Article, Void, Boolean>{
         boolean hasUseMap;
         @Override
@@ -473,12 +503,12 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     class ACJSObject{
         @android.webkit.JavascriptInterface
         public void viewcomment(){
-            AcApp.showToast("查看评论: ac%d",mArticle.id);
             CommentsActivity.start(ArticleActivity.this, mArticle.id);
         }
         @android.webkit.JavascriptInterface
         public void viewImage(String url){
             AcApp.showToast("查看图片: url=%s",url);
+            // TODO
         }
     }
 }

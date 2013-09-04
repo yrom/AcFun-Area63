@@ -11,7 +11,7 @@
 
     <LinearLayout
         android:id="@+id/left_drawer"
-        android:layout_width="200dp"
+        android:layout_width="@dimen/left_drawer_width"
         android:orientation="vertical"
         android:background="#cc303030"
         android:layout_gravity="start"

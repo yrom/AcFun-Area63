@@ -9,7 +9,6 @@ import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Content;
 import tv.acfun.a63.api.entity.Contents;
 import tv.acfun.a63.util.ActionBarUtil;
-import tv.acfun.a63.util.Connectivity;
 import tv.acfun.a63.util.FastJsonRequest;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -36,7 +35,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
@@ -495,7 +493,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             if(obj != null && obj instanceof Content){
                 Content c = (Content)obj;
                 // TODO 根据模式跳转
-                ArticleActivity.start(getActivity(), c.aid);
+                ArticleActivity.start(getActivity(), c.aid,c.title);
             }
         }
     }
