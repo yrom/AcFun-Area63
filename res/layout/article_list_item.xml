@@ -1,35 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-     >
 	<RelativeLayout 
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:background="@drawable/row_backgroud"
 	    android:orientation="vertical"
-	    android:padding="8dp" >
+	    xmlns:android="http://schemas.android.com/apk/res/android">
 	
 	    <TextView
+	        android:padding="8dp"
 	        android:id="@+id/article_item_title"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
+	        android:layout_toLeftOf="@+id/item_tag"
 	        android:textColor="@color/text_color_default"
 	        android:textSize="18sp" />
-		
+		<ImageView
+		    android:id="@+id/item_tag"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentRight="true"
+		    android:layout_alignParentTop="true"
+		    android:src="@drawable/ic_whats_hot"
+		    android:visibility="gone"
+		    />
 	    <TextView
+	        android:paddingLeft="8dp"
 	        android:id="@+id/article_item_post_time"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_alignLeft="@id/article_item_title"
 	        android:layout_below="@id/article_item_title"
-	        android:layout_marginTop="4dip"
 	        android:singleLine="true"
 	        android:textColor="@color/text_color_gray"
+	        android:paddingRight="8dp"
 	        android:textSize="12sp" />
 	
 	    <TextView
+	        android:paddingLeft="8dp"
+	        android:paddingRight="8dp"
+	        android:paddingBottom="8dp"
 	        android:id="@+id/article_desc"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
@@ -39,12 +49,3 @@
 	        android:textSize="13sp" />
 	
 	</RelativeLayout>
-	<ImageView
-		    android:id="@+id/item_tag"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:layout_gravity="top|right"
-		    android:src="@drawable/ic_whats_hot"
-		    android:visibility="gone"
-		    />
-</FrameLayout>

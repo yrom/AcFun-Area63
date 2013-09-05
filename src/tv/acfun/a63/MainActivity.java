@@ -557,7 +557,9 @@ public class MainActivity extends SherlockFragmentActivity implements
             
             else
                 tagHot.setVisibility(View.GONE);
-            holder.postTime.setText(AcApp.getPubDate(art.releaseDate));
+            String tip = String.format(" %s / %d条评论，%d人围观", AcApp.getPubDate(art.releaseDate),art.comments,art.views);
+//            holder.postTime.setText(AcApp.getPubDate(art.releaseDate));
+            holder.postTime.setText(tip);
             return convertView;
         }
 
