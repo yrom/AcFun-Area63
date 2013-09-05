@@ -276,9 +276,9 @@ public class AcApp extends Application {
         mNotiManager.notify(notificationId, notification);
     }
     
-    static final long _1_min = 60 * 1000;
-    static final long _1_hour = 60 * _1_min;
-    static final long _24_hour = 24 * _1_hour;
+    public static final long _1_min = 60 * 1000;
+    public static final long _1_hour = 60 * _1_min;
+    public static final long _24_hour = 24 * _1_hour;
     public static String getPubDate(long postTime) {
         long delta = System.currentTimeMillis() - postTime;
         if( delta <  _24_hour && delta >= _1_hour){

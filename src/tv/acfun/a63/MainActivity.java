@@ -419,22 +419,25 @@ public class MainActivity extends SherlockFragmentActivity implements
         private void loadData(boolean newData, boolean loadCache) {
             page = newData ? 1 : page + 1;
             String url = ArticleApi.getDefaultUrl(Constants.CAT_IDS[getArguments().getInt(ARG_SECTION_NUMBER)], DEFAULT_COUT, page);
-            if(loadCache){
-                // 缓存数据
-                final Cache.Entry entry = mQueue.getCache().get(url);
-                if(entry != null && entry.data!=null && entry.data.length>0){
-                    if (newData) {
-                        entry.softTtl = System.currentTimeMillis() - 1000;
-                        Log.i(TAG, "强制刷新");
-                    }
-                    new Thread(){
+           
+            // 缓存数据
+            final Cache.Entry entry = mQueue.getCache().get(url);
+            if (entry != null && entry.data != null && entry.data.length > 0) {
+                if (newData) {
+//                    entry.ttl = entry.softTtl = System.currentTimeMillis() - 1000;
+                    mQueue.getCache().invalidate(url, true);
+                    Log.i(TAG, "强制刷新");
+                }
+                if (loadCache) {
+                    new Thread() {
                         @Override
                         public void run() {
-                            Contents contens = JSON.parseObject(new String(entry.data),Contents.class);
-                            if(contens != null && contens.getContents() !=null){
+                            Contents contens = JSON.parseObject(new String(entry.data),
+                                    Contents.class);
+                            if (contens != null && contens.getContents() != null) {
                                 adapter = new ArticleListAdapter(inflater, contens.getContents());
                                 list.post(new Runnable() {
-                                    
+
                                     @Override
                                     public void run() {
                                         list.setAdapter(adapter);
@@ -443,7 +446,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                                 });
                             }
                         }
-                        
+
                     }.start();
                     return;
                 }
@@ -539,13 +542,28 @@ public class MainActivity extends SherlockFragmentActivity implements
             holder.title.setText(art .getTitle());
             if(!TextUtils.isEmpty(art.description))
                 holder.comments.setText(Html.fromHtml(art.description));
+            else{
+                holder.comments.setText("无简介...");
+            }
+            View tagHot = convertView.findViewById(R.id.item_tag);
+            if(ArticleApi.isRecommendedArticle(art)){
+                tagHot.setVisibility(View.VISIBLE);
+                ((ImageView)tagHot).setImageResource(R.drawable.ic_recommended);
+            }
+            else if(ArticleApi.isHotArticle(art)){
+                tagHot.setVisibility(View.VISIBLE);
+                ((ImageView)tagHot).setImageResource(R.drawable.ic_whats_hot);
+            }
+            
             else
-                holder.comments.setText("");
+                tagHot.setVisibility(View.GONE);
             holder.postTime.setText(AcApp.getPubDate(art.releaseDate));
             return convertView;
         }
 
+
     }
+    
     static class ArticleListAdapter2 extends BaseAdapter {
         List<Content> contents;
         LayoutInflater inflater;

@@ -15,4 +15,7 @@ public interface Constants {
     int TYPE_DEFAULT = 0;
     int TYPE_HOT = 6;
     int TYPE_LATEST_REPLY = 22;
+    
+    int COUNT_HOT = 15;
+    int COUNT_LAST_REPLY = 15;
 }

@@ -1,39 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:orientation="vertical"
-    android:padding="8dp" >
-
-    <TextView
-        android:id="@+id/article_item_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="阿联酋帅哥奥玛因为太帅曾被沙特驱逐 已到日本发展"
-        android:textColor="@color/text_color_default"
-        android:textSize="18sp" />
-
-    <TextView
-        android:id="@+id/article_item_post_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/article_item_title"
-        android:layout_below="@id/article_item_title"
-        android:layout_marginTop="4dip"
-        android:singleLine="true"
-        android:text="5小时前"
-        android:textColor="@color/text_color_gray"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/article_desc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/article_item_post_time"
-        android:layout_marginTop="4dp"
-        android:text="还记得那位因为太帅而被沙特阿拉伯驱逐的阿联酋帅哥吗？据台湾东森电视台网站报道，这位名叫奥玛（Omar Borkan Gala）的摄影师兼男模已经到了日本发展。据脸谱上的“Omar Borkan Gala”公众人物专页透露，奥玛8月30日到达东京。"
-        android:textColor="@color/text_color_gray"
-        android:textSize="13sp" />
-
-</RelativeLayout>
+	android:layout_height="wrap_content"
+     >
+	<RelativeLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/row_backgroud"
+	    android:orientation="vertical"
+	    android:padding="8dp" >
+	
+	    <TextView
+	        android:id="@+id/article_item_title"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:textColor="@color/text_color_default"
+	        android:textSize="18sp" />
+		
+	    <TextView
+	        android:id="@+id/article_item_post_time"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignLeft="@id/article_item_title"
+	        android:layout_below="@id/article_item_title"
+	        android:layout_marginTop="4dip"
+	        android:singleLine="true"
+	        android:textColor="@color/text_color_gray"
+	        android:textSize="12sp" />
+	
+	    <TextView
+	        android:id="@+id/article_desc"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/article_item_post_time"
+	        android:layout_marginTop="4dp"
+	        android:textColor="@color/text_color_gray"
+	        android:textSize="13sp" />
+	
+	</RelativeLayout>
+	<ImageView
+		    android:id="@+id/item_tag"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="top|right"
+		    android:src="@drawable/ic_whats_hot"
+		    android:visibility="gone"
+		    />
+</FrameLayout>
