@@ -68,15 +68,15 @@ public final class ArticleApi {
         boolean isHot;
         long e = System.currentTimeMillis() - art.releaseDate;
         if (e <= AcApp._1_hour * 3) {
-            isHot = art.comments >= 45 || art.views >= 2500;
+            isHot = art.comments >= 35 || art.views >= 2500;
         } else if (e <= AcApp._1_hour * 6) {
             isHot = art.comments >= 90 || art.views >= 5000;
         } else if (art.channelId == Constants.CAT_COMIC_LIGHT_NOVEL) {
             isHot = art.comments >= 25 || art.views >= 1200;
         } else if (art.channelId == Constants.CAT_WORK_EMOTION) {
-            isHot = art.comments >= 80 || art.views >= 3000;
+            isHot = art.comments >= 70 || art.views >= 3000;
         } else if (art.channelId == Constants.CAT_AN_CULTURE) {
-            isHot = art.comments >= 50 || art.views >= 1400;
+            isHot = art.comments >= 40 || art.views >= 1400;
         } else {
             isHot = art.comments >= 100 || art.views >= 10000;
         }
@@ -86,15 +86,15 @@ public final class ArticleApi {
         boolean isRecommended;
         long e = System.currentTimeMillis() - art.releaseDate;
         if(e<=AcApp._1_hour){
-            isRecommended = art.comments >= 10 && art.views >= 300;
-        } else if(e<=AcApp._1_hour*3){
-            isRecommended = art.comments >= 15 && art.views >= 700 && art.stows >=2;
+            isRecommended = art.comments >= 10 && art.views >= 300 && art.stows>=1;
+        }else if(e<=AcApp._1_hour*3){
+            isRecommended = art.comments >= 25 && art.views >= 700 && art.stows >=5;
         }else if(e<=AcApp._1_hour*5){
-            isRecommended = art.comments >= 20 && art.views >= 1500 && art.stows>= 5;
+            isRecommended = art.comments >= 30 && art.views >= 1500 && art.stows>=10;
         }else if(e<=AcApp._1_hour*12){
-            isRecommended = art.comments >= 70 && art.views >= 2800 && art.stows>=25;
+            isRecommended = art.comments >= 35 && art.views >= 3000 && art.stows>=25;
         }else
-            isRecommended = art.views >= 5000 && art.stows>=50;
+            isRecommended = art.comments >= 40 && art.views >= 6000 && art.stows>=50;
             
             return isRecommended;
     }
