@@ -2,6 +2,8 @@ package tv.acfun.a63;
 
 import java.io.File;
 
+import tv.acfun.a63.api.entity.User;
+import tv.acfun.a63.db.DB;
 import tv.acfun.a63.util.BitmapCache;
 import tv.acfun.a63.util.Connectivity;
 
@@ -65,7 +67,9 @@ public class AcApp extends Application {
         mImageLoader = new ImageLoader(mQueue, new BitmapCache());
         sp = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
-    
+    public static User getUser(){
+        return new DB(mContext).getUser();
+    }
     public static void addRequest(Request<?> request){
         mQueue.add(request);
     }
