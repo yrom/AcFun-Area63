@@ -23,9 +23,11 @@ import org.apache.commons.httpclient.Cookie;
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.util.UsingCookiesRequest;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.alibaba.fastjson.JSON;
@@ -53,6 +55,11 @@ public class ProfileActivity extends SherlockActivity {
         public void onResponse(Profile response) {
             // TODO Auto-generated method stub
             Log.d(TAG, "on response");
+            TextView view = new TextView(ProfileActivity.this);
+            view.setTextSize(20);
+            view.setTextColor(Color.BLUE);
+            view.setText(response.toString());
+            setContentView(view);
         }
     };
     private ErrorListener errorListner = new ErrorListener() {
@@ -122,5 +129,12 @@ public class ProfileActivity extends SherlockActivity {
         public boolean gender;
         public String blog;
         public String userImg;
+        @Override
+        public String toString() {
+            return "Profile [uid=" + uid + ", \nsign=" + sign + ", \nusername=" + username + ", \nemail="
+                    + email + ", \nregTime=" + regTime + ", \ngender=" + gender + ", \nblog=" + blog
+                    + ", \nuserImg=" + userImg + "]";
+        }
+        
     }
 }
