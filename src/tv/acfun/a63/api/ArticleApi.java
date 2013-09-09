@@ -1,3 +1,4 @@
+
 package tv.acfun.a63.api;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public final class ArticleApi {
     public static String getUrl(int type, int catId, int count, int page) {
         if (count <= 0)
             count = 20;
-        if(page <1)
+        if (page < 1)
             page = 1;
         return String.format(Constants.URL_BASE, type, catId, count, 20 * (page - 1));
     }
@@ -49,53 +50,62 @@ public final class ArticleApi {
         return getUrl(Constants.TYPE_LATEST_REPLY, channelId, Constants.COUNT_LAST_REPLY, 1);
     }
 
-    public static String getContentUrl(int aid){
-        if(aid <=0)
+    public static String getContentUrl(int aid) {
+        if (aid <= 0)
             return null;
         return String.format(Constants.URL_CONTENT, aid);
     }
-    
-    
-    public static List<Content> getChannelContents(String json){
+
+    public static List<Content> getChannelContents(String json) {
         return JSON.parseArray(json, Content.class);
     }
-    
-    public static String getCommentUrl(int aid, int page){
-        return String.format(Constants.URL_COMMENT, aid,page);
+
+    public static String getCommentUrl(int aid, int page) {
+        return String.format(Constants.URL_COMMENT, aid, page);
     }
-    
+
     public static boolean isHotArticle(Content art) {
         boolean isHot;
         long e = System.currentTimeMillis() - art.releaseDate;
-        if (e <= AcApp._1_hour * 3) {
-            isHot = art.comments >= 35 || art.views >= 2500;
-        } else if (e <= AcApp._1_hour * 6) {
-            isHot = art.comments >= 90 || art.views >= 5000;
-        } else if (art.channelId == Constants.CAT_COMIC_LIGHT_NOVEL) {
-            isHot = art.comments >= 25 || art.views >= 1200;
+        if (art.channelId == Constants.CAT_COMIC_LIGHT_NOVEL) {
+            isHot = art.comments >= 15 || art.views >= 1200;
         } else if (art.channelId == Constants.CAT_WORK_EMOTION) {
-            isHot = art.comments >= 70 || art.views >= 3000;
+            isHot = art.comments >= 70 || art.views >= 5500;
         } else if (art.channelId == Constants.CAT_AN_CULTURE) {
-            isHot = art.comments >= 40 || art.views >= 1400;
+            isHot = art.comments >= 35 || art.views >= 3500;
+        } else if (e <= AcApp._1_hour * 3) {
+            isHot = art.comments >= 15 || art.views >= 2000;
+        } else if (e <= AcApp._1_hour * 5) {
+            isHot = art.comments >= 35 || art.views >= 3500;
+        } else if (e <= AcApp._1_hour * 8) {
+            isHot = art.comments >= 60 || art.views >= 7500;
+        } else if (e <= AcApp._1_hour * 12) {
+            isHot = art.comments >= 85 || art.views >= 9000;
+        } else if (e <= AcApp._1_hour * 18) {
+            isHot = art.comments >= 110 || art.views >= 12500;
         } else {
-            isHot = art.comments >= 100 || art.views >= 10000;
+            isHot = art.comments >= 120 || art.views >= 14000;
         }
+
         return isHot;
     }
+
     public static boolean isRecommendedArticle(Content art) {
         boolean isRecommended;
         long e = System.currentTimeMillis() - art.releaseDate;
-        if(e<=AcApp._1_hour){
-            isRecommended = art.comments >= 10 && art.views >= 300 && art.stows>=1;
-        }else if(e<=AcApp._1_hour*3){
-            isRecommended = art.comments >= 25 && art.views >= 700 && art.stows >=5;
-        }else if(e<=AcApp._1_hour*5){
-            isRecommended = art.comments >= 30 && art.views >= 1500 && art.stows>=10;
-        }else if(e<=AcApp._1_hour*12){
-            isRecommended = art.comments >= 35 && art.views >= 3000 && art.stows>=25;
-        }else
-            isRecommended = art.comments >= 40 && art.views >= 6000 && art.stows>=50;
-            
-            return isRecommended;
+        if (e <= AcApp._1_hour) {
+            isRecommended = art.views >= 800 && art.comments >= 5 && art.stows >= 2;
+        } else if (e <= AcApp._1_hour * 4) {
+            isRecommended = art.views >= 2000 && art.comments >= 15 && art.stows >= 6;
+        } else if (e <= AcApp._1_hour * 8) {
+            isRecommended = art.views >= 4000 && art.comments >= 25 && art.stows >= 10;
+        } else if (e <= AcApp._1_hour * 14) {
+            isRecommended = art.views >= 7500 && art.comments >= 45 && art.stows >= 16;
+        } else if (e <= AcApp._1_hour * 22) {
+            isRecommended = art.views >= 9000 && art.comments >= 55 && art.stows >= 24;
+        } else
+            isRecommended = art.views >= 11000 && art.comments >= 65 && art.stows >= 40;
+
+        return isRecommended;
     }
 }
