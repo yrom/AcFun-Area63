@@ -70,6 +70,11 @@ public class AcApp extends Application {
     public static User getUser(){
         return new DB(mContext).getUser();
     }
+
+    public static void logout() {
+        new DB(mContext).logout();
+    }
+    
     public static void addRequest(Request<?> request){
         mQueue.add(request);
     }
@@ -302,4 +307,5 @@ public class AcApp extends Application {
             }
         }
     }
+
 }

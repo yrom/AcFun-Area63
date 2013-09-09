@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp"
+    android:padding="16dp"
     android:drawSelectorOnTop="true"
     android:background="?attr/selectableItemBackground"
     android:layout_width="match_parent"
@@ -9,30 +8,46 @@
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:src="@drawable/account_avatar"
         android:layout_width="60dp"
         android:layout_height="60dp" />
-
+	<TextView
+	    android:id="@+id/signout"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignLeft="@+id/avatar"
+	    android:layout_alignBottom="@+id/avatar"
+	    android:layout_alignRight="@+id/avatar"
+	    android:text="注销"
+	    android:padding="2dp"
+	    android:gravity="center"
+	    android:visibility="gone"
+	   	android:textColor="@color/nav_text_color"
+	    android:background="#66333333"
+	    />
+	    
     <TextView
         android:id="@+id/user_name"
-        android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/avatar"
-        android:layout_marginTop="8dp"
         android:text="尚未登录"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/avatar"
         android:textColor="@color/nav_text_color"
-        android:textSize="13sp" />
+        android:textSize="14sp" />
     <TextView
         android:id="@+id/signature"
-        android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/user_name"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_alignLeft="@id/user_name"
         android:maxLines="2"
-        android:textColor="@color/nav_text_color"
         android:visibility="gone"
+        android:text="adfafdfadfadfad"
+        android:textColor="@color/nav_text_color"
         android:textSize="12sp" />
+    
 </RelativeLayout>

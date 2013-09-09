@@ -10,6 +10,7 @@ import tv.acfun.a63.api.entity.Content;
 import tv.acfun.a63.api.entity.Contents;
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.util.ActionBarUtil;
+import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.FastJsonRequest;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -35,7 +36,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -170,9 +174,17 @@ public class MainActivity extends SherlockFragmentActivity implements
             AcApp.getGloableLoader().get(mUser.avatar, ImageLoader.getImageListener(avatar, R.drawable.account_avatar, R.drawable.account_avatar));
             nameText.setText(mUser.name);
             if(!TextUtils.isEmpty(mUser.signature)){
+                LayoutParams params = (LayoutParams) nameText.getLayoutParams();
+                params.addRule(RelativeLayout.CENTER_VERTICAL,0);
+                params.topMargin = DensityUtil.dip2px(getApplicationContext(), 8);
+                nameText.setLayoutParams(params);
                 signatureText.setText(mUser.signature);
                 signatureText.setVisibility(View.VISIBLE);
             }
+            View signout = mAvatarFrame.findViewById(R.id.signout);
+            signout.setVisibility(View.VISIBLE);
+            signout.setOnClickListener(this);
+            avatar.setOnClickListener(this);
         }
     }
 
@@ -731,13 +743,21 @@ public class MainActivity extends SherlockFragmentActivity implements
                 startActivityForResult(
                     SigninActivity.createIntent(getApplicationContext()),
                     SigninActivity.REQUEST_SIGN_IN);
+        }else if(v.getId() == R.id.signout || v.getId() == R.id.avatar && mUser != null){
+            AcApp.logout();
+            mUser = null;
+            // Remove current avatar frame..
+            ((LinearLayout)mDrawer).removeViewAt(0);
+            mAvatarFrame = getLayoutInflater().inflate(R.layout.avatar_frame, (LinearLayout)mDrawer,false);
+            mAvatarFrame.setOnClickListener(this);
+            ((LinearLayout)mDrawer).addView(mAvatarFrame, 0);
+            AcApp.showToast("注销");
         }
 
     }
 
     @Override
     protected void onActivityResult(int request, int result, Intent data) {
-        Log.i(TAG, String.format("request=%d,result=%d", request, result));
         if(result == RESULT_OK){
             mUser = data.getExtras().getParcelable("user");
             setUserInfo();

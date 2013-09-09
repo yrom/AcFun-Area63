@@ -53,4 +53,9 @@ public final class DB {
         db.close();
         return user;
     }
+    public void logout() {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + DBOpenHelper.TABLE_USER);
+        db.close();
+    }
 }
