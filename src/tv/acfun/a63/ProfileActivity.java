@@ -16,12 +16,19 @@
 
 package tv.acfun.a63;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.httpclient.Cookie;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.User;
+import tv.acfun.a63.util.ActionBarUtil;
+import tv.acfun.a63.util.DocumentRequest;
 import tv.acfun.a63.util.UsingCookiesRequest;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -30,6 +37,8 @@ import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.alibaba.fastjson.JSON;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -49,20 +58,17 @@ public class ProfileActivity extends SherlockActivity {
     protected static final String TAG = "ProfileActivity";
     private WebView mWeb;
     private User mUser;
-    private Listener<Profile> listener = new Listener<ProfileActivity.Profile>() {
+    private Listener<Document> mSplashListener = new Listener<Document>() {
 
         @Override
-        public void onResponse(Profile response) {
+        public void onResponse(Document response) {
             // TODO Auto-generated method stub
-            Log.d(TAG, "on response");
-            TextView view = new TextView(ProfileActivity.this);
-            view.setTextSize(20);
-            view.setTextColor(Color.BLUE);
-            view.setText(response.toString());
-            setContentView(view);
+            String data = response.html();
+            mWeb.loadDataWithBaseURL(Constants.URL_BASE, data, "text/html", "utf-8", null);
         }
-    };
-    private ErrorListener errorListner = new ErrorListener() {
+        
+    }; 
+    private ErrorListener mErrorListner = new ErrorListener() {
 
         @Override
         public void onErrorResponse(VolleyError error) {
@@ -74,66 +80,58 @@ public class ProfileActivity extends SherlockActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
+        getSupportActionBar().setTitle("个人信息");
         mUser = AcApp.getUser();
-        mWeb = new WebView(this);
-        mWeb.getSettings();
         Cookie[] cookies = JSON.parseObject(mUser.cookies, Cookie[].class);
-        AcApp.addRequest(new ProfileRequest(cookies, listener, errorListner));
+//        AcApp.addRequest(new ProfileRequest(cookies, mProfileListener, mErrorListner));
+        setContentView(R.layout.activity_article);
+        mWeb = (WebView) findViewById(R.id.webview);
+        mWeb.getSettings().setJavaScriptEnabled(true);
+        AcApp.addRequest(new SplashDocumentRequest(cookies, mSplashListener, mErrorListner));
     }
-    private class ProfileRequest extends UsingCookiesRequest<Profile>{
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        
+        
+        
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+            finish();
+            return true;
+        default:
+            break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    
+    
+    
+    private class SplashDocumentRequest extends DocumentRequest{
 
-        public ProfileRequest(Cookie[] cookies,
-                Listener<Profile> listener, ErrorListener errorListner) {
-            super(Constants.URL_PROFILE, cookies, Profile.class, listener, errorListner);
+        public SplashDocumentRequest(Cookie[] cookies, Listener<Document> listener,
+                ErrorListener errorListner) {
+            super(Constants.URL_SPLAH, cookies, listener, errorListner);
         }
 
         @Override
-        protected Response<Profile> parseNetworkResponse(NetworkResponse response) {
-            String json;
+        protected Document parse(String htmlFromNet) {
             try {
-                json = new String(response.data,
-                        HttpHeaderParser.parseCharset(response.headers));
-                return Response.success(JSON.parseObject(json, Profile.class),
-                        HttpHeaderParser.parseCacheHeaders(response));
-            } catch (UnsupportedEncodingException e) {
-                return Response.error(new ParseError(e));
-            } catch (Exception e){
-                return Response.error(new ParseError(e));
+                InputStream in = getAssets().open("splash.html");
+                Document doc = Jsoup.parse(in, "utf-8","");
+                doc.getElementById("area-cont-splash").html(htmlFromNet);
+                doc.getElementsByClass("alert-info").remove();
+                doc.getElementById("hint-unread-splash").remove();
+                return doc;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             
-        }
-        
-    }
-    /**
-     * {
-          "uid": 458354,
-          "sign": "哦呵呵",
-          "username": "yrom",
-          "sextrend": -1,
-          "email": "80*@qq.com",
-          "regTime": 1357034245000,
-          "gender": true,
-          "blog": "http://www.yrom.net",
-          "success": true,
-          "userImg": "http://w5cdn.ranktv.cn/dotnet/artemis/u/cms/www/201308/04173814xr8l.jpg"
-        }
-     * @author Yrom
-     *
-     */
-    public static class Profile{
-        public int uid;
-        public String sign;
-        public String username;
-        public String email;
-        public long regTime;
-        public boolean gender;
-        public String blog;
-        public String userImg;
-        @Override
-        public String toString() {
-            return "Profile [uid=" + uid + ", \nsign=" + sign + ", \nusername=" + username + ", \nemail="
-                    + email + ", \nregTime=" + regTime + ", \ngender=" + gender + ", \nblog=" + blog
-                    + ", \nuserImg=" + userImg + "]";
+            return null;
         }
         
     }
