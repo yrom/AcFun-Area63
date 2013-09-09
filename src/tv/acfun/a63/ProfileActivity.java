@@ -64,7 +64,7 @@ public class ProfileActivity extends SherlockActivity {
         public void onResponse(Document response) {
             // TODO Auto-generated method stub
             String data = response.html();
-            mWeb.loadDataWithBaseURL(Constants.URL_BASE, data, "text/html", "utf-8", null);
+            mWeb.loadDataWithBaseURL(Constants.URL_HOME, data, "text/html", "utf-8", null);
         }
         
     }; 

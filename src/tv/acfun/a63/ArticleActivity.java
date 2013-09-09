@@ -38,6 +38,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import tv.acfun.a63.api.ArticleApi;
+import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Article;
 import tv.acfun.a63.api.entity.Article.SubContent;
 import tv.acfun.a63.util.ActionBarUtil;
@@ -59,6 +60,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.actionbarsherlock.widget.ShareActionProvider;
+import com.android.volley.Cache.Entry;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -98,8 +100,9 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     private Request<?> request;
     private Document mDoc;
     private List<String> imgUrls;
-    protected DownloadImageTask mDownloadTask;
-    private String title;  
+    private DownloadImageTask mDownloadTask;
+    private String title;
+    private boolean isDownloaded;  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,10 +144,12 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                 public void onPageFinished(WebView view, String url) {
                     if(imgUrls == null || imgUrls.isEmpty()|| url.startsWith("file:///android_asset"))
                         return;
-                    Log.i(TAG, "on finished:"+url);
-                    String[] arr = new String[imgUrls.size()];
-                    mDownloadTask = new DownloadImageTask();
-                    mDownloadTask.execute(imgUrls.toArray(arr));
+                    Log.d(TAG, "on finished:"+url);
+                    if(url.equals(Constants.URL_HOME) && imgUrls.size()>0 && !isDownloaded){
+                        String[] arr = new String[imgUrls.size()];
+                        mDownloadTask = new DownloadImageTask();
+                        mDownloadTask.execute(imgUrls.toArray(arr));
+                    }
                 }
                 
 
@@ -191,7 +196,20 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     private void initData(int aid) {
         request = new ArticleRequest(aid, this, this);
         request.setTag(TAG);
-        AcApp.addRequest(request);
+        request.setShouldCache(true);
+        mWeb.loadUrl("file:///android_asset/loading.html");
+        Entry entry = AcApp.getGloableQueue().getCache().get(request.getCacheKey());
+        if(entry != null && entry.data != null && entry.isExpired()){
+            try {
+                String json = new String(entry.data,
+                        "utf-8");
+                onResponse(Article.newArticle(new JSONObject(json)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+        }else
+            AcApp.addRequest(request);
 
     }
     private String buildTitle(Article article){
@@ -247,7 +265,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     protected void onDestroy() {
         super.onDestroy();
         AcApp.cancelAllRequest(TAG);
-        if(mDownloadTask != null && !mDownloadTask.isDownloaded){
+        if(mDownloadTask != null && !isDownloaded){
             mDownloadTask.cancel(false);
         }
     }
@@ -273,7 +291,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         boolean hasUseMap;
         @Override
         protected void onPreExecute() {
-            mWeb.loadUrl("file:///android_asset/loading.html");
         }
         @Override
         protected Boolean doInBackground(Article... params) {
@@ -304,33 +321,36 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                     Elements imgs = content.select("img");
                     if(imgs.hasAttr("usemap")){
                         hasUseMap = true;
-                    }else{
-                        for(int imgIndex=0;imgIndex<imgs.size();imgIndex++){
-                            Element img = imgs.get(imgIndex);
-                            String src = img.attr("src").trim();
-                            if(!src.startsWith("http")){
-                                src = "http://www.acfun.tv"+src;
-                            }
-                            File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE+"/"+mArticle.id),FileUtil.getHashName(src));
-                            imageCaches.put(src, cache);
-                            imgUrls.add(src);
-                            img.attr("org", src);
-                            String localUri = FileUtil.getLocalFileUri(cache).toString();
-                            if(cache.exists() && cache.canRead())
-                                // set cache
-                                img.attr("src",localUri);
-                            else if(AcApp.getViewMode() != 1)
-                                img.attr("src","file:///android_asset/loading.gif");
-                            else {
-                                // 无图模式
-                                img.after("<p >[图片]</p>");
-                                img.remove();
-                                continue;
-                            }
-                            img.attr("loc",localUri);
-                            // 去掉 style
-                            img.removeAttr("style");
-                            // 给 img 标签加上点击事件
+                    }
+                    for(int imgIndex=0;imgIndex<imgs.size();imgIndex++){
+                        Element img = imgs.get(imgIndex);
+                        String src = img.attr("src").trim();
+                        if(src.startsWith("file"))
+                            continue;
+                        if(!src.startsWith("http")){
+                            src = "http://www.acfun.tv"+src;
+                        }
+                        File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE+"/"+mArticle.id),FileUtil.getHashName(src));
+                        imageCaches.put(src, cache);
+                        imgUrls.add(src);
+                        img.attr("org", src);
+                        String localUri = FileUtil.getLocalFileUri(cache).toString();
+                        if(cache.exists() && cache.canRead())
+                            // set cache
+                            img.attr("src",localUri);
+                        else if(AcApp.getViewMode() != 1)
+                            img.attr("src","file:///android_asset/loading.gif");
+                        else {
+                            // 无图模式
+                            img.after("<p >[图片]</p>");
+                            img.remove();
+                            continue;
+                        }
+                        img.attr("loc",localUri);
+                        // 去掉 style
+                        img.removeAttr("style");
+                        // 给 img 标签加上点击事件
+                        if(!hasUseMap){
                             try {
                                 if ("icon".equals(img.attr("class"))
                                         || Integer.parseInt(img.attr("width")) < 100
@@ -343,7 +363,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                                 continue;
                             // 统一宽度
                             img.removeAttr("width");
-//                            img.attr("width", "90%");
                             img.removeAttr("height");
                             // 过滤掉图片的url跳转
                             if (img.parent() != null
@@ -354,9 +373,10 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                                 img.attr("onclick", "javascript:window.AC.viewImage('"+src+"');");
                             }
                         }
-                        
-                        
                     }
+                        
+                        
+                    
                 }
                 
             } catch (IOException e) {
@@ -391,7 +411,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
 
         int timeoutMs = 3000;
         int tryTimes = 3;
-        boolean isDownloaded;
         @Override
         protected Void doInBackground(String... params) {
             for(int index=0;index<params.length;index++){
