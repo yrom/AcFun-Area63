@@ -18,6 +18,7 @@ package tv.acfun.a63.util;
 
 import java.util.Map;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -30,17 +31,30 @@ import com.android.volley.Response.Listener;
 public abstract class CustomUARequest<T> extends Request<T> {
     protected final Class<T> mClazz;
     private final Listener<T> mListener;
-    public CustomUARequest(int method, String url, Class<T> clazz,Listener<T> listener,ErrorListener errorListner) {
+    protected final Map<String, String> mPostBody;
+    
+    /**
+     * @param method
+     * @param url
+     * @param requestBody the form data to post,
+     * @param clazz
+     * @param listener
+     * @param errorListner
+     */
+    public CustomUARequest(int method, String url, Map<String, String> requestBody,Class<T> clazz,Listener<T> listener,ErrorListener errorListner) {
         super(method, url, errorListner);
         this.mClazz = clazz;
         this.mListener = listener;
-        
+        mPostBody = requestBody;
     }
 
-    public CustomUARequest(String url, Class<T> clazz,Listener<T> listener, ErrorListener errorListner) {
-        this(Method.GET, url, clazz, listener, errorListner);
+    public CustomUARequest(String url, Map<String, String> requestBody, Class<T> clazz,Listener<T> listener, ErrorListener errorListner) {
+        this(requestBody == null? Method.GET:Method.POST, url, requestBody, clazz, listener, errorListner);
     }
     
+    public CustomUARequest(String url, Class<T> clazz,Listener<T> listener, ErrorListener errorListner){
+        this(url,null,clazz,listener,errorListner);
+    }
     
     @Override
     protected final void deliverResponse(T response) {
@@ -48,7 +62,11 @@ public abstract class CustomUARequest<T> extends Request<T> {
     }
     
     @Override
-    public final Map<String, String> getHeaders() {
+    public Map<String, String> getHeaders() {
         return Connectivity.UA_MAP;
+    }
+    @Override
+    protected Map<String, String> getParams() throws AuthFailureError {
+        return mPostBody;
     }
 }

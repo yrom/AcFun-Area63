@@ -17,6 +17,7 @@
 package tv.acfun.a63.util;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.android.volley.NetworkResponse;
@@ -34,13 +35,18 @@ import com.android.volley.toolbox.HttpHeaderParser;
 public class FastJsonRequest<T> extends CustomUARequest<T> {
     
     public FastJsonRequest(int method, String url, Class<T> clazz,Listener<T> listener, ErrorListener errorListner) {
-        super(method, url, clazz,listener, errorListner);
+        super(method, url,null, clazz,listener, errorListner);
         
     }
+    
     public FastJsonRequest(String url, Class<T> clazz,Listener<T> listener, ErrorListener errorListner) {
         this(Method.GET, url, clazz, listener, errorListner);
     }
-
+    
+    public FastJsonRequest(String url,Map<String, String> postBody, Class<T> clazz,Listener<T> listener, ErrorListener errorListner) {
+        super(url, postBody, clazz, listener, errorListner);
+    }
+    
     @Override
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
         try {

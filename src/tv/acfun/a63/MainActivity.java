@@ -8,6 +8,7 @@ import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Content;
 import tv.acfun.a63.api.entity.Contents;
+import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FastJsonRequest;
 import android.content.Intent;
@@ -83,9 +84,18 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     private static RequestQueue mQueue;
 
+    private ImageView avatar;
+
+    private TextView nameText;
+
+    private TextView signatureText;
+
+    private User mUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mUser = AcApp.getUser();
         setContentView(R.layout.activity_main);
         ActionBarUtil.forceShowActionBarOverflowMenu(this);
         mBar = getSupportActionBar();
@@ -94,7 +104,6 @@ public class MainActivity extends SherlockFragmentActivity implements
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         initDrawerLayout(savedInstanceState);
         mQueue = AcApp.getGloableQueue();
-
     }
 
     private void initDrawerLayout(Bundle savedInstanceState) {
@@ -102,6 +111,11 @@ public class MainActivity extends SherlockFragmentActivity implements
         mDrawer = findViewById(R.id.left_drawer);
         mAvatarFrame = findViewById(R.id.avatar_frame);
         mAvatarFrame.setOnClickListener(this);
+        avatar = (ImageView) mAvatarFrame.findViewById(R.id.avatar);
+        nameText = (TextView) mAvatarFrame.findViewById(R.id.user_name);
+        signatureText = (TextView) mAvatarFrame.findViewById(R.id.signature);
+        setUserInfo();
+        
         
         mDrawerList = (ListView) findViewById(R.id.list);
 
@@ -148,6 +162,17 @@ public class MainActivity extends SherlockFragmentActivity implements
         if (AcApp.getConfig().getBoolean("is_first_open", true)) {
             mDrawerLayout.openDrawer(mDrawer);
             AcApp.putBoolean("is_first_open", false);
+        }
+    }
+
+    private void setUserInfo() {
+        if(mUser != null){
+            AcApp.getGloableLoader().get(mUser.avatar, ImageLoader.getImageListener(avatar, R.drawable.account_avatar, R.drawable.account_avatar));
+            nameText.setText(mUser.name);
+            if(!TextUtils.isEmpty(mUser.signature)){
+                signatureText.setText(mUser.signature);
+                signatureText.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -700,7 +725,10 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onClick(View v) {
         if (v == mAvatarFrame) {
-            startActivityForResult(
+            if(mUser != null)
+                startActivity(new Intent(this,ProfileActivity.class));
+            else
+                startActivityForResult(
                     SigninActivity.createIntent(getApplicationContext()),
                     SigninActivity.REQUEST_SIGN_IN);
         }
@@ -710,6 +738,9 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     protected void onActivityResult(int request, int result, Intent data) {
         Log.i(TAG, String.format("request=%d,result=%d", request, result));
-        //TODO do login
+        if(result == RESULT_OK){
+            mUser = data.getExtras().getParcelable("user");
+            setUserInfo();
+        }
     }
 }
