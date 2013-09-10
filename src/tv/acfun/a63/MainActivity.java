@@ -691,64 +691,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     }
     
-    static class ArticleListAdapter2 extends BaseAdapter {
-        List<Content> contents;
-        LayoutInflater inflater;
-        public ArticleListAdapter2(LayoutInflater inflater, List<Content> contents) {
-            this.contents = contents;
-            this.inflater = inflater;
-        }
-        SimpleDateFormat mDateFormatter= new SimpleDateFormat("MM月dd日 HH:mm");
-        @Override
-        public int getCount() {
-            return contents.size();
-        }
-        public void addData(List<Content> contents){
-            this.contents.addAll(contents);
-        }
-        @Override
-        public Content getItem(int position) {
-            return contents.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ListViewHolder holder;
-            if(convertView == null){
-                convertView = inflater.inflate(R.layout.article_list_item2, parent,false);
-                holder = new ListViewHolder();
-                holder.title = (TextView) convertView.findViewById(R.id.article_item_title);
-                holder.titleImage = (ImageView) convertView.findViewById(R.id.article_title_img);
-                holder.views = (TextView) convertView.findViewById(R.id.article_item_views);
-                holder.upman = (TextView) convertView.findViewById(R.id.article_item_upman);
-                holder.postTime = (TextView) convertView.findViewById(R.id.article_item_post_time);
-                holder.comments = (TextView) convertView.findViewById(R.id.article_item_comments);
-                convertView.setTag(holder);
-            }
-            holder = (ListViewHolder) convertView.getTag();
-            Content art = getItem(position);
-            holder.title.setText(art .getTitle());
-            holder.views.setText(String.valueOf(art.getViews()));
-            String up = art.getUsername(); 
-            up = TextUtils.isEmpty(up)?"无名氏 /":up+" / ";
-            String time = mDateFormatter.format(new Date(art.getReleaseDate()));
-            holder.upman.setText(up+time+" / "+String.valueOf(art.getComments()));
-//            holder.comments.setText(String.valueOf(art.getComments()));
-//            holder.postTime.setText(time);
-            holder.postTime.setText(art.description);
-            if(!art.titleImg.contains("style/image/cover")){
-                AcApp.getGloableLoader().get(art.titleImg, ImageLoader.getImageListener(holder.titleImage, 0, 0));
-            }
-//            holder.titleImage.setImageUrl(art.titleImage, AcApp.getGloableLoader());
-            return convertView;
-        }
-
-    }
     static class ListViewHolder{
         TextView comments,
         postTime,
@@ -816,8 +758,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        //TODO change content list type
-        Log.i(TAG, "Navigation Item Selected = " + itemPosition);
         AcApp.putInt("nav_item",itemPosition);
         ((PlanetFragment)mContentFragment).changeContentListMode(itemPosition);
         return true;
