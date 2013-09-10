@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -47,6 +49,7 @@ import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -71,12 +74,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 
 /**
- * 文章页
- * 结构：
- * {@code
-    <div id="title">
-    <h1 class="article-title"></h1>
-        <div id="info" class="article-info">
+ * 文章页 结构： {@code <div id="title"> <h1 class="article-title"></h1>
+ * <div id="info" class="article-info">
           <span class="article-publisher"><i class="icon-slash"></i></span>
           <span class="article-pubdate"></span>
           <span class="article-category"></span>
@@ -89,7 +88,8 @@ import com.android.volley.toolbox.HttpHeaderParser;
  * 
  */
 public class ArticleActivity extends SherlockActivity implements Listener<Article>, ErrorListener {
-    private static String ARTICLE_PATH ;
+    private static String ARTICLE_PATH;
+
     public static void start(Context context, int aid, String title) {
         Intent intent = new Intent(context, ArticleActivity.class);
         intent.putExtra("aid", aid);
@@ -102,19 +102,28 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     private List<String> imgUrls;
     private DownloadImageTask mDownloadTask;
     private String title;
-    private boolean isDownloaded;  
+    private boolean isDownloaded;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         ARTICLE_PATH = AcApp.getExternalCacheDir("article").getAbsolutePath();
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
-        aid = getIntent().getIntExtra("aid", 0);
-        title = getIntent().getStringExtra("title");
+        
+        if(Intent.ACTION_VIEW.equalsIgnoreCase(getIntent().getAction())
+                &&getIntent().getData()!=null &&  getIntent().getData().getScheme().equals("ac")){
+            // ac://000000
+            aid = Integer.parseInt(getIntent().getDataString().substring(5));
+            title = "ac"+aid;
+        }else{
+            aid = getIntent().getIntExtra("aid", 0);
+            title = getIntent().getStringExtra("title");
+        }
         if (aid == 0) {
 
         } else {
-            getSupportActionBar().setTitle("ac"+aid);
+            getSupportActionBar().setTitle("ac" + aid);
             setSupportProgressBarIndeterminateVisibility(true);
             setContentView(R.layout.activity_article);
             mWeb = (WebView) findViewById(R.id.webview);
@@ -136,22 +145,46 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
 
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    // TODO Auto-generated method stub
-                    return super.shouldOverrideUrlLoading(view, url);
+                    Pattern regex = Pattern.compile("/a/ac(\\d{5,})");
+                    Matcher matcher = regex.matcher(url);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    if (matcher.find()) {
+                        String acId = matcher.group(1);
+                        try {
+                            intent.setData(Uri.parse("ac://" + acId));
+                            startActivity(intent);
+                            return true;
+                        } catch (Exception e) {
+                            // nothing
+                        }
+                    }else if((matcher = Pattern.compile("/v/ac(\\d{5,})").matcher(url)).find()){
+                        String acId = matcher.group(1);
+                        try {
+                            intent.setData(Uri.parse("av://ac" + acId));
+                            startActivity(intent);
+                            return true;
+                        } catch (Exception e) {
+                            // nothing
+                        }
+                        
+                    }
+                    intent.setData(Uri.parse(url));
+                    startActivity(intent);
+                    return true;
                 }
 
                 @Override
                 public void onPageFinished(WebView view, String url) {
-                    if(imgUrls == null || imgUrls.isEmpty()|| url.startsWith("file:///android_asset"))
+                    if (imgUrls == null || imgUrls.isEmpty()
+                            || url.startsWith("file:///android_asset"))
                         return;
-                    Log.d(TAG, "on finished:"+url);
-                    if(url.equals(Constants.URL_HOME) && imgUrls.size()>0 && !isDownloaded){
+                    Log.d(TAG, "on finished:" + url);
+                    if (url.equals(Constants.URL_HOME) && imgUrls.size() > 0 && !isDownloaded) {
                         String[] arr = new String[imgUrls.size()];
                         mDownloadTask = new DownloadImageTask();
                         mDownloadTask.execute(imgUrls.toArray(arr));
                     }
                 }
-                
 
             });
             mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
@@ -159,6 +192,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
             initData(aid);
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getSupportMenuInflater().inflate(R.menu.article_options_menu, menu);
@@ -168,7 +202,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         actionProvider.setShareIntent(createShareIntent());
         return super.onCreateOptionsMenu(menu);
     }
-    
+
     private Intent createShareIntent() {
         String shareurl = title + "http://www.acfun.tv/a/ac" + aid;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -177,6 +211,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareurl);
         return shareIntent;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -199,43 +234,40 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         request.setShouldCache(true);
         mWeb.loadUrl("file:///android_asset/loading.html");
         Entry entry = AcApp.getGloableQueue().getCache().get(request.getCacheKey());
-        if(entry != null && entry.data != null && entry.isExpired()){
+        if (entry != null && entry.data != null && entry.isExpired()) {
             try {
-                String json = new String(entry.data,
-                        "utf-8");
+                String json = new String(entry.data, "utf-8");
                 onResponse(Article.newArticle(new JSONObject(json)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
-        }else
+
+        } else
             AcApp.addRequest(request);
 
     }
-    private String buildTitle(Article article){
+
+    private String buildTitle(Article article) {
         StringBuilder builder = new StringBuilder();
         builder.append("<h1 class=\"article-title\">")
-            .append(article.title).append("</h1>")
-            .append("<div id=\"info\" class=\"article-info\">")
-            .append("<span class=\"article-publisher\"><img id=\"icon\" src=\"file:///android_asset/wen2.png\" width='18px' height='18px'/> ")
-            .append("<a href=\"http://www.acfun.tv/member/user.aspx?uid=").append(article.poster.id).append("\" >")
-            .append(article.poster.name)
-            .append("</a>")
-            .append("</span>")
-            .append("<span class=\"article-pubdate\">")
-            .append(AcApp.getPubDate(article.postTime))
-            .append("发布于</span>")
-            .append("<span class=\"article-category\">")
-            .append(article.channelName)
-            .append("</span>")
-            .append("</div>")
-            
-            
-            ;
-        
+                .append(article.title)
+                .append("</h1>")
+                .append("<div id=\"info\" class=\"article-info\">")
+                .append("<span class=\"article-publisher\"><img id=\"icon\" src=\"file:///android_asset/wen2.png\" width='18px' height='18px'/> ")
+                .append("<a href=\"http://www.acfun.tv/member/user.aspx?uid=")
+                .append(article.poster.id).append("\" >")
+                .append(article.poster.name)
+                .append("</a>").append("</span>")
+                .append("<span class=\"article-pubdate\">")
+                .append(AcApp.getPubDate(article.postTime))
+                .append("发布于</span>")
+                .append("<span class=\"article-category\">")
+                .append(article.channelName)
+                .append("</span>")
+                .append("</div>");
+
         return builder.toString();
     }
-    
 
     private static final String TAG = "Article";
     private Article mArticle;
@@ -265,7 +297,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     protected void onDestroy() {
         super.onDestroy();
         AcApp.cancelAllRequest(TAG);
-        if(mDownloadTask != null && !isDownloaded){
+        if (mDownloadTask != null && !isDownloaded) {
             mDownloadTask.cancel(false);
         }
     }
@@ -275,179 +307,191 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         mArticle = response;
         imgUrls = response.imgUrls;
         new BuildDocTask().execute(mArticle);
-        
 
     }
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        // TODO Auto-generated method stub
-        AcApp.showToast("加载失败");
+        mWeb.loadData("<h1>加载失败请重试！</h1>", "text/html", "utf-8");
     }
-    
-    Map<String,File> imageCaches;
+
+    Map<String, File> imageCaches;
     private int aid;
-    private class BuildDocTask extends AsyncTask<Article, Void, Boolean>{
+
+    private class BuildDocTask extends AsyncTask<Article, Void, Boolean> {
         boolean hasUseMap;
+
         @Override
         protected void onPreExecute() {
         }
+
         @Override
         protected Boolean doInBackground(Article... params) {
             try {
                 InputStream in = getAssets().open("article.html");
                 mDoc = Jsoup.parse(in, "utf-8", "");
-                if(imgUrls !=null)
-                    imgUrls.clear();
-                else
-                    imgUrls = new ArrayList<String>();
-                if(imageCaches != null) 
-                    imageCaches.clear();
-                else 
-                    imageCaches = new HashMap<String, File>();
+                initCaches();
                 Element title = mDoc.getElementById("title");
                 title.append(buildTitle(params[0]));
                 Element content = mDoc.getElementById("content");
-                
+
                 ArrayList<SubContent> contents = params[0].contents;
-                
-                for(int i=0;i<contents.size();i++){
+
+                for (int i = 0; i < contents.size(); i++) {
                     SubContent sub = contents.get(i);
-                    
-                    if(!params[0].title.equals(sub.subTitle)){
-                        content.append("<h2 class=\"article-subtitle\">"+sub.subTitle +"</h2><hr>");
-                    }
-                    content.append(sub.content);
-                    Elements imgs = content.select("img");
-                    if(imgs.hasAttr("usemap")){
-                        hasUseMap = true;
-                    }
-                    for(int imgIndex=0;imgIndex<imgs.size();imgIndex++){
-                        Element img = imgs.get(imgIndex);
-                        String src = img.attr("src").trim();
-                        if(src.startsWith("file"))
-                            continue;
-                        if(!src.startsWith("http")){
-                            src = "http://www.acfun.tv"+src;
-                        }
-                        File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE+"/"+mArticle.id),FileUtil.getHashName(src));
-                        imageCaches.put(src, cache);
-                        imgUrls.add(src);
-                        img.attr("org", src);
-                        String localUri = FileUtil.getLocalFileUri(cache).toString();
-                        if(cache.exists() && cache.canRead())
-                            // set cache
-                            img.attr("src",localUri);
-                        else if(AcApp.getViewMode() != 1)
-                            img.attr("src","file:///android_asset/loading.gif");
-                        else {
-                            // 无图模式
-                            img.after("<p >[图片]</p>");
-                            img.remove();
-                            continue;
-                        }
-                        img.attr("loc",localUri);
-                        // 去掉 style
-                        img.removeAttr("style");
-                        // 给 img 标签加上点击事件
-                        if(!hasUseMap){
-                            try {
-                                if ("icon".equals(img.attr("class"))
-                                        || Integer.parseInt(img.attr("width")) < 100
-                                        || Integer.parseInt(img.attr("height")) < 100) {
-                                    continue;
-                                }
-                            } catch (Exception e) {
-                            }
-                            if (src.contains("emotion/images/"))
-                                continue;
-                            // 统一宽度
-                            img.removeAttr("width");
-                            img.removeAttr("height");
-                            // 过滤掉图片的url跳转
-                            if (img.parent() != null
-                                    && img.parent().tagName().equalsIgnoreCase("a")) {
-                                img.parent().attr("href",
-                                        "javascript:window.AC.viewImage('" + src + "');");
-                            } else {
-                                img.attr("onclick", "javascript:window.AC.viewImage('"+src+"');");
-                            }
-                        }
-                    }
-                        
-                        
-                    
+                    handleSubContent(content, sub, params[0]);
                 }
-                
+
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
             }
             return true;
         }
+
+        private void handleSubContent(Element content, SubContent sub, Article article) {
+            if (!article.title.equals(sub.subTitle)) {
+                content.append("<h2 class=\"article-subtitle\">" + sub.subTitle + "</h2><hr>");
+            }
+            content.append(sub.content);
+            Elements imgs = content.select("img");
+            if (imgs.hasAttr("usemap")) {
+                hasUseMap = true;
+            }
+            for (int imgIndex = 0; imgIndex < imgs.size(); imgIndex++) {
+                Element img = imgs.get(imgIndex);
+                String src = img.attr("src").trim();
+                if (src.startsWith("file"))
+                    continue;
+                if (!src.startsWith("http")) {
+                    src = "http://www.acfun.tv" + src;
+                }
+//                File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE + "/" + mArticle.id),
+//                        FileUtil.getHashName(src));
+                File cache = FileUtil.generateImageCacheFile(src);
+                imageCaches.put(src, cache);
+                imgUrls.add(src);
+                img.attr("org", src);
+                String localUri = FileUtil.getLocalFileUri(cache).toString();
+                if (cache.exists() && cache.canRead() && cache.length() > FileUtil._1KB)
+                    // set cache
+                    img.attr("src", localUri);
+                else if (AcApp.getViewMode() != 1)
+                    img.attr("src", "file:///android_asset/loading.gif");
+                else {
+                    // 无图模式
+                    img.after("<p >[图片]</p>");
+                    img.remove();
+                    continue;
+                }
+                img.attr("loc", localUri);
+                // 去掉 style
+                img.removeAttr("style");
+                    // 给 img 标签加上点击事件
+                if (!hasUseMap){
+                    img.removeAttr("width");
+                    img.removeAttr("height");
+                    addClick(img, src);
+                }
+            }
+        }
+
+        private void initCaches() {
+            if (imgUrls != null)
+                imgUrls.clear();
+            else
+                imgUrls = new ArrayList<String>();
+            if (imageCaches != null)
+                imageCaches.clear();
+            else
+                imageCaches = new HashMap<String, File>();
+        }
+
+        private void addClick(Element img, String src) {
+            try {
+                if ("icon".equals(img.attr("class")) || Integer.parseInt(img.attr("width")) < 100
+                        || Integer.parseInt(img.attr("height")) < 100) {
+                    return;
+                }
+            } catch (Exception e) {
+            }
+            if (src.contains("emotion/images/"))
+                return;
+            // 过滤掉图片的url跳转
+            if (img.parent() != null && img.parent().tagName().equalsIgnoreCase("a")) {
+                img.parent().attr("href", "javascript:window.AC.viewImage('" + src + "');");
+            } else {
+                img.attr("onclick", "javascript:window.AC.viewImage('" + src + "');");
+            }
+
+        }
+
         @Override
         protected void onPostExecute(Boolean result) {
-            if(result){
+            if (result) {
                 setSupportProgressBarIndeterminateVisibility(false);
-                mWeb.loadDataWithBaseURL("http://www.acfun.tv/", mDoc.html(), "text/html", "UTF-8", null);
-                if(hasUseMap)
+                mWeb.loadDataWithBaseURL("http://www.acfun.tv/", mDoc.html(), "text/html", "UTF-8",
+                        null);
+                if (hasUseMap)
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
                 else
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
-                
-            }else{
-                mWeb.loadData("<h1>加载失败请重试！</h1>", "text/html", "utf-8");
+
             }
         }
-        
-        
+
     };
+
     /**
      * 异步下载图片到缓存目录
+     * 
      * @author Yrom
-     *
+     * 
      */
-    private class DownloadImageTask extends AsyncTask<String, Integer, Void>{
+    private class DownloadImageTask extends AsyncTask<String, Integer, Void> {
 
         int timeoutMs = 3000;
         int tryTimes = 3;
+
         @Override
         protected Void doInBackground(String... params) {
-            for(int index=0;index<params.length;index++){
-                if(isCancelled()) {
-                    // cancel task on activity destory
-                    Log.w(TAG, "break download task,index="+index);
-                    break; 
-                }
+            for (int index = 0; index < params.length; index++) {
                 String url = params[index];
+                if (isCancelled()) {
+                    // cancel task on activity destory
+                    Log.w(TAG, String.format("break download task,index=%d,src=%s", index,url));
+                    break;
+                }
                 File cache = imageCaches.get(url);
-                if(cache.exists() && cache.canRead()){
+                Log.i(TAG, "cache file = "+cache.getAbsolutePath());
+                if (cache.exists() && cache.canRead()) {
                     publishProgress(index);
                     continue;
-                }else{
+                } else {
                     cache.getParentFile().mkdirs();
                 }
                 InputStream in = null;
                 OutputStream out = null;
-                
+
                 try {
                     URL parsedUrl = new URL(url);
-                    for(int i=0;i<tryTimes;i++){
-                        HttpURLConnection connection = (HttpURLConnection) parsedUrl.openConnection();
-                        connection.setConnectTimeout(timeoutMs+i*1500);
-                        connection.setReadTimeout(timeoutMs*(2+i));
+                    for (int i = 0; i < tryTimes; i++) {
+                        HttpURLConnection connection = (HttpURLConnection) parsedUrl
+                                .openConnection();
+                        connection.setConnectTimeout(timeoutMs + i * 1500);
+                        connection.setReadTimeout(timeoutMs * (2 + i));
                         connection.setUseCaches(false);
                         try {
                             int responseCode = connection.getResponseCode();
                             if (responseCode == 200) {
                                 in = connection.getInputStream();
                                 out = new FileOutputStream(cache);
-                                FileUtil.copyStream(in,out);
+                                FileUtil.copyStream(in, out);
                                 publishProgress(index);
                                 break;
                             }
                         } catch (SocketTimeoutException e) {
-                            Log.w(TAG, "retry",e);
+                            Log.w(TAG, "retry", e);
                         }
                     }
                 } catch (MalformedURLException e) {
@@ -468,25 +512,28 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                     } catch (IOException e) {
                     }
                 }
-            
+
             }
             return null;
         }
+
         @Override
         protected void onProgressUpdate(Integer... values) {
-            if(imgUrls != null){
+            if (imgUrls != null) {
                 String url = imgUrls.get(values[0]);
-                if(url== null) return;
-                Log.i(TAG, url+" cached");
+                if (url == null)
+                    return;
+                Log.i(TAG, url + " cached");
                 mWeb.loadUrl("javascript:(function(){"
                         + "var images = document.getElementsByTagName(\"img\"); "
-                        + "images[" + values[0]+ "].src = images[" + values[0]+ "].getAttribute(\"loc\");"
-                        + "})()"); 
+                        + "images["+ values[0] + "].src = images[" + values[0] + "].getAttribute(\"loc\");"
+                        + "})()");
             }
         }
-        @Override  
-        protected void onPostExecute(Void result) {  
-            //确保所有图片都顺利的显示出来
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // 确保所有图片都顺利的显示出来
             isDownloaded = true;
             mWeb.loadUrl("javascript:(function(){"
                     + "var images = document.getElementsByTagName(\"img\"); "
@@ -495,17 +542,19 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
                     +   "images[i].setAttribute(\"src\",imgSrc);"
                     + "}"
                     + "})()");
-        }  
-        
+        }
+
     }
-    class ACJSObject{
+
+    class ACJSObject {
         @android.webkit.JavascriptInterface
-        public void viewcomment(){
+        public void viewcomment() {
             CommentsActivity.start(ArticleActivity.this, mArticle.id);
         }
+
         @android.webkit.JavascriptInterface
-        public void viewImage(String url){
-            AcApp.showToast("查看图片: url=%s",url);
+        public void viewImage(String url) {
+            AcApp.showToast("查看图片: url=%s", url);
             // TODO
         }
     }

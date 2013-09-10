@@ -31,7 +31,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".SigninActivity" />
-        <activity android:name=".ArticleActivity" />
+        <activity android:name=".ArticleActivity" android:label="@string/app_name_open">
+            <intent-filter> 
+        		<action android:name="android.intent.action.VIEW"/>  
+        		<category android:name="android.intent.category.DEFAULT"/>  
+        		<data android:scheme="ac"/> 
+      		</intent-filter>
+        </activity>
         <activity android:name=".ProfileActivity" />
         <activity android:name=".CommentsActivity" android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
     </application>
