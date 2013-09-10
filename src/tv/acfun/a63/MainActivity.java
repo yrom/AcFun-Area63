@@ -181,10 +181,11 @@ public class MainActivity extends SherlockFragmentActivity implements
                 signatureText.setText(mUser.signature);
                 signatureText.setVisibility(View.VISIBLE);
             }
-            View signout = mAvatarFrame.findViewById(R.id.signout);
-            signout.setVisibility(View.VISIBLE);
-            signout.setOnClickListener(this);
-            avatar.setOnClickListener(this);
+//            logout
+//            View signout = mAvatarFrame.findViewById(R.id.signout);
+//            signout.setVisibility(View.VISIBLE);
+//            signout.setOnClickListener(this);
+//            avatar.setOnClickListener(this);
         }
     }
 
@@ -738,29 +739,40 @@ public class MainActivity extends SherlockFragmentActivity implements
     public void onClick(View v) {
         if (v == mAvatarFrame) {
             if(mUser != null)
-                startActivity(new Intent(this,ProfileActivity.class));
+                startActivityForResult(new Intent(this,ProfileActivity.class),2);
             else
                 startActivityForResult(
                     SigninActivity.createIntent(getApplicationContext()),
                     SigninActivity.REQUEST_SIGN_IN);
-        }else if(v.getId() == R.id.signout || v.getId() == R.id.avatar && mUser != null){
-            AcApp.logout();
-            mUser = null;
-            // Remove current avatar frame..
-            ((LinearLayout)mDrawer).removeViewAt(0);
-            mAvatarFrame = getLayoutInflater().inflate(R.layout.avatar_frame, (LinearLayout)mDrawer,false);
-            mAvatarFrame.setOnClickListener(this);
-            ((LinearLayout)mDrawer).addView(mAvatarFrame, 0);
-            AcApp.showToast("注销");
         }
+//        else if(v.getId() == R.id.signout || v.getId() == R.id.avatar && mUser != null){
+//            AcApp.logout();
+//            invalidateAvatarFrame();
+//            AcApp.showToast("注销");
+//        }
 
+    }
+
+    /**
+     *  Remove current avatar frame..
+     */
+    private void invalidateAvatarFrame() {
+        mUser = null;
+        ((LinearLayout)mDrawer).removeViewAt(0);
+        mAvatarFrame = getLayoutInflater().inflate(R.layout.avatar_frame, (LinearLayout)mDrawer,false);
+        mAvatarFrame.setOnClickListener(this);
+        ((LinearLayout)mDrawer).addView(mAvatarFrame, 0);
     }
 
     @Override
     protected void onActivityResult(int request, int result, Intent data) {
-        if(result == RESULT_OK){
-            mUser = data.getExtras().getParcelable("user");
-            setUserInfo();
+        if(result == RESULT_OK ){
+            if(request == SigninActivity.REQUEST_SIGN_IN){
+                mUser = data.getExtras().getParcelable("user");
+                setUserInfo();
+            }else{
+                invalidateAvatarFrame();
+            }
         }
     }
 }

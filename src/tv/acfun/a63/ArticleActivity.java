@@ -43,16 +43,10 @@ import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Article;
 import tv.acfun.a63.api.entity.Article.SubContent;
-import tv.acfun.a63.util.ActionBarUtil;
-import tv.acfun.a63.util.Connectivity;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -62,10 +56,8 @@ import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import com.actionbarsherlock.widget.ShareActionProvider;
 import com.android.volley.Cache.Entry;
 import com.android.volley.NetworkResponse;
@@ -91,7 +83,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
  * @author Yrom
  * 
  */
-public class ArticleActivity extends SherlockActivity implements Listener<Article>, ErrorListener {
+public class ArticleActivity extends BaseWebViewActivity implements Listener<Article>, ErrorListener {
     private static String ARTICLE_PATH;
 
     public static void start(Context context, int aid, String title) {
@@ -109,11 +101,8 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     private boolean isDownloaded;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+    protected void initView(Bundle savedInstanceState) {
         ARTICLE_PATH = AcApp.getExternalCacheDir("article").getAbsolutePath();
-        ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
         
         if(Intent.ACTION_VIEW.equalsIgnoreCase(getIntent().getAction())
                 &&getIntent().getData()!=null &&  getIntent().getData().getScheme().equals("ac")){
@@ -125,16 +114,11 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
             title = getIntent().getStringExtra("title");
         }
         if (aid == 0) {
-
+            throw new IllegalArgumentException("没有 id");
         } else {
             getSupportActionBar().setTitle("ac" + aid);
-            setSupportProgressBarIndeterminateVisibility(true);
-            setContentView(R.layout.activity_article);
-            mWeb = (WebView) findViewById(R.id.webview);
-            mWeb.getSettings().setAllowFileAccess(true);
             mWeb.getSettings().setAppCachePath(ARTICLE_PATH);
             mWeb.getSettings().setBlockNetworkImage(true);
-            mWeb.getSettings().setJavaScriptEnabled(true);
             mWeb.addJavascriptInterface(new ACJSObject(), "AC");
             mWeb.setWebChromeClient(new WebChromeClient() {
 
@@ -192,9 +176,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
 
             });
             mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
-            mWeb.getSettings().setUserAgentString(Connectivity.UA);
-            mWeb.loadUrl("file:///android_asset/loading.html");
-            initData(aid);
         }
     }
 
@@ -220,9 +201,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case android.R.id.home:
-            finish();
-            return true;
         case R.id.menu_item_comment:
             CommentsActivity.start(ArticleActivity.this, mArticle.id);
             return true;
@@ -233,7 +211,8 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         return super.onOptionsItemSelected(item);
     }
 
-    private void initData(int aid) {
+    protected void initData() {
+        super.initData();
         request = new ArticleRequest(aid, this, this);
         request.setTag(TAG);
         request.setShouldCache(true);
@@ -274,8 +253,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
 
     private static final String TAG = "Article";
     private Article mArticle;
-    private WebView mWeb;
-
     static class ArticleRequest extends CustomUARequest<Article> {
 
         public ArticleRequest(int aid, Listener<Article> listener, ErrorListener errListener) {
@@ -312,28 +289,10 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         new BuildDocTask().execute(mArticle);
 
     }
-    DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-        
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            dialog.dismiss();
-            if(which == DialogInterface.BUTTON_POSITIVE){
-                initData(aid);
-            }else{
-                finish();
-            }
-            
-        }
-    };
     @Override
     public void onErrorResponse(VolleyError error) {
-        try {
-            Drawable icon = Drawable.createFromStream(getAssets().open("emotion/ais/27.gif"),"27.gif");
-            icon.setBounds(0,0,icon.getIntrinsicWidth(), icon.getIntrinsicHeight());
-            new AlertDialog.Builder(this).setTitle("加载失败！").setIcon(icon).setMessage("是否重试？").setPositiveButton("重试", listener ).setNegativeButton("算了", listener).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        setSupportProgressBarIndeterminateVisibility(false);
+        showErrorDialog();
     }
 
     Map<String, File> imageCaches;
@@ -449,8 +408,8 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
 
         @Override
         protected void onPostExecute(Boolean result) {
+            setSupportProgressBarIndeterminateVisibility(false);
             if (result) {
-                setSupportProgressBarIndeterminateVisibility(false);
                 mWeb.loadDataWithBaseURL("http://www.acfun.tv/", mDoc.html(), "text/html", "UTF-8",
                         null);
                 if (hasUseMap)

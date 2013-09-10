@@ -18,53 +18,39 @@ package tv.acfun.a63;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.httpclient.Cookie;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.User;
-import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.DocumentRequest;
-import tv.acfun.a63.util.UsingCookiesRequest;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.webkit.WebView;
-import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.alibaba.fastjson.JSON;
-import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
-import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
 
 /**
  * @author Yrom
  *
  */
-public class ProfileActivity extends SherlockActivity {
+public class ProfileActivity extends BaseWebViewActivity {
 
     
     protected static final String TAG = "ProfileActivity";
-    private WebView mWeb;
     private User mUser;
     private Listener<Document> mSplashListener = new Listener<Document>() {
 
         @Override
         public void onResponse(Document response) {
-            // TODO Auto-generated method stub
             String data = response.html();
             mWeb.loadDataWithBaseURL(Constants.URL_HOME, data, "text/html", "utf-8", null);
+            setSupportProgressBarIndeterminateVisibility(false);
         }
         
     }; 
@@ -72,24 +58,29 @@ public class ProfileActivity extends SherlockActivity {
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            // TODO Auto-generated method stub
             Log.e(TAG, "VolleyError", error);
+            setSupportProgressBarIndeterminateVisibility(false);
+            showErrorDialog();
         }
     };
+    private Cookie[] cookies;
+
+    
+    @Override
+    protected void initView(Bundle savedInstanceState) {
+        getSupportActionBar().setTitle("个人信息");
+        mWeb.addJavascriptInterface(new ACJSObject(), "AC");
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
-        getSupportActionBar().setTitle("个人信息");
+    protected void initData() {
+        super.initData();
         mUser = AcApp.getUser();
-        Cookie[] cookies = JSON.parseObject(mUser.cookies, Cookie[].class);
-//        AcApp.addRequest(new ProfileRequest(cookies, mProfileListener, mErrorListner));
-        setContentView(R.layout.activity_article);
-        mWeb = (WebView) findViewById(R.id.webview);
-        mWeb.getSettings().setJavaScriptEnabled(true);
+        cookies = JSON.parseObject(mUser.cookies, Cookie[].class);
         AcApp.addRequest(new SplashDocumentRequest(cookies, mSplashListener, mErrorListner));
     }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         
@@ -97,19 +88,6 @@ public class ProfileActivity extends SherlockActivity {
         
         return super.onCreateOptionsMenu(menu);
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case android.R.id.home:
-            finish();
-            return true;
-        default:
-            break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    
-    
     
     private class SplashDocumentRequest extends DocumentRequest{
 
@@ -126,6 +104,9 @@ public class ProfileActivity extends SherlockActivity {
                 doc.getElementById("area-cont-splash").html(htmlFromNet);
                 doc.getElementsByClass("alert-info").remove();
                 doc.getElementById("hint-unread-splash").remove();
+                //TODO <a class=\"button\" href=\"javascript:window.AC.checkin();\">签到</a>
+                String html = "<div id=\"control\"><a class=\"button\" href=\"javascript:window.AC.logout();\" >注销</a> </div>";
+                doc.getElementById("list-info-splash").before(html);
                 return doc;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -134,5 +115,17 @@ public class ProfileActivity extends SherlockActivity {
             return null;
         }
         
+    }
+    class ACJSObject {
+        @android.webkit.JavascriptInterface
+        public void logout(){
+            AcApp.logout();
+            setResult(RESULT_OK);
+            finish();
+        }
+//        @android.webkit.JavascriptInterface
+//        public void checkin(){
+//            MemberUtils.checkIn(cookies);
+//        }
     }
 }
