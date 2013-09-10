@@ -164,7 +164,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     if (imgUrls == null || imgUrls.isEmpty()
-                            || url.startsWith("file:///android_asset"))
+                            || url.startsWith("file:///android_asset") 
+                            || AcApp.getViewMode() == 1) // 无图模式
                         return;
                     Log.d(TAG, "on finished:" + url);
                     if (url.equals(Constants.URL_HOME) && imgUrls.size() > 0 && !isDownloaded) {
