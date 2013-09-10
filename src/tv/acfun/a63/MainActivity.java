@@ -411,7 +411,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         int page;
         PullToRefreshListView list;
         LayoutInflater inflater;
-        
+        boolean isLoading;
+        View footView;
         private FastJsonRequest<Contents> request;
         private ILoadingLayout loadingLayout;
         public DummyCardFragment() {
@@ -424,6 +425,8 @@ public class MainActivity extends SherlockFragmentActivity implements
             View rootView = inflater.inflate(R.layout.fragment_main_dummy,
                     container, false);
             list = (PullToRefreshListView) rootView.findViewById(R.id.list);
+            footView = inflater.inflate(R.layout.list_footerview, list.getRefreshableView(),false);
+            list.getRefreshableView().addFooterView(footView, null, false);
             loadingLayout = list.getLoadingLayoutProxy(true, false);
             list.setOnRefreshListener(new OnRefreshListener<ListView>() {
                 @Override
@@ -439,6 +442,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
                 @Override
                 public void onLastItemVisible() {
+                    if(!isLoading)
                     loadData(false,false);
                 }
             });
@@ -453,8 +457,62 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
         
         private ArticleListAdapter adapter;
+        Response.Listener<Contents> listener = new Response.Listener<Contents>() {
+            @Override
+            public void onResponse(Contents response) {
+                if(page <= 1){
+                    if(adapter == null){
+                        adapter = new ArticleListAdapter(inflater,response.getContents());
+                        list.setAdapter(adapter);
+                    } else
+                        adapter.contents = response.getContents();
+                }else{
+                    adapter.addData(response.getContents());
+                }
+                adapter.notifyDataSetChanged();
+                list.onRefreshComplete();
+                needReload = false;
+                isLoading = false;
+            }
 
+        };
+        OnClickListener onReload = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(needReload){
+                    if(page >1) {
+                        page -= 1;
+                        loadData(false, false);
+                    }else{
+                        loadData(true, false);
+                    }
+                }
+            }
+        };
+        boolean needReload;
+        Response.ErrorListener errorListner = new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "load list error", error);
+                AcApp.showToast("加载失败");
+                TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
+                text.setText(R.string.reloading);
+                footView.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
+                footView.setOnClickListener(onReload);
+                needReload = true;
+                list.onRefreshComplete();
+                isLoading = false;
+            }
+        };
+        
         private void loadData(boolean newData, boolean loadCache) {
+            isLoading = true;
+            TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
+            text.setText(R.string.loading);
+            footView.findViewById(R.id.list_footview_progress).setVisibility(View.VISIBLE);
+            footView.setOnClickListener(null);
+            
             page = newData ? 1 : page + 1;
             String url = ArticleApi.getDefaultUrl(Constants.CAT_IDS[getArguments().getInt(ARG_SECTION_NUMBER)], DEFAULT_COUT, page);
            
@@ -489,32 +547,8 @@ public class MainActivity extends SherlockFragmentActivity implements
                     return;
                 }
             }
-            request = new FastJsonRequest<Contents>(
-                    url, Contents.class, new Response.Listener<Contents>() {
-                        @Override
-                        public void onResponse(Contents response) {
-                            if(page <= 1){
-                                if(adapter == null){
-                                    adapter = new ArticleListAdapter(inflater,response.getContents());
-                                    list.setAdapter(adapter);
-                                } else
-                                    adapter.contents = response.getContents();
-                            }else{
-                                adapter.addData(response.getContents());
-                            }
-                            adapter.notifyDataSetChanged();
-                            list.onRefreshComplete();
-                        }
-
-                    }, new Response.ErrorListener() {
-
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e(TAG, "load list error", error);
-                            AcApp.showToast("加载失败");
-                            list.onRefreshComplete();
-                        }
-                    });
+            
+            request = new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
             request.setShouldCache(true);
             if(BuildConfig.DEBUG)
                 Log.d(TAG, "new request:"+request.getUrl());
