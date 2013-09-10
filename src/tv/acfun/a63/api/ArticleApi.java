@@ -39,15 +39,15 @@ public final class ArticleApi {
     /**
      * 获得周热门列表url
      */
-    public static String getHotListUrl(int channelId) {
-        return getUrl(Constants.TYPE_HOT, channelId, Constants.COUNT_HOT, 1);
+    public static String getHotListUrl(int channelId,int page) {
+        return getUrl(Constants.TYPE_HOT, channelId, Constants.COUNT_HOT, page);
     }
 
     /**
      * 获得最新回复列表url
      */
-    public static String getLatestRepliedUrl(int channelId) {
-        return getUrl(Constants.TYPE_LATEST_REPLY, channelId, Constants.COUNT_LAST_REPLY, 1);
+    public static String getLatestRepliedUrl(int channelId,int page) {
+        return getUrl(Constants.TYPE_LATEST_REPLY, channelId, Constants.COUNT_LAST_REPLY, page);
     }
 
     public static String getContentUrl(int aid) {

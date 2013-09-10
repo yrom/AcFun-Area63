@@ -21,6 +21,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
@@ -95,6 +96,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     private TextView signatureText;
 
     private User mUser;
+
+    private Fragment mContentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,7 +193,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void selectItem(int position) {
-        Fragment fragment = new PlanetFragment();
+        mContentFragment = new PlanetFragment();
         Bundle args = new Bundle();
         args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
         if (position == 0) {
@@ -215,14 +218,11 @@ public class MainActivity extends SherlockFragmentActivity implements
             };
             adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
             mBar.setListNavigationCallbacks(adapter, this);
-
         }
-
-        fragment.setArguments(args);
-
+        mContentFragment.setArguments(args);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, fragment).commit();
+                .replace(R.id.content_frame, mContentFragment).commit();
 
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
@@ -286,7 +286,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     public static class SectionsPagerAdapter extends FragmentPagerAdapter {
         String[] titles;
-
+        int contentListMode = 0;
         public SectionsPagerAdapter(FragmentManager fragmentManager,
                 String[] titles) {
             super(fragmentManager);
@@ -298,6 +298,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             Fragment fragment = new DummyCardFragment();
             Bundle args = new Bundle();
             args.putInt(DummyCardFragment.ARG_SECTION_NUMBER, position);
+            args.putInt(DummyCardFragment.ARG_LIST_MODE, contentListMode);
             fragment.setArguments(args);
             return fragment;
         }
@@ -313,6 +314,21 @@ public class MainActivity extends SherlockFragmentActivity implements
             if (position < titles.length)
                 return titles[position];
             return null;
+        }
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            DummyCardFragment fragment = (DummyCardFragment) super.instantiateItem(container, position);
+            fragment.setContentListMode(contentListMode);
+            return fragment;
+            
+        }
+        @Override
+        public int getItemPosition(Object object) {
+            return PagerAdapter.POSITION_NONE;
+        }
+        public void changeContentListMode(int itemPosition) {
+            contentListMode = itemPosition;
+            notifyDataSetChanged();
         }
     }
 
@@ -402,10 +418,16 @@ public class MainActivity extends SherlockFragmentActivity implements
             }
             return rootView;
         }
+
+        public void changeContentListMode(int itemPosition) {
+            Log.d(TAG, "adapter change Content ListMode = " +itemPosition );
+            mSectionsPagerAdapter.changeContentListMode(itemPosition);
+        }
     }
 
     public static class DummyCardFragment extends Fragment implements OnItemClickListener {
 
+        public static final String ARG_LIST_MODE = "list_mode";
         public static final String ARG_SECTION_NUMBER = "section_number";
         int DEFAULT_COUT = 20;
         int page;
@@ -413,11 +435,24 @@ public class MainActivity extends SherlockFragmentActivity implements
         LayoutInflater inflater;
         boolean isLoading;
         View footView;
+        int listMode;
         private FastJsonRequest<Contents> request;
         private ILoadingLayout loadingLayout;
         public DummyCardFragment() {
         }
         
+        public void setContentListMode(int contentListMode) {
+            if(listMode != contentListMode){
+                listMode = contentListMode;
+                Log.d(TAG, "framgent change Content ListMode = "+listMode);
+                list.setRefreshing();
+            }
+        }
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            listMode = getArguments().getInt(ARG_LIST_MODE);
+        }
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
@@ -432,6 +467,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 @Override
                 public void onRefresh(PullToRefreshBase<ListView> refreshView) {
                     // Do work to refresh the list here.
+                    isLoading = true;
                     String label = DateUtils.formatDateTime(getActivity(), System.currentTimeMillis(),
                             DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
                     loadingLayout.setLastUpdatedLabel(label);
@@ -442,8 +478,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 
                 @Override
                 public void onLastItemVisible() {
-                    if(!isLoading)
-                    loadData(false,false);
+                    if(!isLoading){
+                        Log.i(TAG, "加载下一页, mode="+listMode);
+                        loadData(false,false);
+                    }
                 }
             });
             list.setOnItemClickListener(this);
@@ -507,14 +545,14 @@ public class MainActivity extends SherlockFragmentActivity implements
         };
         
         private void loadData(boolean newData, boolean loadCache) {
-            isLoading = true;
+            
             TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
             text.setText(R.string.loading);
             footView.findViewById(R.id.list_footview_progress).setVisibility(View.VISIBLE);
             footView.setOnClickListener(null);
             
             page = newData ? 1 : page + 1;
-            String url = ArticleApi.getDefaultUrl(Constants.CAT_IDS[getArguments().getInt(ARG_SECTION_NUMBER)], DEFAULT_COUT, page);
+            String url = getContentListUrl();
            
             // 缓存数据
             final Cache.Entry entry = mQueue.getCache().get(url);
@@ -537,6 +575,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                                     @Override
                                     public void run() {
                                         list.setAdapter(adapter);
+                                        isLoading = false;
                                         list.setRefreshing();
                                     }
                                 });
@@ -544,6 +583,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                         }
 
                     }.start();
+                    
                     return;
                 }
             }
@@ -553,6 +593,19 @@ public class MainActivity extends SherlockFragmentActivity implements
             if(BuildConfig.DEBUG)
                 Log.d(TAG, "new request:"+request.getUrl());
             mQueue.add(request);
+        }
+        //将默认列表调整为热门
+        private String getContentListUrl() {
+            int section = getArguments().getInt(ARG_SECTION_NUMBER);
+            switch (listMode) {
+            case 1:
+                return ArticleApi.getLatestRepliedUrl(Constants.CAT_IDS[section],page);
+            case 2:
+                return ArticleApi.getDefaultUrl(Constants.CAT_IDS[section], DEFAULT_COUT, page);
+            case 0:
+            default:
+                return ArticleApi.getHotListUrl(Constants.CAT_IDS[section],page);
+            }
         }
         @Override
         public void onDestroyView() {
@@ -764,9 +817,10 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         //TODO change content list type
-        Log.i(TAG, "click position = " + itemPosition);
-        
-        return false;
+        Log.i(TAG, "Navigation Item Selected = " + itemPosition);
+        AcApp.putInt("nav_item",itemPosition);
+        ((PlanetFragment)mContentFragment).changeContentListMode(itemPosition);
+        return true;
     }
 
     @Override

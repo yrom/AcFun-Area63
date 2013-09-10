@@ -21,10 +21,10 @@
         <item>漫画·轻小说</item>
 	</string-array>
 	<string-array name="modes">
-	    <item>所有</item>
-        <item>今日最热</item>
+        <item>热门文章</item>
         <item>最新回复</item>
-        <item>本区推荐</item>
+	    <item>最近发布</item>
+        <!--item>本区推荐</item-->
 	</string-array>
 	<string name="user_name">用户名</string>
 	<string name="signin">登录</string>
