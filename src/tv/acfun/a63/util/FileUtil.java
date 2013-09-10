@@ -167,4 +167,16 @@ public class FileUtil {
         }
         buf = null;
     }
+    
+    public static File generateCacheFile(String type, String fileUri){
+        int hashCode = fileUri.hashCode();
+        String folderName = String.format("%x", hashCode & 0xf);
+        String fileName = String.format("%x", hashCode >>> 4)+getUrlExt(fileUri);
+        File cache =new File(AcApp.getExternalCacheDir(type+"/"+folderName),fileName);
+        return cache;
+        
+    }
+    public static File generateImageCacheFile(String imgUri){
+        return generateCacheFile(AcApp.IMAGE, imgUri);
+    }
 }
