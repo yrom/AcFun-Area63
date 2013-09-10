@@ -296,7 +296,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         showErrorDialog();
     }
 
-    Map<String, File> imageCaches;
+    List<File> imageCaches;
     private int aid;
 
     private class BuildDocTask extends AsyncTask<Article, Void, Boolean> {
@@ -350,7 +350,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 //                File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE + "/" + mArticle.id),
 //                        FileUtil.getHashName(src));
                 File cache = FileUtil.generateImageCacheFile(src);
-                imageCaches.put(src, cache);
+                imageCaches.add(cache);
                 imgUrls.add(src);
                 img.attr("org", src);
                 String localUri = FileUtil.getLocalFileUri(cache).toString();
@@ -370,9 +370,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 img.removeAttr("style");
                     // 给 img 标签加上点击事件
                 if (!hasUseMap){
+                    addClick(img, src);
                     img.removeAttr("width");
                     img.removeAttr("height");
-                    addClick(img, src);
                 }
             }
         }
@@ -385,7 +385,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             if (imageCaches != null)
                 imageCaches.clear();
             else
-                imageCaches = new HashMap<String, File>();
+                imageCaches = new ArrayList<File>();
         }
 
         private void addClick(Element img, String src) {
@@ -443,7 +443,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     Log.w(TAG, String.format("break download task,index=%d,src=%s", index,url));
                     break;
                 }
-                File cache = imageCaches.get(url);
+                File cache = imageCaches.get(imgUrls.indexOf(url));
                 Log.i(TAG, "cache file = "+cache.getAbsolutePath());
                 if (cache.exists() && cache.canRead()) {
                     publishProgress(index);
@@ -537,6 +537,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         public void viewImage(String url) {
             AcApp.showToast("查看图片: url=%s", url);
             // TODO
+            ImagePagerActivity.start(ArticleActivity.this, (ArrayList<File>) imageCaches, imgUrls.indexOf(url));
         }
     }
 }

@@ -39,6 +39,7 @@
       		</intent-filter>
         </activity>
         <activity android:name=".ProfileActivity" />
+        <activity android:name=".ImagePagerActivity" />
         <activity android:name=".CommentsActivity" android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
     </application>
 
