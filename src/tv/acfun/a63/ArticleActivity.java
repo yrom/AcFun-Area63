@@ -47,8 +47,12 @@ import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.Connectivity;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -189,6 +193,7 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
             });
             mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
             mWeb.getSettings().setUserAgentString(Connectivity.UA);
+            mWeb.loadUrl("file:///android_asset/loading.html");
             initData(aid);
         }
     }
@@ -232,7 +237,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         request = new ArticleRequest(aid, this, this);
         request.setTag(TAG);
         request.setShouldCache(true);
-        mWeb.loadUrl("file:///android_asset/loading.html");
         Entry entry = AcApp.getGloableQueue().getCache().get(request.getCacheKey());
         if (entry != null && entry.data != null && entry.isExpired()) {
             try {
@@ -241,7 +245,6 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         } else
             AcApp.addRequest(request);
 
@@ -309,10 +312,28 @@ public class ArticleActivity extends SherlockActivity implements Listener<Articl
         new BuildDocTask().execute(mArticle);
 
     }
-
+    DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+        
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+            if(which == DialogInterface.BUTTON_POSITIVE){
+                initData(aid);
+            }else{
+                finish();
+            }
+            
+        }
+    };
     @Override
     public void onErrorResponse(VolleyError error) {
-        mWeb.loadData("<h1>加载失败请重试！</h1>", "text/html", "utf-8");
+        try {
+            Drawable icon = Drawable.createFromStream(getAssets().open("emotion/ais/27.gif"),"27.gif");
+            icon.setBounds(0,0,icon.getIntrinsicWidth(), icon.getIntrinsicHeight());
+            new AlertDialog.Builder(this).setTitle("加载失败！").setIcon(icon).setMessage("是否重试？").setPositiveButton("重试", listener ).setNegativeButton("算了", listener).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     Map<String, File> imageCaches;
