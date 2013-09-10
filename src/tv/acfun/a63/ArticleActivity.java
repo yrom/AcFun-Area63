@@ -27,9 +27,7 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -535,8 +533,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
         @android.webkit.JavascriptInterface
         public void viewImage(String url) {
-            AcApp.showToast("查看图片: url=%s", url);
-            // TODO
             ImagePagerActivity.start(ArticleActivity.this, (ArrayList<File>) imageCaches, imgUrls.indexOf(url));
         }
     }
