@@ -77,7 +77,9 @@ public class ProfileActivity extends BaseWebViewActivity {
         super.initData();
         mUser = AcApp.getUser();
         cookies = JSON.parseObject(mUser.cookies, Cookie[].class);
-        AcApp.addRequest(new SplashDocumentRequest(cookies, mSplashListener, mErrorListner));
+        SplashDocumentRequest request = new SplashDocumentRequest(cookies, mSplashListener, mErrorListner);
+        request.setTag(TAG);
+        AcApp.addRequest(request);
     }
 
 
@@ -127,5 +129,10 @@ public class ProfileActivity extends BaseWebViewActivity {
 //        public void checkin(){
 //            MemberUtils.checkIn(cookies);
 //        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AcApp.cancelAllRequest(TAG);
     }
 }

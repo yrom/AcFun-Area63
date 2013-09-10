@@ -74,13 +74,13 @@ public final class ArticleApi {
         } else if (art.channelId == Constants.CAT_AN_CULTURE) {
             isHot = art.comments >= 35 || art.views >= 3500;
         } else if (e <= AcApp._1_hour * 3) {
-            isHot = art.comments >= 35 || art.views >= 2000;
+            isHot = art.comments >= 50 || art.views >= 3500;
         } else if (e <= AcApp._1_hour * 5) {
-            isHot = art.comments >= 45 || art.views >= 3500;
+            isHot = art.comments >= 65 || art.views >= 5000;
         } else if (e <= AcApp._1_hour * 8) {
-            isHot = art.comments >= 65 || art.views >= 6500;
+            isHot = art.comments >= 80 || art.views >= 7000;
         } else if (e <= AcApp._1_hour * 12) {
-            isHot = art.comments >= 85 || art.views >= 9000;
+            isHot = art.comments >= 95 || art.views >= 9000;
         } else if (e <= AcApp._1_hour * 18) {
             isHot = art.comments >= 110 || art.views >= 12500;
         } else {
