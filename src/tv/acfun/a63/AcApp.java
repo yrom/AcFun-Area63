@@ -292,16 +292,16 @@ public class AcApp extends Application {
         long delta = System.currentTimeMillis() - postTime;
         if( delta <  _24_hour && delta >= _1_hour){
             int time = (int) (delta / _1_hour);
-            return time+"小时前";
+            return time+"小时前 ";
         } else if( delta < _1_hour && delta >= _1_min){
             int time = (int) (delta / _1_min);
-            return time+"分钟前";
+            return time+"分钟前 ";
         } else if( delta < _1_min){
-            return "半分钟前";
+            return "刚刚 ";
         } else {
             int time = (int) (delta / _24_hour);
             if(time <= 6){
-                return time+"天前" ;
+                return time+"天前 " ;
             }else{
                 return getDateTime(postTime);
             }
