@@ -1,5 +1,6 @@
 package tv.acfun.a63;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import tv.acfun.a63.api.ArticleApi;
@@ -10,6 +11,7 @@ import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.FastJsonRequest;
+import tv.acfun.a63.util.TextViewUtils;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -18,6 +20,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -161,6 +164,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mTitles = getResources().getStringArray(R.array.titles);
+        mFragments = new ArrayList<Fragment>(mTitles.length);
         if (savedInstanceState == null) {
             selectItem(0);
         }
@@ -189,39 +193,86 @@ public class MainActivity extends SherlockFragmentActivity implements
 //            avatar.setOnClickListener(this);
         }
     }
+    /**
+     * @see <a href="http://www.yrom.net/blog/2013/03/10/fragment-switch-not-restart/" >fragment switch</a>
+     * @param from
+     * @param to
+     */
+    private void switchContent(Fragment from, Fragment to) {
+        if(to == null) 
+            throw new IllegalStateException("content fragment还没有初始化！");
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().setCustomAnimations(
+                android.R.anim.fade_in, R.anim.slide_out);
+        if(from == null){
+            mContentFragment = to;
+            transaction.replace(R.id.content_frame, to);
+        } else if (mContentFragment != to) {
+            mContentFragment = to;
+            transaction.hide(from);
+            if (!to.isAdded()) {  
+                transaction.add(R.id.content_frame, to);
+            } else {
+                transaction.show(to);
+            }
+        }
+        transaction.commit();
+        
+    }
+    private List<Fragment> mFragments;
 
-    private void selectItem(int position) {
-        mContentFragment = new PlanetFragment();
+    private ArrayAdapter<String> mNavAdapter;
+    /**
+     * @see <a href="http://www.yrom.net/blog/2013/07/17/viewpager-cant-change-tag-of-fragment/">can't change tag of fragment</a>
+     * @param position
+     * @return
+     */
+    private Fragment getFragment(int position){
+        Fragment f = null;
+        if(position <mFragments.size()){
+            f = mFragments.get(position);
+            if(f != null)
+                return f;
+        }
+        while(position>=mFragments.size()){
+            mFragments.add(null);
+        }
+        f = new PlanetFragment();
         Bundle args = new Bundle();
         args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
+        if(position == 0)
+            args.putStringArray(PlanetFragment.ARG_TITLES, mTitles);
+        f.setArguments(args);
+        mFragments.set(position,f);
+        return f;
+    }
+    private void selectItem(int position) {
         if (position == 0) {
             mBar.setDisplayShowTitleEnabled(false);
             mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-            args.putStringArray(PlanetFragment.ARG_TITLES, mTitles);
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                    mBar.getThemedContext(), R.layout.list_item_2,
-                    android.R.id.text2, getResources().getStringArray(
-                            R.array.modes)) {
-
-                @Override
-                public View getView(int position, View convertView,
-                        ViewGroup parent) {
-                    View view = super.getView(position, convertView, parent);
-                    TextView text = (TextView) view
-                            .findViewById(android.R.id.text1);
-                    text.setText(mPlanetTitles[0]);
-                    return view;
-                }
-
-            };
-            adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-            mBar.setListNavigationCallbacks(adapter, this);
+            if(mNavAdapter == null){
+                mNavAdapter = new ArrayAdapter<String>(
+                        mBar.getThemedContext(), R.layout.list_item_2,
+                        android.R.id.text2, getResources().getStringArray(
+                                R.array.modes)) {
+    
+                    @Override
+                    public View getView(int position, View convertView,
+                            ViewGroup parent) {
+                        View view = super.getView(position, convertView, parent);
+                        TextView text = (TextView) view
+                                .findViewById(android.R.id.text1);
+                        text.setText(mPlanetTitles[0]);
+                        return view;
+                    }
+    
+                };
+                mNavAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                mBar.setListNavigationCallbacks(mNavAdapter, this);
+            }
         }
-        mContentFragment.setArguments(args);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, mContentFragment).commit();
-
+        
+        Fragment f = getFragment(position);
+        switchContent(mContentFragment, f);
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
         setTitle(mPlanetTitles[position]);
@@ -495,11 +546,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 //            super.onActivityCreated(savedInstanceState);
 //            loadData(true, true);
 //        }
+        boolean isShowing;
         @Override
         public void onResume() {
             super.onResume();
-            Log.d(TAG, String.format("[%d] on fragment resume",section));
-            loadData(true, true);
+            Log.d(TAG, String.format("[%d] on fragment resume, showing = %b",section,isShowing));
+            if(!isShowing){
+                loadData(true, true);
+                isShowing = true;
+            }
         }
         private ArticleListAdapter adapter;
         Response.Listener<Contents> listener = new Response.Listener<Contents>() {
@@ -617,10 +672,20 @@ public class MainActivity extends SherlockFragmentActivity implements
         @Override
         public void onDestroyView() {
             super.onDestroyView();
+            isShowing = false;
             if(request != null && !request.hasHadResponseDelivered() && !request.isCanceled()){
                 request.cancel();
                 Log.w(TAG, String.format("[%d]request canceled : %s",section,request.getUrl()));
                 request = null;
+            }
+        }
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+            if(adapter != null && adapter.contents != null){
+                Log.d(TAG, String.format("[%d] destory adapter,size=%d", section,adapter.getCount()));
+                adapter.contents.clear();
+                adapter = null;
             }
         }
 
@@ -671,9 +736,9 @@ public class MainActivity extends SherlockFragmentActivity implements
             }
             holder = (ListViewHolder) convertView.getTag();
             Content art = getItem(position);
-            holder.title.setText(art .getTitle());
+            holder.title.setText(TextViewUtils.getSource(art.getTitle()));
             if(!TextUtils.isEmpty(art.description))
-                holder.comments.setText(Html.fromHtml(art.description));
+                holder.comments.setText(Html.fromHtml(TextViewUtils.getSource(art.description)));
             else{
                 holder.comments.setText("无简介...");
             }

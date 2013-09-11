@@ -144,4 +144,17 @@ public class TextViewUtils {
         text = text.replace("[email]", "<font color=\"#FF9A03\"> ").replace("[/email]", "</font>");
         return text;
     }
+    
+    /**
+     * 字符 转义字符
+     *   “ &quot;
+     *   & &amp; 
+     *   < &lt;
+     *   > &gt;
+     *     &nbsp;
+     */
+    public static String getSource(String escapedHtml) {
+        return escapedHtml.replaceAll("&quot;", "\"").replaceAll("&amp;", "&").replaceAll("&lt;", "<")
+                .replaceAll("&gt;", ">").replaceAll("&nbsp;", " ");
+    }
 }
