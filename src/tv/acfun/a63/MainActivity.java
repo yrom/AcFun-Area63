@@ -515,6 +515,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             View rootView = inflater.inflate(R.layout.fragment_main_dummy,
                     container, false);
             list = (PullToRefreshListView) rootView.findViewById(R.id.list);
+            timeOut = rootView.findViewById(R.id.time_out_text);
             footView = inflater.inflate(R.layout.list_footerview, list.getRefreshableView(),false);
             list.getRefreshableView().addFooterView(footView, null, false);
             loadingLayout = list.getLoadingLayoutProxy(true, false);
@@ -598,19 +599,21 @@ public class MainActivity extends SherlockFragmentActivity implements
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, String.format("[%d] load list error",section), error);
-                AcApp.showToast("加载失败");
                 TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
                 text.setText(R.string.reloading);
                 footView.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
                 footView.setOnClickListener(onReload);
                 needReload = true;
+                if(list.getRefreshableView().getAdapter()==null)
+                    timeOut.setVisibility(View.VISIBLE);
                 list.onRefreshComplete();
                 isLoading = false;
             }
         };
         private int section;
+        private View timeOut;
         private void loadData(boolean newData, boolean loadCache) {
-            
+            timeOut.setVisibility(View.GONE);
             TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
             text.setText(R.string.loading);
             footView.findViewById(R.id.list_footview_progress).setVisibility(View.VISIBLE);

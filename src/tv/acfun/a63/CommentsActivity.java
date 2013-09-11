@@ -220,7 +220,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }else{
             mLoadingBar.setVisibility(View.GONE);
             mTimeOutText.setVisibility(View.VISIBLE);
-            mList.setVisibility(View.INVISIBLE);
+            mList.setVisibility(View.GONE);
         }
     }
     @Override
@@ -230,7 +230,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         if(response.totalCount == 0){
             mLoadingBar.setVisibility(View.GONE);
             mTimeOutText.setVisibility(View.VISIBLE);
-            mList.setVisibility(View.INVISIBLE);
+            mList.setVisibility(View.GONE);
             mTimeOutText.setText(R.string.no_comment_yet);
             return;
         }
