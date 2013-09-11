@@ -18,11 +18,17 @@ package tv.acfun.a63;
 
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FileUtil;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
@@ -32,26 +38,39 @@ import com.actionbarsherlock.app.SherlockPreferenceActivity;
  *
  */
 @SuppressWarnings("deprecation")
-public class SettingsActivity extends SherlockPreferenceActivity implements OnPreferenceClickListener {
+public class SettingsActivity extends SherlockPreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
+    private static final String KEY_IMAGE_CACHE = "image_cache";
+    private static final String KEY_CLEAR_CACHE = "clear_cache";
+    private String oldPath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getListView().setFooterDividersEnabled(false);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
         addPreferencesFromResource(R.xml.preferences);
-        Preference cache = findPreference("clear_cache");
+        Preference cache = findPreference(KEY_CLEAR_CACHE);
         String size = FileUtil.getFormatFolderSize(getExternalCacheDir());
         cache.setSummary(size);
         cache.setOnPreferenceClickListener(this);
         
+        cachePath = (EditTextPreference) findPreference(KEY_IMAGE_CACHE);
+        cachePath.setPersistent(true);
+        String defaultPath = AcApp.getExternalCacheDir(AcApp.IMAGE).getAbsolutePath();
+        cachePath.setDefaultValue(defaultPath);
+        if(TextUtils.isEmpty(cachePath.getText())){
+            cachePath.setText(defaultPath);
+            oldPath = defaultPath;
+        }else
+            oldPath = cachePath.getText();
+        cachePath.setSummary(cachePath.getText());
+        cachePath.setOnPreferenceChangeListener(this);
     }
     public static void start(Context context){
         context.startActivity(new Intent(context, SettingsActivity.class));
     }
     @Override
     public boolean onPreferenceClick(Preference preference) {
-        // TODO Auto-generated method stub
-        if("clear_cache".equals(preference.getKey())){
+        if(KEY_CLEAR_CACHE.equals(preference.getKey())){
             preference.setEnabled(false);
             if(FileUtil.deleteFiles(getExternalCacheDir()))
                 preference.setSummary("清除完毕");
@@ -60,5 +79,46 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
             return true;
         }
         return false;
+    }
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if(KEY_IMAGE_CACHE.equals(preference.getKey())){
+            if(FileUtil.validate(newValue.toString())){
+                preference.setSummary(newValue.toString());
+                showPathChangeDialog();
+                return true;
+            }else{
+                showPathInvalidateDialog();
+                return false;
+            }
+        }
+        return false;
+    }
+    OnClickListener listener = new OnClickListener() {
+        
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if(which==DialogInterface.BUTTON_POSITIVE){
+                FileUtil.move(oldPath,cachePath.getText());
+            }
+        }
+    };
+
+    private EditTextPreference cachePath;
+    
+    void showPathChangeDialog(){
+        new AlertDialog.Builder(this)
+            .setTitle("位置已改变")
+            .setMessage("是否将原有缓存迁移到新的位置？")
+            .setPositiveButton("是", listener)
+            .setNegativeButton("否",null)
+            .show();
+    }
+    void showPathInvalidateDialog(){
+        new AlertDialog.Builder(this)
+            .setTitle("位置无效")
+            .setMessage("请重新输入！")
+            .setNegativeButton("好",null)
+            .show();
     }
 }

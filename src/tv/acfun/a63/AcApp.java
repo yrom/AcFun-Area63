@@ -199,7 +199,11 @@ public class AcApp extends Application {
         cacheDir.mkdirs();
         return cacheDir;
     }
-
+    
+    public static String getPreferenceImageCacheDir(){
+        return sp.getString("image_cache", getExternalCacheDir(IMAGE).getAbsolutePath());
+        
+    }
     /**
      * 获得SDcard根目录 <br>
      * <b>NOTE:</b>请先调用 {@link #isExternalStorageAvailable()} 判断是否可用

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import tv.acfun.a63.AcApp;
@@ -176,17 +178,24 @@ public class FileUtil {
         }
         buf = null;
     }
+    public static File newFile(File folder,String fileName){
+        return new File(folder,fileName);
+    }
     
     public static File generateCacheFile(String type, String fileUri){
         int hashCode = fileUri.hashCode();
         String folderName = String.format("%x", hashCode & 0xf);
         String fileName = String.format("%x", hashCode >>> 4)+getUrlExt(fileUri);
-        File cache =new File(AcApp.getExternalCacheDir(type+"/"+folderName),fileName);
+        File cache =newFile(AcApp.getExternalCacheDir(type+"/"+folderName),fileName);
         return cache;
         
     }
     public static File generateImageCacheFile(String imgUri){
-        return generateCacheFile(AcApp.IMAGE, imgUri);
+        int hashCode = imgUri.hashCode();
+        String folderName = String.format("%x", hashCode & 0xf);
+        String fileName = String.format("%x", hashCode >>> 4)+getUrlExt(imgUri);
+        File folder = new File(AcApp.getPreferenceImageCacheDir(),folderName);
+        return newFile(folder, fileName);
     }
     
     public static boolean deleteFiles(File file){
@@ -220,5 +229,39 @@ public class FileUtil {
                 }
             }
         }.start();
+    }
+    /**
+     * 
+     * @param source folder
+     * @param dest folder
+     * @return
+     */
+    public static boolean move(String source, String dest) {
+        File sourceFile = new File(source);
+        List<String> sourceArray = new ArrayList<String>();
+        sourceArray.add(0, "mv");
+        if(sourceFile.isDirectory()){
+            for(File file : sourceFile.listFiles()){
+                sourceArray.add(file.getAbsolutePath());
+            }
+        }else{
+            sourceArray.add(source);
+        }
+        new File(dest).mkdirs();
+        sourceArray.add(dest);
+        String[] arr = sourceArray.toArray(new String[sourceArray.size()]);
+        try {
+            Runtime.getRuntime().exec(arr);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public static boolean validate(String file){
+        File f = new File(file);
+        if(f.exists()) return f.isDirectory(); 
+        return f.mkdirs();
     }
 }

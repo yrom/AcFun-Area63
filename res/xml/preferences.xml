@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen android:title="设置"
   xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory
+      android:title="操作"
+       >
   	<Preference 
             android:title="清空缓存" 
             android:key="clear_cache"
+            android:icon="@drawable/ic_discard"
             />
     <EditTextPreference 
         android:title="图片缓存路径"
         android:key="image_cache"
+        android:icon="@drawable/ic_download"
         />
+    </PreferenceCategory>
   </PreferenceScreen>
