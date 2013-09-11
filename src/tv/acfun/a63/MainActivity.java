@@ -308,7 +308,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         @Override
         public CharSequence getPageTitle(int position) {
-
             if (position < titles.length)
                 return titles[position];
             return null;
@@ -325,8 +324,11 @@ public class MainActivity extends SherlockFragmentActivity implements
             return PagerAdapter.POSITION_NONE;
         }
         public void changeContentListMode(int itemPosition) {
-            contentListMode = itemPosition;
-            notifyDataSetChanged();
+            if(contentListMode != itemPosition){
+                contentListMode = itemPosition;
+                AcApp.putInt("nav_item",itemPosition);
+                notifyDataSetChanged();
+            }
         }
     }
 
@@ -405,7 +407,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                         getChildFragmentManager(), getArguments().getStringArray(ARG_TITLES));
                 PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) rootView.findViewById(R.id.tabs);
                 ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.pager);
-                viewPager.setOffscreenPageLimit(1);
+                viewPager.setOffscreenPageLimit(3);
                 viewPager.setAdapter(mSectionsPagerAdapter);
                 tabs.setViewPager(viewPager);
             } else {
@@ -416,9 +418,9 @@ public class MainActivity extends SherlockFragmentActivity implements
             }
             return rootView;
         }
-
+        
         public void changeContentListMode(int itemPosition) {
-            Log.d(TAG, "adapter change Content ListMode = " +itemPosition );
+            Log.d(TAG, "on adapter change Content ListMode = " +itemPosition );
             mSectionsPagerAdapter.changeContentListMode(itemPosition);
         }
     }
@@ -442,7 +444,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         public void setContentListMode(int contentListMode) {
             if(listMode != contentListMode){
                 listMode = contentListMode;
-                Log.d(TAG, "framgent change Content ListMode = "+listMode);
+                Log.d(TAG, String.format("[%d] framgent change Content ListMode =%d",section,listMode));
                 list.setRefreshing();
             }
         }
@@ -450,6 +452,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             listMode = getArguments().getInt(ARG_LIST_MODE);
+            section = getArguments().getInt(ARG_SECTION_NUMBER);
         }
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -465,6 +468,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 @Override
                 public void onRefresh(PullToRefreshBase<ListView> refreshView) {
                     // Do work to refresh the list here.
+                    Log.i(TAG, String.format("[%d] on refresh ",section));
                     isLoading = true;
                     String label = DateUtils.formatDateTime(getActivity(), System.currentTimeMillis(),
                             DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
@@ -477,7 +481,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 @Override
                 public void onLastItemVisible() {
                     if(!isLoading){
-                        Log.i(TAG, "加载下一页, mode="+listMode);
+                        Log.i(TAG, String.format("[%d] 加载下一页, mode=%d",section,listMode));
                         loadData(false,false);
                     }
                 }
@@ -486,12 +490,17 @@ public class MainActivity extends SherlockFragmentActivity implements
             return rootView;
         }
 
+//        @Override
+//        public void onActivityCreated(Bundle savedInstanceState) {
+//            super.onActivityCreated(savedInstanceState);
+//            loadData(true, true);
+//        }
         @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
+        public void onResume() {
+            super.onResume();
+            Log.d(TAG, String.format("[%d] on fragment resume",section));
             loadData(true, true);
         }
-        
         private ArticleListAdapter adapter;
         Response.Listener<Contents> listener = new Response.Listener<Contents>() {
             @Override
@@ -499,9 +508,9 @@ public class MainActivity extends SherlockFragmentActivity implements
                 if(page <= 1){
                     if(adapter == null){
                         adapter = new ArticleListAdapter(inflater,response.getContents());
-                        list.setAdapter(adapter);
                     } else
                         adapter.contents = response.getContents();
+                    list.setAdapter(adapter);
                 }else{
                     adapter.addData(response.getContents());
                 }
@@ -530,7 +539,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "load list error", error);
+                Log.e(TAG, String.format("[%d] load list error",section), error);
                 AcApp.showToast("加载失败");
                 TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
                 text.setText(R.string.reloading);
@@ -541,7 +550,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 isLoading = false;
             }
         };
-        
+        private int section;
         private void loadData(boolean newData, boolean loadCache) {
             
             TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
@@ -555,10 +564,10 @@ public class MainActivity extends SherlockFragmentActivity implements
             // 缓存数据
             final Cache.Entry entry = mQueue.getCache().get(url);
             if (entry != null && entry.data != null && entry.data.length > 0) {
-                if (newData) {
+                if (newData && !entry.isExpired()) {
 //                    entry.ttl = entry.softTtl = System.currentTimeMillis() - 1000;
                     mQueue.getCache().invalidate(url, true);
-                    Log.i(TAG, "强制刷新");
+                    Log.i(TAG, String.format("[%d] 刷新数据",section));
                 }
                 if (loadCache) {
                     new Thread() {
@@ -589,12 +598,12 @@ public class MainActivity extends SherlockFragmentActivity implements
             request = new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
             request.setShouldCache(true);
             if(BuildConfig.DEBUG)
-                Log.d(TAG, "new request:"+request.getUrl());
+                Log.d(TAG, String.format("[%d] new request: %s",section,request.getUrl()));
             mQueue.add(request);
         }
         //将默认列表调整为热门
         private String getContentListUrl() {
-            int section = getArguments().getInt(ARG_SECTION_NUMBER);
+            
             switch (listMode) {
             case 1:
                 return ArticleApi.getLatestRepliedUrl(Constants.CAT_IDS[section],page);
@@ -610,7 +619,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             super.onDestroyView();
             if(request != null && !request.hasHadResponseDelivered() && !request.isCanceled()){
                 request.cancel();
-                Log.w(TAG, "request canceled");
+                Log.w(TAG, String.format("[%d]request canceled : %s",section,request.getUrl()));
                 request = null;
             }
         }
@@ -753,10 +762,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         if (mCurrentNavPosition != position)
             selectItem(position);
     }
-
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        AcApp.putInt("nav_item",itemPosition);
         ((PlanetFragment)mContentFragment).changeContentListMode(itemPosition);
         return true;
     }
