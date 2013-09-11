@@ -31,7 +31,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".SigninActivity" />
-        <activity android:name=".ArticleActivity" android:label="@string/app_name_open">
+        <activity android:name=".ArticleActivity" 
+            android:configChanges="keyboardHidden|screenSize|screenLayout|orientation"
+            android:label="@string/app_name_open">
             <intent-filter> 
         		<action android:name="android.intent.action.VIEW"/>  
         		<category android:name="android.intent.category.DEFAULT"/>  
