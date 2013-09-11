@@ -323,6 +323,9 @@ public class MainActivity extends SherlockFragmentActivity implements
                 mDrawerLayout.openDrawer(mDrawer);
             }
             return true;
+        case R.id.action_settings:
+            SettingsActivity.start(this);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

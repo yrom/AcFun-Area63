@@ -10,6 +10,7 @@ import java.util.Locale;
 import tv.acfun.a63.AcApp;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StatFs;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,7 +30,15 @@ public class FileUtil {
         }
         return size;
     }
-
+    /**
+     * @see {@link FileUtil#getFolderSize(File)}
+     * @param folder
+     * @return
+     */
+    public static String getFormatFolderSize(File folder){
+        return formatFileSize(getFolderSize(folder));
+    }
+    
     /*** 格式化文件大小(xxx.xx B/KB/MB/GB) */
     public static String formatFileSize(long size) {
         if(size <=0) return "0B";
@@ -178,5 +187,38 @@ public class FileUtil {
     }
     public static File generateImageCacheFile(String imgUri){
         return generateCacheFile(AcApp.IMAGE, imgUri);
+    }
+    
+    public static boolean deleteFiles(File file){
+        if(file.isFile()) return file.delete();
+        else{
+            String[] progArray = new String[]{"rm","-r",file.getAbsolutePath()};
+            try {
+                Runtime.getRuntime().exec(progArray);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+    
+    public static final int MSG_DELETE_OK  = 200;
+    
+    public static final int MSG_DELETE_FAILED  = 300;
+    
+    public static void deleteFilesAsync(final File file, final Handler handler) {
+        new Thread() {
+            public void run() {
+                
+                boolean ok = deleteFiles(file);
+                if(handler != null){
+                    if(ok)
+                        handler.sendEmptyMessage(MSG_DELETE_OK);
+                    else
+                        handler.sendEmptyMessage(MSG_DELETE_FAILED);
+                }
+            }
+        }.start();
     }
 }
