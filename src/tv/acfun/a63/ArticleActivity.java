@@ -449,25 +449,37 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 } else {
                     cache.getParentFile().mkdirs();
                 }
+                File temp = new File(cache.getAbsolutePath()+".tmp");
+                
                 InputStream in = null;
                 OutputStream out = null;
 
                 try {
                     URL parsedUrl = new URL(url);
-                    for (int i = 0; i < tryTimes; i++) {
+                    retry: for (int i = 0; i < tryTimes && !isCancelled(); i++) {
+                        
                         HttpURLConnection connection = (HttpURLConnection) parsedUrl
                                 .openConnection();
                         connection.setConnectTimeout(timeoutMs + i * 1500);
                         connection.setReadTimeout(timeoutMs * (2 + i));
                         connection.setUseCaches(false);
+                        connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36");
+                        if(temp.exists()){
+                            connection.addRequestProperty("Range", "bytes="+temp.length()+"-");
+                            out = new FileOutputStream(temp,true);
+                        }else
+                            out = new FileOutputStream(temp);
                         try {
                             int responseCode = connection.getResponseCode();
-                            if (responseCode == 200) {
+                            if (responseCode == 200 || responseCode == 206) {
                                 in = connection.getInputStream();
-                                out = new FileOutputStream(cache);
                                 FileUtil.copyStream(in, out);
+                                cache.delete();
+                                if(!temp.renameTo(cache)){
+                                    Log.w(TAG, "重命名失败"+temp.getName());
+                                }
                                 publishProgress(index);
-                                break;
+                                break retry;
                             }
                         } catch (SocketTimeoutException e) {
                             Log.w(TAG, "retry", e);
