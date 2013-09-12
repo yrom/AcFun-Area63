@@ -53,17 +53,17 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
         cache.setSummary(size);
         cache.setOnPreferenceClickListener(this);
         
-        cachePath = (EditTextPreference) findPreference(KEY_IMAGE_CACHE);
-        cachePath.setPersistent(true);
-        String defaultPath = AcApp.getExternalCacheDir(AcApp.IMAGE).getAbsolutePath();
-        cachePath.setDefaultValue(defaultPath);
-        if(TextUtils.isEmpty(cachePath.getText())){
-            cachePath.setText(defaultPath);
+        savePath = (EditTextPreference) findPreference(KEY_IMAGE_CACHE);
+        savePath.setPersistent(true);
+        String defaultPath = AcApp.getDefaultImageSaveDir();
+        savePath.setDefaultValue(defaultPath);
+        if(TextUtils.isEmpty(savePath.getText())){
+            savePath.setText(defaultPath);
             oldPath = defaultPath;
         }else
-            oldPath = cachePath.getText();
-        cachePath.setSummary(cachePath.getText());
-        cachePath.setOnPreferenceChangeListener(this);
+            oldPath = savePath.getText();
+        savePath.setSummary(savePath.getText());
+        savePath.setOnPreferenceChangeListener(this);
     }
     public static void start(Context context){
         context.startActivity(new Intent(context, SettingsActivity.class));
@@ -99,12 +99,12 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
         @Override
         public void onClick(DialogInterface dialog, int which) {
             if(which==DialogInterface.BUTTON_POSITIVE){
-                FileUtil.move(oldPath,cachePath.getText());
+                FileUtil.move(oldPath,savePath.getText());
             }
         }
     };
 
-    private EditTextPreference cachePath;
+    private EditTextPreference savePath;
     
     void showPathChangeDialog(){
         new AlertDialog.Builder(this)

@@ -47,6 +47,7 @@ public class AcApp extends Application {
     private static SharedPreferences sp;
     public static final String LOG = "Logs";
     public static final String IMAGE = "Images";
+    public static final String PIC = "Pictures";
     public static float density = 1f;
     private static NotificationManager mNotiManager;
     private static RequestQueue mQueue;
@@ -199,10 +200,16 @@ public class AcApp extends Application {
         cacheDir.mkdirs();
         return cacheDir;
     }
-    
-    public static String getPreferenceImageCacheDir(){
-        return sp.getString("image_cache", getExternalCacheDir(IMAGE).getAbsolutePath());
+    /**
+     * 获得图片保存路径
+     * @return 默认值 {@code getDefaultImageSaveDir();}
+     */
+    public static String getPreferenceImageSaveDir(){
+        return sp.getString("image_cache", getDefaultImageSaveDir());
         
+    }
+    public static String getDefaultImageSaveDir(){
+        return getSDcardDir(PIC);
     }
     /**
      * 获得SDcard根目录 <br>
@@ -217,6 +224,9 @@ public class AcApp extends Application {
         return mSDcardDir;
     }
 
+    public static String getSDcardDir(String type){
+        return new File(getSDcardDir(),type).getAbsolutePath();
+    }
     /**
      * 获取当前默认的日期时间显示 eg. 20130411-110445
      * 

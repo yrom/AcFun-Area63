@@ -178,24 +178,28 @@ public class FileUtil {
         }
         buf = null;
     }
-    public static File newFile(File folder,String fileName){
-        return new File(folder,fileName);
-    }
-    
+
+    /**
+     * 简单的hash 散列存储
+     * @param type 文件根目录名
+     * @param fileUri 文件 uri
+     * @return 缓存文件
+     */
     public static File generateCacheFile(String type, String fileUri){
         int hashCode = fileUri.hashCode();
         String folderName = String.format("%x", hashCode & 0xf);
         String fileName = String.format("%x", hashCode >>> 4)+getUrlExt(fileUri);
-        File cache =newFile(AcApp.getExternalCacheDir(type+"/"+folderName),fileName);
+        File cache =new File(AcApp.getExternalCacheDir(type+"/"+folderName),fileName);
         return cache;
         
     }
+    /**
+     * 图片缓存路径
+     * @param imgUri
+     * @return
+     */
     public static File generateImageCacheFile(String imgUri){
-        int hashCode = imgUri.hashCode();
-        String folderName = String.format("%x", hashCode & 0xf);
-        String fileName = String.format("%x", hashCode >>> 4)+getUrlExt(imgUri);
-        File folder = new File(AcApp.getPreferenceImageCacheDir(),folderName);
-        return newFile(folder, fileName);
+        return generateCacheFile(AcApp.IMAGE,imgUri);
     }
     
     public static boolean deleteFiles(File file){

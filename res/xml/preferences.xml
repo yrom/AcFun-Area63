@@ -10,7 +10,7 @@
             android:icon="@drawable/ic_discard"
             />
     <EditTextPreference 
-        android:title="图片缓存路径"
+        android:title="图片保存路径"
         android:key="image_cache"
         android:icon="@drawable/ic_download"
         />
