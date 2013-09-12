@@ -525,7 +525,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                     // Do work to refresh the list here.
                     Log.i(TAG, String.format("[%d] on refresh ",section));
                     isLoading = true;
-                    String label = DateUtils.formatDateTime(getActivity(), System.currentTimeMillis(),
+                    String label = DateUtils.formatDateTime(getActivity() == null?getActivity():AcApp.context(), System.currentTimeMillis(),
                             DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
                     loadingLayout.setLastUpdatedLabel(label);
                     loadData(true,false);

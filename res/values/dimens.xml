@@ -4,5 +4,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="left_drawer_width">200dp</dimen>
+    <dimen name="emotions_height">120dp</dimen>
+    <dimen name="emotions_column_width">48dp</dimen>
 
 </resources>
