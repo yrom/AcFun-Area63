@@ -276,7 +276,9 @@ public class FileUtil {
      * @return
      */
     public static boolean copy(File sourceFile, String destDir){
+        if(!sourceFile.exists()) return false;
         List<String> prog = new ArrayList<String>();
+        
         prog.add(0,"cp");
         if(sourceFile.isDirectory()){
             prog.add("-R"); 
@@ -306,7 +308,7 @@ public class FileUtil {
             out = new FileOutputStream(saveFile);
             out.write(bytes);
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         } finally {

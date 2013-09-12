@@ -210,18 +210,25 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
             CommentsActivity.start(this, aid);
             return true;
         case R.id.menu_item_save_image:
-            saveImage();
+            saveImage(mCurrentImage);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-    private void saveImage() {
+    
+    private void saveImage(int index) {
         String dest = AcApp.getPreferenceImageSaveDir();
-        String path = mList.get(mCurrentImage);
+        String path = mList.get(index);
         Uri uri = Uri.parse(path);
         boolean success;
         if(uri.getScheme().equals("http")){
-            success = FileUtil.save(AcApp.getDataInDiskCache(path),dest+"/"+FileUtil.getHashName(path));
+            byte[] diskCache = AcApp.getDataInDiskCache(path);
+            if(diskCache != null)
+                success = FileUtil.save(diskCache,dest+"/"+FileUtil.getHashName(path));
+            else{
+                File cache = FileUtil.generateImageCacheFile(path);
+                success = FileUtil.copy(cache, dest);
+            }
         } else {
             File cache = new File(uri.getPath());
             success = FileUtil.copy(cache, dest);
