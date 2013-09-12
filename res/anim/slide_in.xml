@@ -15,6 +15,6 @@
 -->
 
 <set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/accelerate_interpolator">
-    <translate android:toYDelta="100%" android:fromYDelta="0" android:duration="@android:integer/config_shortAnimTime" />
-    <alpha android:fromAlpha="1.0" android:toAlpha="0.0" android:duration="@android:integer/config_shortAnimTime" />
+    <translate android:fromYDelta="100%" android:toYDelta="0" android:duration="@android:integer/config_shortAnimTime" />
+    <alpha android:fromAlpha="0.0" android:toAlpha="1.0" android:duration="@android:integer/config_shortAnimTime" />
 </set>

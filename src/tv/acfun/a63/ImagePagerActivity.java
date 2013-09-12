@@ -20,12 +20,17 @@ import java.io.File;
 import java.util.ArrayList;
 
 import tv.acfun.a63.util.ActionBarUtil;
+import tv.acfun.a63.util.BaseAnimationListener;
 import tv.acfun.a63.util.FileUtil;
 import uk.co.senab.photoview.PhotoView;
+import uk.co.senab.photoview.PhotoViewAttacher.OnPhotoTapListener;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -37,6 +42,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -59,6 +67,7 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
     private static final String EXTRA_INDEX = "index";
     private ViewPager pager;
     private TextView indexText;
+
     public static void startCacheImage(Context context, ArrayList<File> flist, int index, int aid, String title){
         ArrayList<String> list = new ArrayList<String>(flist.size());
         for(File file : flist){
@@ -74,6 +83,7 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
         getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
         Bundle extras = getIntent().getExtras();
         title = extras.getString("title");
+        getSupportActionBar().setTitle(title);
         aid = extras.getInt("aid");
         mList = extras.getStringArrayList(EXTRA_IMAGES);
         int index = extras.getInt(EXTRA_INDEX,0);
@@ -114,24 +124,71 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
         }
         
     }
+    AnimationListener mHideListener = new BaseAnimationListener(){
+        
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+        public void onAnimationEnd(Animation animation) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                indexText.setTranslationY(indexText.getHeight());
+            indexText.setVisibility(View.GONE);
+        }
+    };
+    AnimationListener mShowListener = new BaseAnimationListener(){
+        
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+        public void onAnimationStart(Animation animation) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                indexText.setTranslationY(0);
+            indexText.setVisibility(View.VISIBLE);
+        }
+    };
+    void hideInfo(){
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_out);
+        anim.setAnimationListener(mHideListener);
+        indexText.startAnimation(anim);
+    }
+    void showInfo(){
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_in);
+        anim.setAnimationListener(mShowListener);
+        indexText.startAnimation(anim);
+    }
     public static class ImageFragment extends Fragment{
         public static final String ARG_IMAGE_URL = "image_url";
         private Uri mUri;
         private ImageContainer imageContainer;
         ProgressBar progress;
         TextView timeOut;
-        public ImageFragment(){}
+        ImagePagerActivity mContext;
+        
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            mContext = (ImagePagerActivity) activity;
+        }
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             mUri = Uri.parse(getArguments().getString(ARG_IMAGE_URL));
         }
+        OnPhotoTapListener onTap = new OnPhotoTapListener() {
+            
+            @Override
+            public void onPhotoTap(View view, float x, float y) {
+                if(mContext.getSupportActionBar().isShowing()){
+                    mContext.getSupportActionBar().hide();
+                    mContext.hideInfo();
+                }else{
+                    mContext.getSupportActionBar().show();
+                    mContext.showInfo();
+                }
+            }
+        };
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_image, container,false);
             
             final PhotoView image = (PhotoView) rootView.findViewById(R.id.image);
-            
+            image.setOnPhotoTapListener(onTap);
             timeOut = (TextView)rootView.findViewById(R.id.time_out_text);
             
             Bitmap bitmap = AcApp.getBitmpInCache(mUri.toString());
@@ -214,7 +271,6 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
             this.finish();
             return true;
         case R.id.menu_item_comment:
-            // TODO
             CommentsActivity.start(this, aid);
             return true;
         case R.id.menu_item_save_image:
@@ -288,6 +344,6 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
     @Override
     public void onPageSelected(int arg0) {
         mCurrentImage = arg0;
-        indexText.setText(String.format("%d/%d", mCurrentImage+1,mList.size()));
+        indexText.setText(String.format("%d/%d",mCurrentImage+1,mList.size()));
     }
 }
