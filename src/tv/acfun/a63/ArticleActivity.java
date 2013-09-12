@@ -118,15 +118,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             mWeb.getSettings().setAppCachePath(ARTICLE_PATH);
             mWeb.getSettings().setBlockNetworkImage(true);
             mWeb.addJavascriptInterface(new ACJSObject(), "AC");
-            mWeb.setWebChromeClient(new WebChromeClient() {
-
-                @Override
-                public void onProgressChanged(WebView view, int newProgress) {
-                    // TODO Auto-generated method stub
-                    super.onProgressChanged(view, newProgress);
-                }
-
-            });
+            mWeb.setWebChromeClient(new WebChromeClient());
             mWeb.setWebViewClient(new WebViewClient() {
 
                 @Override
@@ -180,11 +172,13 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.article_options_menu, menu);
-        MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
-        ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
-        actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
-        actionProvider.setShareIntent(createShareIntent());
+        if(AcApp.getViewMode() != Constants.MODE_COMMIC){
+            getSupportMenuInflater().inflate(R.menu.article_options_menu, menu);
+            MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
+            ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
+            actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+            actionProvider.setShareIntent(createShareIntent());
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -204,6 +198,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             CommentsActivity.start(ArticleActivity.this, mArticle.id);
             return true;
         case R.id.menu_item_fov_action_provider_action_bar:
+            //TODO
             AcApp.showToast("收藏");
             break;
         }
@@ -220,11 +215,12 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             try {
                 String json = new String(entry.data, "utf-8");
                 onResponse(Article.newArticle(JSON.parseObject(json)));
+                return;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else
-            AcApp.addRequest(request);
+        }
+        AcApp.addRequest(request);
 
     }
 

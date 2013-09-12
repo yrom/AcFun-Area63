@@ -32,6 +32,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 /**
  * @author Yrom
@@ -105,7 +106,18 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
     };
 
     private EditTextPreference savePath;
-    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+            finish();
+            break;
+
+        default:
+            break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
     void showPathChangeDialog(){
         new AlertDialog.Builder(this)
             .setTitle("位置已改变")

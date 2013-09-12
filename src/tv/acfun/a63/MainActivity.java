@@ -267,8 +267,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     
                 };
                 mNavAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-                mBar.setListNavigationCallbacks(mNavAdapter, this);
             }
+            mBar.setListNavigationCallbacks(mNavAdapter, this);
         }
         
         Fragment f = getFragment(position);
@@ -700,7 +700,6 @@ public class MainActivity extends SherlockFragmentActivity implements
             Object obj = parent.getItemAtPosition(position);
             if(obj != null && obj instanceof Content){
                 Content c = (Content)obj;
-                // TODO 根据模式跳转
                 ArticleActivity.start(getActivity(), c.aid,c.title);
             }
         }
