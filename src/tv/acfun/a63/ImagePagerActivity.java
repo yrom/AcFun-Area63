@@ -17,16 +17,14 @@
 package tv.acfun.a63;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FileUtil;
-import tv.acfun.a63.view.MyViewPager;
 import uk.co.senab.photoview.PhotoView;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -60,6 +58,7 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
     private static final String EXTRA_IMAGES = "images";
     private static final String EXTRA_INDEX = "index";
     private ViewPager pager;
+    private TextView indexText;
     public static void startCacheImage(Context context, ArrayList<File> flist, int index, int aid, String title){
         ArrayList<String> list = new ArrayList<String>(flist.size());
         for(File file : flist){
@@ -78,12 +77,15 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
         aid = extras.getInt("aid");
         mList = extras.getStringArrayList(EXTRA_IMAGES);
         int index = extras.getInt(EXTRA_INDEX,0);
-        pager = new MyViewPager(this);
-        pager.setId(R.id.pager);
+        
+        setContentView(R.layout.activity_images);
+        
+        indexText = (TextView) findViewById(R.id.index);
+        pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new ImageAdapter(getSupportFragmentManager(),mList));
         pager.setOnPageChangeListener(this);
-        setContentView(pager);
         pager.setCurrentItem(index);
+        onPageSelected(index);
     }
     
     static class ImageAdapter extends FragmentPagerAdapter{
@@ -106,7 +108,6 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
         public Fragment getItem(int position) {
             Fragment fragment = new ImageFragment();
             Bundle args = new Bundle();
-            args.putIntArray(ImageFragment.ARG_INDEX_ARRAY, new int[]{position+1, getCount()});
             args.putString(ImageFragment.ARG_IMAGE_URL, list.get(position));
             fragment.setArguments(args);
             return fragment;
@@ -115,47 +116,54 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
     }
     public static class ImageFragment extends Fragment{
         public static final String ARG_IMAGE_URL = "image_url";
-        public static final String ARG_INDEX_ARRAY = "index_arr";
         private Uri mUri;
         private ImageContainer imageContainer;
-        private int[] index;
         ProgressBar progress;
-        View timeOut;
+        TextView timeOut;
         public ImageFragment(){}
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             mUri = Uri.parse(getArguments().getString(ARG_IMAGE_URL));
-            index = getArguments().getIntArray(ARG_INDEX_ARRAY);
         }
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_image, container,false);
             
             final PhotoView image = (PhotoView) rootView.findViewById(R.id.image);
-            TextView indexText = (TextView) rootView.findViewById(R.id.index);
-            indexText.setText(String.format("%d/%d", index[0],index[1]));
+            
+            timeOut = (TextView)rootView.findViewById(R.id.time_out_text);
+            
+            Bitmap bitmap = AcApp.getBitmpInCache(mUri.toString());
+            if(bitmap != null && !bitmap.isRecycled()){
+                Log.d("image", "got bitmap in cache: "+mUri.toString());
+                image.setImageBitmap(bitmap);
+                return rootView;
+            }
             if(mUri.getScheme().equals("file")){
                 File img = new File(mUri.getPath());
                 if(img.exists()){
-                    image.setImageURI(mUri);
-                }else{
-                    try {
-                        Drawable drawable = Drawable.createFromStream(getActivity().getAssets().open("emotion/21.gif"), "21.gif");
-                        drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*AcApp.density), (int)(drawable.getIntrinsicHeight()*AcApp.density));
-                        image.setImageDrawable(drawable);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if(bitmap == null || bitmap.isRecycled()){
+                        bitmap= AcApp.decodeBitmap(mUri.getPath(), Bitmap.Config.RGB_565);
+                        AcApp.putBitmapInCache(mUri.toString(), bitmap);
                     }
+                    image.setImageBitmap(bitmap);
+                }else{
+                    timeOut.setVisibility(View.VISIBLE);
+                    timeOut.setText("加载失败，可能还没下载到数据，请重试");
                 }
                 
             }else{
                 File cache = FileUtil.generateImageCacheFile(mUri.toString());
                 if(cache.exists()){
-                    image.setImageURI(Uri.fromFile(cache));
+                    if(bitmap == null || bitmap.isRecycled()){
+                        bitmap= AcApp.decodeBitmap(cache.getAbsolutePath(), Bitmap.Config.RGB_565);
+                        AcApp.putBitmapInCache(mUri.toString(), bitmap);
+                    }
+                    image.setImageBitmap(bitmap);
+                    
                 }else{
                     progress = (ProgressBar) rootView.findViewById(R.id.loading);
-                    timeOut = rootView.findViewById(R.id.time_out_text);
                     get(image);
                 }
             }
@@ -279,7 +287,7 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
     private int aid;
     @Override
     public void onPageSelected(int arg0) {
-        // TODO Auto-generated method stub
         mCurrentImage = arg0;
+        indexText.setText(String.format("%d/%d", mCurrentImage+1,mList.size()));
     }
 }

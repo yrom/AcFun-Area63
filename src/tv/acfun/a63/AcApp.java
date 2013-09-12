@@ -6,7 +6,6 @@ import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.db.DB;
 import tv.acfun.a63.util.BitmapCache;
 import tv.acfun.a63.util.Connectivity;
-
 import android.app.Activity;
 import android.app.Application;
 import android.app.Notification;
@@ -19,6 +18,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -32,7 +34,6 @@ import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.RequestQueue.RequestFilter;
-import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.ImageLoader;
 
 /**
@@ -54,6 +55,7 @@ public class AcApp extends Application {
     private static NotificationManager mNotiManager;
     private static RequestQueue mQueue;
     private static ImageLoader mImageLoader;
+    private static BitmapCache mBitmapCache;
     /**
      * <b>NOTE:</b>在 <code>getApplicationContext()</code> 调用一次之后才能用这个方便的方法
      */
@@ -61,13 +63,15 @@ public class AcApp extends Application {
         return instance;
     }
 
+
     public void onCreate() {
         super.onCreate();
         mContext = instance = this;
         mResources = getResources();
         density = mResources.getDisplayMetrics().density;
         mQueue = Connectivity.newRequestQueue();
-        mImageLoader = new ImageLoader(mQueue, new BitmapCache());
+        mBitmapCache = new BitmapCache();
+        mImageLoader = new ImageLoader(mQueue, mBitmapCache);
         sp = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
     public static User getUser(){
@@ -78,6 +82,42 @@ public class AcApp extends Application {
         new DB(mContext).logout();
     }
     
+    // ====================================
+    // bitmap
+    // ====================================
+    
+    public static Bitmap getBitmpInCache(String url){
+        String key = getCacheKey(url, 0, 0);
+        return mBitmapCache.getBitmap(key);
+    }
+    
+    public static Bitmap decodeBitmap(String imagePath, Bitmap.Config config){
+        
+        Options opts = new Options();
+        opts.inPreferredConfig = config;
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, opts);
+        return bitmap;
+    }
+    /**
+     * copy from Volley - Image loader
+     * @param url
+     * @param maxWidth
+     * @param maxHeight
+     * @return
+     */
+    public static String getCacheKey(String url, int maxWidth, int maxHeight) {
+        return new StringBuilder(url.length() + 12).append("#W").append(maxWidth)
+                .append("#H").append(maxHeight).append(url).toString();
+    }
+    
+    public static void putBitmapInCache(String url, Bitmap value){
+        String key = getCacheKey(url, 0, 0);
+        mBitmapCache.putBitmap(key, value);
+    }
+    
+    // ====================================
+    // volley
+    // ====================================
     public static void addRequest(Request<?> request){
         mQueue.add(request);
     }
