@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.util.Log;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 
 /***
 {
@@ -100,7 +100,7 @@ public class Article {
     private static Pattern imageReg = Pattern.compile("<img.+?src=[\"|'](.+?)[\"|']");
 
     public static Article newArticle(JSONObject articleJson) {
-        if (!articleJson.optBoolean("success")) {
+        if (Boolean.TRUE != articleJson.getBoolean("success")) {
             return null;
         }
         Article article = null;
@@ -110,23 +110,23 @@ public class Article {
             JSONObject info = articleJson.getJSONObject("info");
             article.title = info.getString("title");
             article.postTime = info.getLong("posttime");
-            article.id = info.getInt("id");
+            article.id = info.getIntValue("id");
             article.poster = parseUser(info);
             // statistics
             JSONArray statistics = info.getJSONArray("statistics");
-            article.views = statistics.getInt(0);
-            article.comments = statistics.getInt(1);
-            article.stows = statistics.getInt(5);
+            article.views = statistics.getIntValue(0);
+            article.comments = statistics.getIntValue(1);
+            article.stows = statistics.getIntValue(5);
             // sub contents and images
             JSONArray contentArray = articleJson.getJSONArray("content");
-            article.contents = new ArrayList<Article.SubContent>(contentArray.length());
+            article.contents = new ArrayList<Article.SubContent>(contentArray.size());
             article.imgUrls = new ArrayList<String>();
 
-            for (int i = 0; i < contentArray.length(); i++) {
+            for (int i = 0; i < contentArray.size(); i++) {
                 SubContent content = new SubContent();
                 JSONObject sub = contentArray.getJSONObject(i);
-                content.content = sub.optString("content");
-                content.subTitle = sub.optString("subtitle");
+                content.content = sub.getString("content");
+                content.subTitle = sub.getString("subtitle");
                 Matcher matcher = imageReg.matcher(content.content);
                 while (matcher.find()) {
                     article.imgUrls.add(matcher.group(1));
@@ -135,7 +135,7 @@ public class Article {
             }
             // channel
             JSONObject channel = info.getJSONObject("channel");
-            article.channelId = channel.getInt("channelID");
+            article.channelId = channel.getIntValue("channelID");
             article.channelName = channel.getString("channelName");
 
         } catch (Exception e) {
@@ -149,9 +149,9 @@ public class Article {
         JSONObject postuser = info.getJSONObject("postuser");
         User poster = new User();
         poster.name = postuser.getString("name");
-        poster.id = postuser.getInt("uid");
-        poster.signature = postuser.optString("signature");
-        poster.avatar = postuser.optString("avastar");
+        poster.id = postuser.getIntValue("uid");
+        poster.signature = postuser.getString("signature");
+        poster.avatar = postuser.getString("avastar");
         return poster;
     }
 

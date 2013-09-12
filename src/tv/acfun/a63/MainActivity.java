@@ -407,13 +407,13 @@ public class MainActivity extends SherlockFragmentActivity implements
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
             case R.id.mode_mix:
-                VIEW_MODE_CODE = 0;
+                VIEW_MODE_CODE = Constants.MODE_MIX;
                 break;
             case R.id.mode_no_image:
-                VIEW_MODE_CODE = 1;
+                VIEW_MODE_CODE = Constants.MODE_NO_PIC;
                 break;
             case R.id.mode_comic:
-                VIEW_MODE_CODE = 2;
+                VIEW_MODE_CODE = Constants.MODE_COMMIC;
                 break;
             }
             AcApp.putInt("view_mode", VIEW_MODE_CODE);
@@ -423,15 +423,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         private void setMenuIcon() {
             switch (VIEW_MODE_CODE) {
-            case 1:
+            case Constants.MODE_NO_PIC:
                 mModeMenu.setIcon(R.drawable.mode_no_pic);
                 mModeMenu.setTitle(R.string.view_mode_no_image);
                 break;
-            case 2:
+            case Constants.MODE_COMMIC:
                 mModeMenu.setTitle(R.string.view_mode_comic);
                 mModeMenu.setIcon(R.drawable.mode_comic);
                 break;
-            case 0:
+            case Constants.MODE_MIX:
             default:
                 mModeMenu.setTitle(R.string.view_mode_mix);
                 mModeMenu.setIcon(R.drawable.mode_mix);

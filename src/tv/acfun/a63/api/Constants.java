@@ -28,4 +28,8 @@ public interface Constants {
     
     int COUNT_HOT = 15;
     int COUNT_LAST_REPLY = 15;
+    
+    int MODE_MIX = 0;
+    int MODE_NO_PIC = 1;
+    int MODE_COMMIC = 2;
 }

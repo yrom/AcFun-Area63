@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -57,6 +56,7 @@ import android.webkit.WebViewClient;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.ShareActionProvider;
+import com.alibaba.fastjson.JSON;
 import com.android.volley.Cache.Entry;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -163,7 +163,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 public void onPageFinished(WebView view, String url) {
                     if (imgUrls == null || imgUrls.isEmpty()
                             || url.startsWith("file:///android_asset") 
-                            || AcApp.getViewMode() == 1) // 无图模式
+                            || AcApp.getViewMode() == Constants.MODE_NO_PIC) // 无图模式
                         return;
                     Log.d(TAG, "on finished:" + url);
                     if (url.equals(Constants.URL_HOME) && imgUrls.size() > 0 && !isDownloaded) {
@@ -219,7 +219,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         if (entry != null && entry.data != null && entry.isExpired()) {
             try {
                 String json = new String(entry.data, "utf-8");
-                onResponse(Article.newArticle(new JSONObject(json)));
+                onResponse(Article.newArticle(JSON.parseObject(json)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -263,7 +263,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             try {
                 String json = new String(response.data,
                         HttpHeaderParser.parseCharset(response.headers));
-                return Response.success(Article.newArticle(new JSONObject(json)),
+                return Response.success(Article.newArticle(JSON.parseObject(json)),
                         HttpHeaderParser.parseCacheHeaders(response));
             } catch (Exception e) {
                 Log.e(TAG, "parse article error", e);
@@ -285,6 +285,10 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     public void onResponse(Article response) {
         mArticle = response;
         imgUrls = response.imgUrls;
+        if(AcApp.getViewMode() == Constants.MODE_COMMIC){
+            ImagePagerActivity.startNetworkImage(this, (ArrayList<String>) imgUrls,0);
+            finish();
+        }else
         new BuildDocTask().execute(mArticle);
 
     }
@@ -296,7 +300,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
     List<File> imageCaches;
     private int aid;
-
+    
     private class BuildDocTask extends AsyncTask<Article, Void, Boolean> {
         boolean hasUseMap;
 
@@ -355,10 +359,11 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 if (cache.exists() && cache.canRead() && cache.length() > FileUtil._1KB)
                     // set cache
                     img.attr("src", localUri);
-                else if (AcApp.getViewMode() != 1)
+                else if (AcApp.getViewMode() != Constants.MODE_NO_PIC)
                     img.attr("src", "file:///android_asset/loading.gif");
                 else {
                     // 无图模式
+                    // TODO 点击后加载图片
                     img.after("<p >[图片]</p>");
                     img.remove();
                     continue;
@@ -545,7 +550,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
         @android.webkit.JavascriptInterface
         public void viewImage(String url) {
-            ImagePagerActivity.start(ArticleActivity.this, (ArrayList<File>) imageCaches, imgUrls.indexOf(url));
+            ImagePagerActivity.startCacheImage(ArticleActivity.this, (ArrayList<File>) imageCaches, imgUrls.indexOf(url));
         }
     }
 }

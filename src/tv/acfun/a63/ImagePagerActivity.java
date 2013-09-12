@@ -17,6 +17,7 @@
 package tv.acfun.a63;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import tv.acfun.a63.util.ActionBarUtil;
@@ -26,18 +27,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Window;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.ImageLoader.ImageContainer;
 
 
 /**
@@ -48,15 +53,12 @@ public class ImagePagerActivity extends SherlockFragmentActivity {
     private static final String EXTRA_IMAGES = "images";
     private static final String EXTRA_INDEX = "index";
     private ViewPager pager;
-    public static void start(Context context, ArrayList<File> flist, int index){
-        Intent intent = new Intent(context, ImagePagerActivity.class);
+    public static void startCacheImage(Context context, ArrayList<File> flist, int index){
         ArrayList<String> list = new ArrayList<String>(flist.size());
         for(File file : flist){
             list.add(Uri.fromFile(file).toString());
         }
-        intent.putStringArrayListExtra(EXTRA_IMAGES, list);
-        intent.putExtra(EXTRA_INDEX, index);
-        context.startActivity(intent);
+        startNetworkImage(context, list, index);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,15 +106,46 @@ public class ImagePagerActivity extends SherlockFragmentActivity {
     public static class ImageFragment extends Fragment{
         public static final String ARG_IMAGE_URL = "image_url";
         public static final String ARG_INDEX_ARRAY = "index_arr";
+        private Uri mUri;
+        private ImageContainer imageContainer;
         public ImageFragment(){}
-        
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            mUri = Uri.parse(getArguments().getString(ARG_IMAGE_URL));
+            
+        }
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             PhotoView image = new PhotoView(inflater.getContext());
-            image.setImageURI(Uri.parse(getArguments().getString(ARG_IMAGE_URL)));
+            if(mUri.getScheme().equals("file")){
+                File img = new File(mUri.getPath());
+                if(img.exists()){
+                    image.setImageURI(mUri);
+                }else{
+                    try {
+                        Drawable drawable = Drawable.createFromStream(getActivity().getAssets().open("emotion/21.gif"), "21.gif");
+                        drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*AcApp.density), (int)(drawable.getIntrinsicHeight()*AcApp.density));
+                        image.setImageDrawable(drawable);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                
+            }else{
+                imageContainer = AcApp.getGloableLoader().get(mUri.toString(), ImageLoader.getImageListener(image, 0, 0));
+                
+            }
             return image;
         }
-        
+        @Override
+        public void onDestroyView() {
+            super.onDestroyView();
+            if(imageContainer != null && imageContainer.getBitmap()==null){
+                Log.w("image loader", "cancle request:"+imageContainer.getRequestUrl());
+                imageContainer.cancelRequest();
+            }
+        }
     }
     @Override
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
@@ -123,5 +156,11 @@ public class ImagePagerActivity extends SherlockFragmentActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    public static void startNetworkImage(Context context, ArrayList<String> list, int index) {
+        Intent intent = new Intent(context, ImagePagerActivity.class);
+        intent.putStringArrayListExtra(EXTRA_IMAGES, list);
+        intent.putExtra(EXTRA_INDEX, index);
+        context.startActivity(intent);
     }
 }

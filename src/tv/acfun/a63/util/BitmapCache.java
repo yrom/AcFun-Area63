@@ -32,7 +32,7 @@ public class BitmapCache implements ImageCache {
     @Override
     public void putBitmap(String url, Bitmap bitmap) {
         mCache.put(url, bitmap);
-        Log.d("BitmapCache", "put "+url);
+        Log.d("BitmapCache", "put="+url+";size="+mCache.size());
     }
 
 }
