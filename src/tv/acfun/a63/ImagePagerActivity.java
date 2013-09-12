@@ -21,12 +21,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import tv.acfun.a63.util.ActionBarUtil;
+import tv.acfun.a63.util.FileUtil;
 import tv.acfun.a63.view.MyViewPager;
 import uk.co.senab.photoview.PhotoView;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,44 +33,55 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
-import com.android.volley.toolbox.ImageLoader;
+import com.actionbarsherlock.widget.ShareActionProvider;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
+import com.android.volley.toolbox.ImageLoader.ImageListener;
 
 
 /**
  * @author Yrom
  *
  */
-public class ImagePagerActivity extends SherlockFragmentActivity {
+public class ImagePagerActivity extends SherlockFragmentActivity implements OnPageChangeListener {
     private static final String EXTRA_IMAGES = "images";
     private static final String EXTRA_INDEX = "index";
     private ViewPager pager;
-    public static void startCacheImage(Context context, ArrayList<File> flist, int index){
+    public static void startCacheImage(Context context, ArrayList<File> flist, int index, int aid, String title){
         ArrayList<String> list = new ArrayList<String>(flist.size());
         for(File file : flist){
             list.add(Uri.fromFile(file).toString());
         }
-        startNetworkImage(context, list, index);
+        startNetworkImage(context, list, index, aid, title);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(124, 0, 0, 0)));
+        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
         Bundle extras = getIntent().getExtras();
-        ArrayList<String> list = extras.getStringArrayList(EXTRA_IMAGES);
+        title = extras.getString("title");
+        aid = extras.getInt("aid");
+        mList = extras.getStringArrayList(EXTRA_IMAGES);
         int index = extras.getInt(EXTRA_INDEX,0);
         pager = new MyViewPager(this);
         pager.setId(R.id.pager);
-        pager.setAdapter(new ImageAdapter(getSupportFragmentManager(),list));
+        pager.setAdapter(new ImageAdapter(getSupportFragmentManager(),mList));
+        pager.setOnPageChangeListener(this);
         setContentView(pager);
         pager.setCurrentItem(index);
     }
@@ -108,16 +118,23 @@ public class ImagePagerActivity extends SherlockFragmentActivity {
         public static final String ARG_INDEX_ARRAY = "index_arr";
         private Uri mUri;
         private ImageContainer imageContainer;
+        private int[] index;
+        ProgressBar progress;
+        View timeOut;
         public ImageFragment(){}
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             mUri = Uri.parse(getArguments().getString(ARG_IMAGE_URL));
-            
+            index = getArguments().getIntArray(ARG_INDEX_ARRAY);
         }
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            PhotoView image = new PhotoView(inflater.getContext());
+            View rootView = inflater.inflate(R.layout.fragment_image, container,false);
+            
+            final PhotoView image = (PhotoView) rootView.findViewById(R.id.image);
+            TextView indexText = (TextView) rootView.findViewById(R.id.index);
+            indexText.setText(String.format("%d/%d", index[0],index[1]));
             if(mUri.getScheme().equals("file")){
                 File img = new File(mUri.getPath());
                 if(img.exists()){
@@ -133,10 +150,44 @@ public class ImagePagerActivity extends SherlockFragmentActivity {
                 }
                 
             }else{
-                imageContainer = AcApp.getGloableLoader().get(mUri.toString(), ImageLoader.getImageListener(image, 0, 0));
-                
+                File cache = FileUtil.generateImageCacheFile(mUri.toString());
+                if(cache.exists()){
+                    image.setImageURI(Uri.fromFile(cache));
+                }else{
+                    progress = (ProgressBar) rootView.findViewById(R.id.loading);
+                    timeOut = rootView.findViewById(R.id.time_out_text);
+                    get(image);
+                }
             }
-            return image;
+            return rootView;
+        }
+        private void get(final PhotoView image) {
+            progress.setVisibility(View.VISIBLE);
+            imageContainer = AcApp.getGloableLoader().get(mUri.toString(), new ImageListener() {
+                
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    progress.setVisibility(View.GONE);
+                    timeOut.setOnClickListener(new OnClickListener() {
+                        
+                        @Override
+                        public void onClick(View v) {
+                            v.setVisibility(View.GONE);
+                            get(image);
+                        }
+                    });
+                    timeOut.setVisibility(View.VISIBLE);
+                }
+                
+                @Override
+                public void onResponse(ImageContainer response, boolean isImmediate) {
+                    if (response.getBitmap() != null) {
+                        image.setImageBitmap(response.getBitmap());
+                        progress.setVisibility(View.GONE);
+                    }
+                    
+                }
+            });
         }
         @Override
         public void onDestroyView() {
@@ -154,13 +205,74 @@ public class ImagePagerActivity extends SherlockFragmentActivity {
         case android.R.id.home:
             this.finish();
             return true;
+        case R.id.menu_item_comment:
+            // TODO
+            CommentsActivity.start(this, aid);
+            return true;
+        case R.id.menu_item_save_image:
+            saveImage();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
-    public static void startNetworkImage(Context context, ArrayList<String> list, int index) {
+    private void saveImage() {
+        String dest = AcApp.getPreferenceImageSaveDir();
+        String path = mList.get(mCurrentImage);
+        Uri uri = Uri.parse(path);
+        boolean success;
+        if(uri.getScheme().equals("http")){
+            success = FileUtil.save(AcApp.getDataInDiskCache(path),dest+"/"+FileUtil.getHashName(path));
+        } else {
+            File cache = new File(uri.getPath());
+            success = FileUtil.copy(cache, dest);
+        }
+        if(success){
+            AcApp.showToast("保存成功");
+        }else
+            AcApp.showToast("保存失败！");
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getSupportMenuInflater().inflate(R.menu.image, menu);
+        MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
+        ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
+        actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+        actionProvider.setShareIntent(createShareIntent());
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    private Intent createShareIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        String path = mList.get(mCurrentImage);
+        Uri uri = Uri.parse(path);
+        shareIntent.setType("image/*");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("分享图片，%s - http://www.acfun.tv/a/ac%d",title,aid));
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        return shareIntent;
+    }
+    public static void startNetworkImage(Context context, ArrayList<String> list, int index, int aid, String title) {
         Intent intent = new Intent(context, ImagePagerActivity.class);
         intent.putStringArrayListExtra(EXTRA_IMAGES, list);
         intent.putExtra(EXTRA_INDEX, index);
+        intent.putExtra("aid", aid);
+        intent.putExtra("title", title);
         context.startActivity(intent);
+    }
+    @Override
+    public void onPageScrollStateChanged(int arg0) {
+    }
+    @Override
+    public void onPageScrolled(int arg0, float arg1, int arg2) {
+        
+    }
+    private int mCurrentImage;
+    private ArrayList<String> mList;
+    private String title;
+    private int aid;
+    @Override
+    public void onPageSelected(int arg0) {
+        // TODO Auto-generated method stub
+        mCurrentImage = arg0;
     }
 }

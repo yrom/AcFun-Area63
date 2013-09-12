@@ -29,15 +29,16 @@
 	<string name="user_name">用户名</string>
 	<string name="signin">登录</string>
 	<string name="password">密码</string>
-	<string name="time_out">(|||ﾟДﾟ)获取超时，点击重试！</string>
+	<string name="time_out">获取超时，点击重试！</string>
 	<string name="loading">加载下一页…</string>
 	<string name="hide_requote">重复引用已隐藏</string>
 	<string name="no_more">(=ﾟωﾟ)= 已经没有啦</string>
 	<string name="reloading">点我重新加载…</string>
-	<string name="no_comment_yet">( ﾟ∀。)沙发依旧在…</string>
+	<string name="no_comment_yet">沙发依旧在…</string>
 	<string name="post_comment">快速回复</string>
 	<string name="action_bar_share">分享</string>
 	<string name="action_bar_fov">收藏</string>
 	<string name="action_bar_comment">评论</string>
+	<string name="action_bar_save">保存到图片文件夹</string>
 	<string name="pull_to_retry">加载失败，下拉重试</string>
 </resources>

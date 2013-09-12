@@ -1,6 +1,7 @@
 package tv.acfun.a63.util;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -267,5 +268,52 @@ public class FileUtil {
         File f = new File(file);
         if(f.exists()) return f.isDirectory(); 
         return f.mkdirs();
+    }
+    /**
+     * 
+     * @param sourceFile
+     * @param destDir
+     * @return
+     */
+    public static boolean copy(File sourceFile, String destDir){
+        List<String> prog = new ArrayList<String>();
+        prog.add(0,"cp");
+        if(sourceFile.isDirectory()){
+            prog.add("-R"); 
+        }
+        prog.add(sourceFile.getAbsolutePath());
+        prog.add(destDir);
+        String[] progArray = prog.toArray(new String[prog.size()]);
+        try {
+            Runtime.getRuntime().exec(progArray);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public static boolean save(byte[] bytes, String savePath){
+        FileOutputStream out = null;
+        try {
+            File saveFile = new File(savePath);
+            if(saveFile.isDirectory()){
+                saveFile = new File(savePath,String.valueOf(System.currentTimeMillis()));
+            }
+            if(!saveFile.exists()){
+                saveFile.getParentFile().mkdirs();
+            }
+            out = new FileOutputStream(saveFile);
+            out.write(bytes);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                out.close();
+            } catch (Exception e) { }
+        }
+        
     }
 }

@@ -28,9 +28,11 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
+import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.RequestQueue.RequestFilter;
+import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.ImageLoader;
 
 /**
@@ -102,6 +104,11 @@ public class AcApp extends Application {
             mImageLoader = new ImageLoader(getGloableQueue(),new BitmapCache());
         }
         return mImageLoader;
+    }
+    
+    public static byte[] getDataInDiskCache(String key){
+        Cache.Entry entry = getGloableQueue().getCache().get(key);
+        return entry ==null? null : entry.data;
     }
     
     @Override

@@ -17,17 +17,21 @@
         	android:paddingRight="@dimen/activity_horizontal_margin"
         	android:paddingTop="0dp"
             android:listSelector="?attr/selectableItemBackground"
+            android:visibility="gone"
             />
 
         <TextView
             android:id="@+id/time_out_text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:layout_gravity="center"
+            android:drawablePadding="4dp"
+            android:drawableLeft="@drawable/ac_30"
             android:text="@string/time_out"
-            android:textSize="18sp"
-            android:textColor="@color/main_color"
+            android:textSize="16sp"
+            android:textColor="@color/error"
              />
 
         <include layout="@layout/comments_bottom" />

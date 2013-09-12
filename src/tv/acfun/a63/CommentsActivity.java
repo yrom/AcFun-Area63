@@ -30,6 +30,7 @@ import tv.acfun.a63.util.ArrayUtil;
 import tv.acfun.a63.util.CustomUARequest;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
@@ -231,6 +232,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             mLoadingBar.setVisibility(View.GONE);
             mTimeOutText.setVisibility(View.VISIBLE);
             mList.setVisibility(View.GONE);
+            Drawable drawable = getResources().getDrawable(R.drawable.ac_16);
+            drawable.setBounds(0,0,drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+            mTimeOutText.setCompoundDrawables(drawable, null, null, null);
             mTimeOutText.setText(R.string.no_comment_yet);
             return;
         }

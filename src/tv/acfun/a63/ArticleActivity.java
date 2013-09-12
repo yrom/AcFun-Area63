@@ -286,7 +286,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         mArticle = response;
         imgUrls = response.imgUrls;
         if(AcApp.getViewMode() == Constants.MODE_COMMIC){
-            ImagePagerActivity.startNetworkImage(this, (ArrayList<String>) imgUrls,0);
+            ImagePagerActivity.startNetworkImage(this, (ArrayList<String>) imgUrls,0,aid,title);
             finish();
         }else
         new BuildDocTask().execute(mArticle);
@@ -550,7 +550,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
         @android.webkit.JavascriptInterface
         public void viewImage(String url) {
-            ImagePagerActivity.startCacheImage(ArticleActivity.this, (ArrayList<File>) imageCaches, imgUrls.indexOf(url));
+            ImagePagerActivity.startCacheImage(ArticleActivity.this, (ArrayList<File>) imageCaches, imgUrls.indexOf(url),aid,title);
         }
     }
 }
