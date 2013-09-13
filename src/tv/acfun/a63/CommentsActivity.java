@@ -19,8 +19,6 @@ package tv.acfun.a63;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import tv.acfun.a63.adapter.CommentsAdaper;
 import tv.acfun.a63.adapter.CommentsAdaper.OnQuoteClickListener;
@@ -41,6 +39,9 @@ import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.method.ArrowKeyMovementMethod;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.util.SparseArray;
@@ -263,6 +264,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     List<Integer> commentIdList = new ArrayList<Integer>();
     private boolean isloading;
     private boolean isreload;
+    private Quote mQuoteSpan;
+    private ImageSpan mQuoteImage;
 
     @Override
     public void onClick(View v) {
@@ -285,16 +288,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     }
 
     private void postComment() {
-        // TODO Auto-generated method stub
-        String comment = mCommentText.getText().toString();
-        Matcher matcher = Pattern.compile("re: #(\\d+)").matcher(comment);
-        int count = 0;
-        if(matcher.find()){
-            try{
-                count = Integer.parseInt(matcher.group(1));
-                comment = matcher.replaceAll("");
-            }catch(Exception e){}
-        }
+        int count = getQuoteCount();
+        String comment = getComment();
         Comment quote = data == null? null:data.get(findCid(count));
         final String rComment = comment;
         if(TextUtils.isEmpty(rComment)){
@@ -308,12 +303,14 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         mBtnSend.setEnabled(false);
         
         Log.i(TAG, String.format("post comment :%s,quoteId=%d",rComment,quote==null?0:quote.cid));
+        mCommentText.setText("");
         mBtnSend.postDelayed(new Runnable() {
             
             @Override
             public void run() {
                 // TODO Auto-generated method stub
                 mBtnSend.setEnabled(true);
+                
             }
         }, 1000);
         
@@ -391,7 +388,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             }
         } else {
             Comment c = (Comment) parent.getItemAtPosition(position);
-            String pre = "re: #" + c.count + " ";
+            
+            String pre = "引用:#" + c.count;
+            mQuoteSpan = new Quote(c.count);
             // TODO Bubble span
             /**
              * @see http://www.kpbird.com/2013/02/android-chips-edittext-token-edittext.html
@@ -400,9 +399,12 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             TextView tv = TextViewUtils.createBubbleTextView(this,pre);
             BitmapDrawable bd = (BitmapDrawable) TextViewUtils.convertViewToDrawable(tv);
             bd.setBounds(0, 0, bd.getIntrinsicWidth(),bd.getIntrinsicHeight());
-            
-            sb.append(pre + " ");
-            sb.setSpan(new ImageSpan(bd), sb.length()-(pre.length()+1), sb.length()-1,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.append(pre);
+            mQuoteImage = new ImageSpan(bd);
+            sb.setSpan(mQuoteImage, sb.length()-pre.length(), sb.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            mCommentText.setMovementMethod(LinkMovementMethod.getInstance());
+            sb.setSpan(mQuoteSpan, sb.length()-pre.length(), sb.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.append("");
             mCommentText.setText(sb);
             mCommentText.setSelection(mCommentText.getText().length());
             view.postDelayed(new Runnable() {
@@ -415,7 +417,50 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
         }
     }
-
+    void removeQuote() {
+        Editable text = mCommentText.getText();
+        int start = text.getSpanStart(mQuoteSpan);
+        int end = text.getSpanEnd(mQuoteSpan);
+        Log.i(TAG, String.format("start=%d, end=%d",start,end));
+        if(start>=0){
+            Log.i(TAG, text.subSequence(start, end).toString());
+            text.delete(start, end);
+        }
+//        text.removeSpan(mQuoteSpan);
+//        text.removeSpan(mQuoteImage);
+//        mCommentText.setMovementMethod(ArrowKeyMovementMethod.getInstance());
+    }
+    
+    String getComment(){
+        removeQuote();
+        Editable text = mCommentText.getText();
+        return text.toString().trim();
+    }
+    /**
+     * call before {@code removeQuote()} or {@code getComment()}
+     * @return -1,if not found
+     */
+    int getQuoteCount(){
+        Editable text = mCommentText.getText();
+        int start = text.getSpanStart(mQuoteSpan);
+        if(start>=0){
+            return mQuoteSpan.floosCount;
+        }
+        return -1;
+        
+    }
+    class Quote extends ClickableSpan{
+        int floosCount;
+        public Quote(int count) {
+            this.floosCount = count;
+        }
+        @Override
+        public void onClick(View widget) {
+            // TODO Auto-generated method stub
+            removeQuote();
+        }
+    }
+    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -425,4 +470,5 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:maxLines="5"
+            android:inputType="textNoSuggestions|textMultiLine"
             android:hint="@string/post_comment" />
 
         <ImageButton

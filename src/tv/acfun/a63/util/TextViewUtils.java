@@ -98,7 +98,7 @@ public class TextViewUtils {
         
         return;
     }
-    static Object getLast(Spanned text, Class<?> kind) {
+    public static Object getLast(Spanned text, Class<?> kind) {
         /*
          * This knows that the last returned object from getSpans()
          * will be the most recently added.
@@ -170,9 +170,9 @@ public class TextViewUtils {
       //creating textview dynamically
       TextView tv = new TextView(context);
       tv.setText(text);
-      tv.setTextSize(20);
+      tv.setTextSize(16);
       tv.setBackgroundResource(R.drawable.oval);
-      tv.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.abs__ic_clear_search_api_holo_light, 0);
+      tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.forward, 0, 0, 0);
       return tv;
     }
 
@@ -180,7 +180,7 @@ public class TextViewUtils {
       int spec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
       view.measure(spec, spec);
       view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
-      Bitmap b = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(),
+      Bitmap b = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
                 Bitmap.Config.ARGB_8888);
       Canvas c = new Canvas(b);
       c.translate(-view.getScrollX(), -view.getScrollY());
