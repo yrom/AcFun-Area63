@@ -32,16 +32,13 @@ import tv.acfun.a63.util.TextViewUtils;
 import tv.acfun.a63.view.EmotionView;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
-import android.text.method.ArrowKeyMovementMethod;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.util.SparseArray;
@@ -49,6 +46,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -139,8 +137,24 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         mAdapter.setOnClickListener(this);
         mList.setAdapter(mAdapter);
         requestData(1, true);
+        test();
     }
+    private void test(){
+        final View activityRootView = findViewById(R.id.content_frame);
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        @Override
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                // r will be populated with the coordinates of your view that
+                // area still visible.
+                activityRootView.getWindowVisibleDisplayFrame(r);
 
+                int heightDiff = activityRootView.getRootView().getHeight() - (r.bottom - r.top);
+                isInputShow = heightDiff > 100; // TODO 
+            }
+        });
+    }
+    private boolean isInputShow;
     private void initSendBar() {
         mBtnSend = (ImageButton) findViewById(R.id.comments_send_btn);
         mCommentText = (EditText) findViewById(R.id.comments_edit);
@@ -156,7 +170,12 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 // TODO 直接插入图片表情
                 int index = mCommentText.getSelectionEnd();
                 Editable text = mCommentText.getText();
-                text.insert(index, parent.getItemAtPosition(position).toString());
+                String emotion = parent.getItemAtPosition(position).toString();
+                text.insert(index, emotion);
+                EmotionView v = (EmotionView) parent.getAdapter().getView(position, null, null);
+                Drawable drawable = TextViewUtils.convertViewToDrawable(v);
+                drawable.setBounds(0, 0, drawable.getIntrinsicWidth()/2, drawable.getIntrinsicHeight()/2);
+                text.setSpan(new ImageSpan(drawable), index, index+emotion.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             
         });
@@ -266,43 +285,48 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     private boolean isreload;
     private Quote mQuoteSpan;
     private ImageSpan mQuoteImage;
-
+    
     @Override
     public void onClick(View v) {
-        // TODO Auto-generated method stub
         switch (v.getId()) {
         case R.id.time_out_text:
             pageIndex = 1;
             requestData(pageIndex, true);
             break;
         case R.id.comments_send_btn:
-            AcApp.showToast("发送");
-            // TODO post commment
             postComment();
             break;
         case R.id.comments_emotion_btn:
-            // TODO select emotion
-            mEmotionGrid.setVisibility(mEmotionGrid.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+            if(isInputShow){
+                mKeyboard.hideSoftInputFromWindow(mEmotionGrid.getWindowToken(), 0);
+                if(mEmotionGrid.getVisibility() != View.VISIBLE)
+                    mEmotionGrid.postDelayed(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        mEmotionGrid.setVisibility(View.VISIBLE);
+                        
+                    }
+                }, 20);
+            }else{
+                mEmotionGrid.setVisibility(mEmotionGrid.getVisibility() == View.VISIBLE?View.GONE:View.VISIBLE);
+            }
             break;
         }
     }
 
     private void postComment() {
+        if(!validate()){
+            return;
+        }
         int count = getQuoteCount();
         String comment = getComment();
         Comment quote = data == null? null:data.get(findCid(count));
         final String rComment = comment;
-        if(TextUtils.isEmpty(rComment)){
-            Toast.makeText(this, "评论不能为空哦", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(rComment.length()<5){
-            Toast.makeText(this, "吐槽得不够", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        mBtnSend.setEnabled(false);
         
-        Log.i(TAG, String.format("post comment :%s,quoteId=%d",rComment,quote==null?0:quote.cid));
+        mBtnSend.setEnabled(false);
+        //TODO post comment
+        AcApp.showToast("post comment :%s,quoteId=%d",rComment,quote==null?0:quote.cid);
         mCommentText.setText("");
         mBtnSend.postDelayed(new Runnable() {
             
@@ -387,77 +411,99 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 requestData(pageIndex, false);
             }
         } else {
+            removeQuote(mCommentText.getText());
             Comment c = (Comment) parent.getItemAtPosition(position);
-            
             String pre = "引用:#" + c.count;
             mQuoteSpan = new Quote(c.count);
-            // TODO Bubble span
             /**
              * @see http://www.kpbird.com/2013/02/android-chips-edittext-token-edittext.html
-             */            
-            SpannableStringBuilder sb = new SpannableStringBuilder();
+             */    
+            SpannableStringBuilder sb = SpannableStringBuilder.valueOf(mCommentText.getText());//new SpannableStringBuilder();
             TextView tv = TextViewUtils.createBubbleTextView(this,pre);
             BitmapDrawable bd = (BitmapDrawable) TextViewUtils.convertViewToDrawable(tv);
             bd.setBounds(0, 0, bd.getIntrinsicWidth(),bd.getIntrinsicHeight());
-            sb.append(pre);
+            sb.insert(0,pre);
             mQuoteImage = new ImageSpan(bd);
-            sb.setSpan(mQuoteImage, sb.length()-pre.length(), sb.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(mQuoteImage, 0 , pre.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //            mCommentText.setMovementMethod(LinkMovementMethod.getInstance());
-            sb.setSpan(mQuoteSpan, sb.length()-pre.length(), sb.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(mQuoteSpan,  0 , pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.append("");
             mCommentText.setText(sb);
             mCommentText.setSelection(mCommentText.getText().length());
-            view.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    mKeyboard.showSoftInput(mCommentText, 0);
-                }
-            }, 200);
+//            view.postDelayed(new Runnable() {
+//
+//                @Override
+//                public void run() {
+//                    mKeyboard.showSoftInput(mCommentText, 0);
+//                }
+//            }, 200);
 
         }
     }
-    void removeQuote() {
+    boolean validate(){
         Editable text = mCommentText.getText();
-        int start = text.getSpanStart(mQuoteSpan);
-        int end = text.getSpanEnd(mQuoteSpan);
-        Log.i(TAG, String.format("start=%d, end=%d",start,end));
+        int len = text.length() - getQuoteSpanLength(text);
+        if(len == 0 ){
+            Toast.makeText(this, "评论不能为空哦", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if(len <= 5){
+            Toast.makeText(this, "吐槽得不够啊", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+    int getQuoteSpanLength(Editable text){
+        Quote quote = TextViewUtils.getLast(text, Quote.class);
+        int start = text.getSpanStart(quote);
+        int end = text.getSpanEnd(quote);
         if(start>=0){
-            Log.i(TAG, text.subSequence(start, end).toString());
+            return end - start;
+        }
+        return 0;
+        
+    }
+    void removeQuote(Editable text) {
+        Quote quote = TextViewUtils.getLast(text, Quote.class);
+        int start = text.getSpanStart(quote);
+        int end = text.getSpanEnd(quote);
+        Log.d(TAG, String.format("start=%d, end=%d",start,end));
+        if(start>=0){
+            Log.d(TAG, text.subSequence(start, end).toString());
             text.delete(start, end);
         }
-//        text.removeSpan(mQuoteSpan);
-//        text.removeSpan(mQuoteImage);
-//        mCommentText.setMovementMethod(ArrowKeyMovementMethod.getInstance());
     }
     
     String getComment(){
-        removeQuote();
-        Editable text = mCommentText.getText();
-        return text.toString().trim();
+        Editable text = SpannableStringBuilder.valueOf(mCommentText.getText());
+        Quote quote = TextViewUtils.getLast(text, Quote.class);
+        int start = text.getSpanStart(quote);
+        int end = text.getSpanEnd(quote);
+        if(start < 0 ) 
+            return text.toString();
+        else if(start == 0){
+            return text.subSequence(end, text.length()).toString(); 
+        }else
+            return text.subSequence(0, start).toString()+text.subSequence(end, text.length()).toString();
     }
     /**
-     * call before {@code removeQuote()} or {@code getComment()}
+     * call before {@code removeQuote()}
      * @return -1,if not found
      */
     int getQuoteCount(){
         Editable text = mCommentText.getText();
-        int start = text.getSpanStart(mQuoteSpan);
+        Quote quote = TextViewUtils.getLast(text, Quote.class);
+        int start = text.getSpanStart(quote);
         if(start>=0){
-            return mQuoteSpan.floosCount;
+            return quote.floosCount;
         }
         return -1;
         
     }
-    class Quote extends ClickableSpan{
+    class Quote{
         int floosCount;
         public Quote(int count) {
             this.floosCount = count;
-        }
-        @Override
-        public void onClick(View widget) {
-            // TODO Auto-generated method stub
-            removeQuote();
         }
     }
     

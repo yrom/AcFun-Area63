@@ -98,7 +98,7 @@ public class TextViewUtils {
         
         return;
     }
-    public static Object getLast(Spanned text, Class<?> kind) {
+    public static <T> T getLast(Spanned text, Class<T> kind) {
         /*
          * This knows that the last returned object from getSpans()
          * will be the most recently added.
@@ -108,7 +108,7 @@ public class TextViewUtils {
         if (objs.length == 0) {
             return null;
         } else {
-            return objs[objs.length - 1];
+            return (T) objs[objs.length - 1];
         }
     }
     private static String replace(String text) {

@@ -195,7 +195,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_item_comment:
-            CommentsActivity.start(ArticleActivity.this, mArticle.id);
+            if(mArticle != null){
+                CommentsActivity.start(ArticleActivity.this, mArticle.id);
+            }
             return true;
         case R.id.menu_item_fov_action_provider_action_bar:
             //TODO
