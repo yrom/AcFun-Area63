@@ -19,6 +19,8 @@ package tv.acfun.a63;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import tv.acfun.a63.adapter.CommentsAdaper;
 import tv.acfun.a63.adapter.CommentsAdaper.OnQuoteClickListener;
@@ -28,11 +30,18 @@ import tv.acfun.a63.api.entity.Comments;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.ArrayUtil;
 import tv.acfun.a63.util.CustomUARequest;
+import tv.acfun.a63.util.TextViewUtils;
 import tv.acfun.a63.view.EmotionView;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -52,6 +61,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -138,6 +148,17 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         mBtnSend.setOnClickListener(this);
         mBtnEmotion.setOnClickListener(this);
         mEmotionGrid.setAdapter(mEmotionAdapter);
+        mEmotionGrid.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO 直接插入图片表情
+                int index = mCommentText.getSelectionEnd();
+                Editable text = mCommentText.getText();
+                text.insert(index, parent.getItemAtPosition(position).toString());
+            }
+            
+        });
     }
 
     ListAdapter mEmotionAdapter = new BaseAdapter() {
@@ -158,7 +179,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
         @Override
         public String getItem(int position) {
-           return null;
+            String cat = position >= 54 ? "ais" : "ac";
+            int id = position >= 54 ? position - 53 : position + 1;
+            return String.format("[emot=%s,%02d/]", cat, id);
         }
 
         @Override
@@ -252,6 +275,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         case R.id.comments_send_btn:
             AcApp.showToast("发送");
             // TODO post commment
+            postComment();
             break;
         case R.id.comments_emotion_btn:
             // TODO select emotion
@@ -260,6 +284,50 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
     }
 
+    private void postComment() {
+        // TODO Auto-generated method stub
+        String comment = mCommentText.getText().toString();
+        Matcher matcher = Pattern.compile("re: #(\\d+)").matcher(comment);
+        int count = 0;
+        if(matcher.find()){
+            try{
+                count = Integer.parseInt(matcher.group(1));
+                comment = matcher.replaceAll("");
+            }catch(Exception e){}
+        }
+        Comment quote = data == null? null:data.get(findCid(count));
+        final String rComment = comment;
+        if(TextUtils.isEmpty(rComment)){
+            Toast.makeText(this, "评论不能为空哦", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(rComment.length()<5){
+            Toast.makeText(this, "吐槽得不够", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mBtnSend.setEnabled(false);
+        
+        Log.i(TAG, String.format("post comment :%s,quoteId=%d",rComment,quote==null?0:quote.cid));
+        mBtnSend.postDelayed(new Runnable() {
+            
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                mBtnSend.setEnabled(true);
+            }
+        }, 1000);
+        
+    }
+
+    int findCid(int floorCount){
+        for(int i=0;i<commentIdList.size();i++){
+            int key = commentIdList.get(i);
+            Comment c = data.get(key);
+            if(c.count == floorCount)
+                return c.cid;
+        }
+        return 0;
+    }
     @Override
     public void onClick(View v, int position) {
         mList.performItemClick(v, position, mAdapter.getItemId(position));
@@ -322,11 +390,21 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 requestData(pageIndex, false);
             }
         } else {
-
             Comment c = (Comment) parent.getItemAtPosition(position);
             String pre = "re: #" + c.count + " ";
-            mCommentText.setText(pre);
-            mCommentText.setSelection(pre.length());
+            // TODO Bubble span
+            /**
+             * @see http://www.kpbird.com/2013/02/android-chips-edittext-token-edittext.html
+             */            
+            SpannableStringBuilder sb = new SpannableStringBuilder();
+            TextView tv = TextViewUtils.createBubbleTextView(this,pre);
+            BitmapDrawable bd = (BitmapDrawable) TextViewUtils.convertViewToDrawable(tv);
+            bd.setBounds(0, 0, bd.getIntrinsicWidth(),bd.getIntrinsicHeight());
+            
+            sb.append(pre + " ");
+            sb.setSpan(new ImageSpan(bd), sb.length()-(pre.length()+1), sb.length()-1,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mCommentText.setText(sb);
+            mCommentText.setSelection(mCommentText.getText().length());
             view.postDelayed(new Runnable() {
 
                 @Override

@@ -22,8 +22,13 @@ import java.util.regex.Pattern;
 import org.xml.sax.XMLReader;
 
 import tv.acfun.a63.AcApp;
+import tv.acfun.a63.R;
 import tv.acfun.a63.api.entity.Comment;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.Html;
@@ -33,6 +38,8 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
 import android.text.util.Linkify;
+import android.view.View;
+import android.view.View.MeasureSpec;
 import android.widget.TextView;
 
 public class TextViewUtils {
@@ -156,5 +163,33 @@ public class TextViewUtils {
     public static String getSource(String escapedHtml) {
         return escapedHtml.replaceAll("&quot;", "\"").replaceAll("&amp;", "&").replaceAll("&lt;", "<")
                 .replaceAll("&gt;", ">").replaceAll("&nbsp;", " ");
+    }
+    
+
+    public static TextView createBubbleTextView(Context context, String text){
+      //creating textview dynamically
+      TextView tv = new TextView(context);
+      tv.setText(text);
+      tv.setTextSize(20);
+      tv.setBackgroundResource(R.drawable.oval);
+      tv.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.abs__ic_clear_search_api_holo_light, 0);
+      return tv;
+    }
+
+    public static Drawable convertViewToDrawable(View view) {
+      int spec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+      view.measure(spec, spec);
+      view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+      Bitmap b = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(),
+                Bitmap.Config.ARGB_8888);
+      Canvas c = new Canvas(b);
+      c.translate(-view.getScrollX(), -view.getScrollY());
+      view.draw(c);
+      view.setDrawingCacheEnabled(true);
+      Bitmap cacheBmp = view.getDrawingCache();
+      Bitmap viewBmp = cacheBmp.copy(Bitmap.Config.ARGB_8888, true);
+      view.destroyDrawingCache();
+      return new BitmapDrawable(view.getResources(),viewBmp);
+
     }
 }

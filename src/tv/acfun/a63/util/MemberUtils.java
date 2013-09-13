@@ -75,11 +75,13 @@ public class MemberUtils{
 	}
 	public static boolean postComments(String comment, Comment quote,String aid, Cookie[] cks) throws HttpException, IOException{
 	    PostMethod post = new PostMethod("/comment.aspx");
-        NameValuePair[] nps = new NameValuePair[4];
-        nps[0] = new NameValuePair("text", comment);
-        nps[1] = new NameValuePair("quoteId", quote == null? "0": quote.cid+"");
-        nps[2] = new NameValuePair("contentId", aid);
-        nps[3] = new NameValuePair("quoteName",quote == null? "": quote.userName);
+        NameValuePair[] nps = { new NameValuePair("name", "sendComm()"),
+                new NameValuePair("name", "mimiko"), 
+                new NameValuePair("text", comment),
+                new NameValuePair("quoteId", quote == null ? "0" : quote.cid + ""),
+                new NameValuePair("contentId", aid), 
+                new NameValuePair("cooldown", "5000"),
+                new NameValuePair("quoteName", quote == null ? "" : quote.userName) };
         post.setRequestBody(nps);
         post.setRequestHeader("Content-Type",Connectivity.CONTENT_TYPE_FORM);
         int state  = Connectivity.doPost(post, cks);
