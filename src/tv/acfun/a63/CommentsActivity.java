@@ -16,7 +16,6 @@
 
 package tv.acfun.a63;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,9 +28,9 @@ import tv.acfun.a63.api.entity.Comments;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.ArrayUtil;
 import tv.acfun.a63.util.CustomUARequest;
+import tv.acfun.a63.view.EmotionView;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,7 +48,6 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -143,22 +141,13 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     }
 
     ListAdapter mEmotionAdapter = new BaseAdapter() {
-        private Rect bounds = new Rect(0, 0, (int)(56*AcApp.density), (int)(56*AcApp.density));
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             
             if (convertView == null) {
-                convertView = new ImageView(getApplicationContext());
+                convertView = new EmotionView(getApplicationContext());
             }
-            String fileName = getItem(position);
-            Log.d(TAG, fileName);
-            try {
-                Drawable drawable = Drawable.createFromStream(getAssets().open(fileName), position + ".gif");
-                drawable.setBounds(bounds);
-                ((ImageView) convertView).setImageDrawable(drawable);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            ((EmotionView) convertView).setEmotionId(position+1);
             return convertView;
         }
 
@@ -169,10 +158,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
         @Override
         public String getItem(int position) {
-            if(position >=54){
-                return String.format("emotion/ais/%02d.gif", position - 53);
-            }
-            return String.format("emotion/%02d.gif", position + 1);
+           return null;
         }
 
         @Override

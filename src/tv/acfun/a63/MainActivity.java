@@ -112,6 +112,9 @@ public class MainActivity extends SherlockFragmentActivity implements
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         initDrawerLayout(savedInstanceState);
         mQueue = AcApp.getGloableQueue();
+        
+        
+        
     }
 
     private void initDrawerLayout(Bundle savedInstanceState) {
