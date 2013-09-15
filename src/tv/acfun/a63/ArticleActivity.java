@@ -51,6 +51,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -380,7 +381,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     addClick(img, src);
                     img.removeAttr("width");
                     img.removeAttr("height");
-                    img.attr("width", "90%");
                 }
             }
         }
@@ -421,10 +421,10 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             if (result) {
                 mWeb.loadDataWithBaseURL("http://www.acfun.tv/", mDoc.html(), "text/html", "UTF-8",
                         null);
-//                if (hasUseMap)
-//                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
-//                else
-//                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
+                if (hasUseMap)
+                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
+                else
+                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
 
             }
         }

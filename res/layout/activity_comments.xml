@@ -12,7 +12,8 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
         	android:paddingRight="@dimen/activity_horizontal_margin"
         	android:paddingTop="0dp"
-            android:listSelector="?attr/selectableItemBackground"
+        	android:drawSelectorOnTop="true"
+            android:listSelector="@drawable/article_item_background"
             />
 
         <TextView
