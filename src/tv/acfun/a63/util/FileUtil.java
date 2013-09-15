@@ -110,7 +110,7 @@ public class FileUtil {
             }
             
         }
-        return "flv";
+        return ".jpg";
     }
     
     public static String guessVideoMimetype(String ext){

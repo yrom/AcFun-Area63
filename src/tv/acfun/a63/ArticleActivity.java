@@ -42,14 +42,15 @@ import tv.acfun.a63.api.entity.Article;
 import tv.acfun.a63.api.entity.Article.SubContent;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -98,6 +99,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     private String title;
     private boolean isDownloaded;
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void initView(Bundle savedInstanceState) {
         ARTICLE_PATH = AcApp.getExternalCacheDir("article").getAbsolutePath();
@@ -166,7 +168,11 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 }
 
             });
-            mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
+            mWeb.getSettings().setSupportZoom(true);
+            mWeb.getSettings().setBuiltInZoomControls(true);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                mWeb.getSettings().setDisplayZoomControls(false);
+//            mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
         }
     }
 
@@ -374,6 +380,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     addClick(img, src);
                     img.removeAttr("width");
                     img.removeAttr("height");
+                    img.attr("width", "90%");
                 }
             }
         }
@@ -414,10 +421,10 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             if (result) {
                 mWeb.loadDataWithBaseURL("http://www.acfun.tv/", mDoc.html(), "text/html", "UTF-8",
                         null);
-                if (hasUseMap)
-                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
-                else
-                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
+//                if (hasUseMap)
+//                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
+//                else
+//                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
 
             }
         }

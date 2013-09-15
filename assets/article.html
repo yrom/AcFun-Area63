@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="zh-CN">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 html {
@@ -12,7 +12,7 @@ html {
      color: #3f484f;
      }
 
-body, div, a ,span{
+body, div, a {
     padding:0 2%;
     word-wrap: break-word;
     vertical-align: baseline;
@@ -29,7 +29,7 @@ li{
 	vertical-align: baseline;
 }
 #content {
-    padding:5%;
+    padding:2% 5%;
     font-size: 1.0em;
     line-height: 140%;
     color:#333;
@@ -80,10 +80,14 @@ h1, h2, h3, h4 ,h5, h6 {
 
 }  
 #title{
-	padding: 15px 2%;
+	padding: 5% 1% 5% 2%;
+	text-align: center;
 	border-bottom: 1px solid #ebeced;
 }
-#info.article-info {
+#info {
+text-align: center;
+}
+#info .article-info {
     font-size:14px;
     line-height:15px;
 	list-style: none;
@@ -93,7 +97,12 @@ h1, h2, h3, h4 ,h5, h6 {
     -webkit-tap-highlight-color: rgba(243, 200, 10, 0);
  	color: #c66;
 }
-
+#info img{
+	width: 18px;
+	height: 18px;
+	padding: 0;
+	margin: 0;
+}
 .article-pubdate{
 	color: #9fa3a7;
 	font-weight: bold;
@@ -111,10 +120,8 @@ h1, h2, h3, h4 ,h5, h6 {
 }
    
 .article-title {
-	display: table;
-	width: 100%;
 	color:#0187c5;
-	font-size: 1.3em;
+	font-size: 1.5em;
 	line-height: 32px;
 	
 }
@@ -123,19 +130,13 @@ h1, h2, h3, h4 ,h5, h6 {
     margin-left: auto;
     margin-right: auto;
 }
-.icon-slash{
-	background-image: url(wen2.png);
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-}
+
 #comment {
 	background-color:#3bb3e0;
 	padding-left:20px;
 	padding-right:20px;
 	padding-bottom:10px;
 	padding-top:10px;
-	position:relative;
 	font-family: 'Open Sans', sans-serif;
 	font-size:14px;
 	text-decoration:none;
