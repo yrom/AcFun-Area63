@@ -603,6 +603,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         case android.R.id.home:
             this.finish();
             break;
+        case R.id.action_settings:
+            SettingsActivity.start(this);
+            break;
         }
         return super.onOptionsItemSelected(item);
     }
