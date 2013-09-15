@@ -78,6 +78,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -91,7 +92,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 public class CommentsActivity extends SherlockActivity implements OnClickListener, OnQuoteClickListener,
         Listener<Comments>, ErrorListener, OnItemClickListener {
 
-    private static final String TAG = CommentsActivity.class.getSimpleName();
+    private static final String TAG = "Comments";
     private int aid;
     private InputMethodManager mKeyboard;
     private ListView mList;
@@ -122,7 +123,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             return;
         setContentView(R.layout.activity_comments);
         ActionBar ab = getSupportActionBar();
-        
+
         ab.setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
         mKeyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         ActionBarUtil.setXiaomiFilterDisplayOptions(ab, false);
@@ -152,10 +153,12 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         mAdapter.setOnClickListener(this);
         mList.setAdapter(mAdapter);
     }
-    private void handleKeyboardStatus(){
+
+    private void handleKeyboardStatus() {
         final View activityRootView = findViewById(R.id.content_frame);
         activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-        @Override
+
+            @Override
             public void onGlobalLayout() {
                 Rect r = new Rect();
                 // r will be populated with the coordinates of your view that
@@ -163,13 +166,15 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 activityRootView.getWindowVisibleDisplayFrame(r);
 
                 int heightDiff = activityRootView.getRootView().getHeight() - (r.bottom - r.top);
-                isInputShow = heightDiff > 100; // TODO 
+                isInputShow = heightDiff > 100; // TODO
             }
         });
     }
+
     private boolean isInputShow;
+
     private void initCommentsBar() {
-        mCommentBar = findViewById(R.id.comments_bar);
+        // TODO mCommentBar = findViewById(R.id.comments_bar);
         mBtnSend = (ImageButton) findViewById(R.id.comments_send_btn);
         mCommentText = (EditText) findViewById(R.id.comments_edit);
         mBtnEmotion = findViewById(R.id.comments_emotion_btn);
@@ -187,21 +192,23 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 text.insert(index, emotion);
                 EmotionView v = (EmotionView) parent.getAdapter().getView(position, null, null);
                 Drawable drawable = TextViewUtils.convertViewToDrawable(v);
-                drawable.setBounds(0, 0, drawable.getIntrinsicWidth()/2, drawable.getIntrinsicHeight()/2);
-                text.setSpan(new ImageSpan(drawable), index, index+emotion.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                drawable.setBounds(0, 0, drawable.getIntrinsicWidth() / 2, drawable.getIntrinsicHeight() / 2);
+                text.setSpan(new ImageSpan(drawable), index, index + emotion.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
-            
+
         });
     }
 
     ListAdapter mEmotionAdapter = new BaseAdapter() {
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            
+
             if (convertView == null) {
                 convertView = new EmotionView(getApplicationContext());
             }
-            ((EmotionView) convertView).setEmotionId(position+1);
+            ((EmotionView) convertView).setEmotionId(position + 1);
             return convertView;
         }
 
@@ -229,16 +236,18 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             mLoadingBar.setVisibility(View.VISIBLE);
         }
         isloading = true;
-        AcApp.addRequest(new CommentsRequest(aid, page, this, this));
+        Request<?> request = new CommentsRequest(aid, page, this, this);
+        request.setTag(TAG);
+        AcApp.addRequest(request);
     }
 
     OnScrollListener mScrollListener = new OnScrollListener() {
 
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if(scrollState != SCROLL_STATE_IDLE && getSupportActionBar().isShowing()){
+            if (scrollState != SCROLL_STATE_IDLE && getSupportActionBar().isShowing()) {
                 hideBar();
-            }else
+            } else
                 showBar();
         }
 
@@ -258,17 +267,21 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
 
     };
-    //TODO hide & show comment bar
-    void hideBar(){
+
+    // TODO hide & show comment bar
+    void hideBar() {
         getSupportActionBar().hide();
     }
-    void showBar(){
+
+    void showBar() {
         getSupportActionBar().show();
     }
+
     static class CommentsRequest extends CustomUARequest<Comments> {
 
         public CommentsRequest(int aid, int page, Listener<Comments> listener, ErrorListener errListener) {
             super(ArticleApi.getCommentUrl(aid, page), Comments.class, listener, errListener);
+
         }
 
         @Override
@@ -306,7 +319,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     private Quote mQuoteSpan;
     private ImageSpan mQuoteImage;
     private User mUser;
-    private View mCommentBar;
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -319,46 +332,50 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             postComment();
             break;
         case R.id.comments_emotion_btn:
-            if(isInputShow){
+            if (isInputShow) {
                 mKeyboard.hideSoftInputFromWindow(mEmotionGrid.getWindowToken(), 0);
-                if(mEmotionGrid.getVisibility() != View.VISIBLE)
+                if (mEmotionGrid.getVisibility() != View.VISIBLE)
                     mEmotionGrid.postDelayed(new Runnable() {
-                    
-                    @Override
-                    public void run() {
-                        mEmotionGrid.setVisibility(View.VISIBLE);
-                        
-                    }
-                }, 20);
-            }else{
-                mEmotionGrid.setVisibility(mEmotionGrid.getVisibility() == View.VISIBLE?View.GONE:View.VISIBLE);
+
+                        @Override
+                        public void run() {
+                            mEmotionGrid.setVisibility(View.VISIBLE);
+
+                        }
+                    }, 20);
+            } else {
+                mEmotionGrid.setVisibility(mEmotionGrid.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
             }
             break;
         }
     }
 
     private void postComment() {
-        if(!validate()){
+        if (!validate()) {
             return;
         }
         int count = getQuoteCount();
         String comment = getComment();
-        Comment quote = data == null? null:data.get(findCid(count));
+        Comment quote = data == null ? null : data.get(findCid(count));
         new CommentPostTask(comment, quote).execute();
     }
-    
-    class CommentPostTask extends AsyncTask<Void, Void, Boolean>{
+
+    class CommentPostTask extends AsyncTask<Void, Void, Boolean> {
+
         protected void onPreExecute() {
             mBtnSend.setEnabled(false);
-            dialog = ProgressDialog.show(CommentsActivity.this, null,"提交中", true, false);
+            dialog = ProgressDialog.show(CommentsActivity.this, null, "提交中", true, false);
         }
+
         String comment;
         Comment quote;
         ProgressDialog dialog;
-        public CommentPostTask(String comment,Comment quote){
+
+        public CommentPostTask(String comment, Comment quote) {
             this.comment = comment;
             this.quote = quote;
         }
+
         @Override
         protected Boolean doInBackground(Void... params) {
             Cookie[] cookies = JSON.parseObject(mUser.cookies, Cookie[].class);
@@ -373,29 +390,32 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 }
             return false;
         }
+
         @Override
         protected void onPostExecute(Boolean result) {
             dialog.dismiss();
             mBtnSend.setEnabled(true);
             mCommentText.setText("");
-            if(result){
+            if (result) {
                 pageIndex = 1;
                 requestData(pageIndex, true);
                 Toast.makeText(getApplicationContext(), "提交成功!", 0).show();
-            }else{
+            } else {
                 Toast.makeText(getApplicationContext(), "提交失败!", 0).show();
             }
         }
     }
-    int findCid(int floorCount){
-        for(int i=0;i<commentIdList.size();i++){
+
+    int findCid(int floorCount) {
+        for (int i = 0; i < commentIdList.size(); i++) {
             int key = commentIdList.get(i);
             Comment c = data.get(key);
-            if(c.count == floorCount)
+            if (c.count == floorCount)
                 return c.cid;
         }
         return 0;
     }
+
     @Override
     public void onClick(View v, int position) {
         mList.performItemClick(v, position, mAdapter.getItemId(position));
@@ -431,7 +451,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
 
         if (response.page == 1) {
-            if(mAdapter != null)
+            if (mAdapter != null)
                 mAdapter.notifyDataSetInvalidated();
             data.clear();
             commentIdList.clear();
@@ -465,109 +485,122 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             String pre = "引用:#" + c.count;
             mQuoteSpan = new Quote(c.count);
             /**
-             * @see http://www.kpbird.com/2013/02/android-chips-edittext-token-edittext.html
-             */    
-            SpannableStringBuilder sb = SpannableStringBuilder.valueOf(mCommentText.getText());//new SpannableStringBuilder();
-            TextView tv = TextViewUtils.createBubbleTextView(this,pre);
+             * @see http
+             *      ://www.kpbird.com/2013/02/android-chips-edittext-token-edittext
+             *      .html
+             */
+            SpannableStringBuilder sb = SpannableStringBuilder.valueOf(mCommentText.getText());// new
+                                                                                               // SpannableStringBuilder();
+            TextView tv = TextViewUtils.createBubbleTextView(this, pre);
             BitmapDrawable bd = (BitmapDrawable) TextViewUtils.convertViewToDrawable(tv);
-            bd.setBounds(0, 0, bd.getIntrinsicWidth(),bd.getIntrinsicHeight());
-            sb.insert(0,pre);
+            bd.setBounds(0, 0, bd.getIntrinsicWidth(), bd.getIntrinsicHeight());
+            sb.insert(0, pre);
             mQuoteImage = new ImageSpan(bd);
-            sb.setSpan(mQuoteImage, 0 , pre.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//            mCommentText.setMovementMethod(LinkMovementMethod.getInstance());
-            sb.setSpan(mQuoteSpan,  0 , pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(mQuoteImage, 0, pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            // mCommentText.setMovementMethod(LinkMovementMethod.getInstance());
+            sb.setSpan(mQuoteSpan, 0, pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.append("");
             mCommentText.setText(sb);
             mCommentText.setSelection(mCommentText.getText().length());
-//            view.postDelayed(new Runnable() {
-//
-//                @Override
-//                public void run() {
-//                    mKeyboard.showSoftInput(mCommentText, 0);
-//                }
-//            }, 200);
+            // view.postDelayed(new Runnable() {
+            //
+            // @Override
+            // public void run() {
+            // mKeyboard.showSoftInput(mCommentText, 0);
+            // }
+            // }, 200);
 
         }
     }
-    boolean validate(){
+
+    boolean validate() {
         mUser = AcApp.getUser();
-        if(mUser == null){
+        if (mUser == null) {
             Toast.makeText(this, "请先登录", 0).show();
             startActivity(SigninActivity.createIntent(this));
             return false;
         }
         Editable text = mCommentText.getText();
         int len = text.length() - getQuoteSpanLength(text);
-        if(len == 0 ){
+        if (len == 0) {
             Toast.makeText(this, "评论不能为空哦", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if(len <= 5){
+        if (len <= 5) {
             Toast.makeText(this, "吐槽得不够啊", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
     }
-    int getQuoteSpanLength(Editable text){
+
+    int getQuoteSpanLength(Editable text) {
         Quote quote = TextViewUtils.getLast(text, Quote.class);
         int start = text.getSpanStart(quote);
         int end = text.getSpanEnd(quote);
-        if(start>=0){
+        if (start >= 0) {
             return end - start;
         }
         return 0;
-        
+
     }
+
     void removeQuote(Editable text) {
         Quote quote = TextViewUtils.getLast(text, Quote.class);
         int start = text.getSpanStart(quote);
         int end = text.getSpanEnd(quote);
-        Log.d(TAG, String.format("start=%d, end=%d",start,end));
-        if(start>=0){
+        Log.d(TAG, String.format("start=%d, end=%d", start, end));
+        if (start >= 0) {
             Log.d(TAG, text.subSequence(start, end).toString());
             text.delete(start, end);
         }
     }
-    
-    String getComment(){
+
+    String getComment() {
         Editable text = SpannableStringBuilder.valueOf(mCommentText.getText());
         Quote quote = TextViewUtils.getLast(text, Quote.class);
         int start = text.getSpanStart(quote);
         int end = text.getSpanEnd(quote);
-        if(start < 0 ) 
+        if (start < 0)
             return text.toString();
-        else if(start == 0){
-            return text.subSequence(end, text.length()).toString(); 
-        }else
-            return text.subSequence(0, start).toString()+text.subSequence(end, text.length()).toString();
+        else if (start == 0) {
+            return text.subSequence(end, text.length()).toString();
+        } else
+            return text.subSequence(0, start).toString() + text.subSequence(end, text.length()).toString();
     }
+
     /**
      * call before {@code removeQuote()}
+     * 
      * @return -1,if not found
      */
-    int getQuoteCount(){
+    int getQuoteCount() {
         Editable text = mCommentText.getText();
         Quote quote = TextViewUtils.getLast(text, Quote.class);
         int start = text.getSpanStart(quote);
-        if(start>=0){
+        if (start >= 0) {
             return quote.floosCount;
         }
         return -1;
-        
+
     }
-    class Quote{
+
+    class Quote {
+
         int floosCount;
+
         public Quote(int count) {
             this.floosCount = count;
         }
     }
+
     @Override
     public void onBackPressed() {
-        if(isInputShow)
+        if (isInputShow)
             mKeyboard.hideSoftInputFromWindow(mEmotionGrid.getWindowToken(), 0);
         else
             super.onBackPressed();
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -578,4 +611,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AcApp.cancelAllRequest(TAG);
+    }
 }
