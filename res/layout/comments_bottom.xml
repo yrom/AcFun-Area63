@@ -4,16 +4,15 @@
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:layout_gravity="bottom"
-    android:background="@drawable/background_tabs_diagonal"
-    >
+    android:background="@drawable/background_tabs_diagonal" >
 
     <LinearLayout
         android:id="@+id/send_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:gravity="center_vertical"
         android:background="@drawable/comments_bar_backgroud"
+        android:gravity="center_vertical"
+        android:minHeight="48dp"
         android:orientation="horizontal" >
 
         <ImageButton
@@ -25,12 +24,12 @@
 
         <EditText
             android:id="@+id/comments_edit"
-            android:layout_width="0dip"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:maxLines="5"
+            android:layout_weight="1"
+            android:hint="@string/post_comment"
             android:inputType="textNoSuggestions|textMultiLine"
-            android:hint="@string/post_comment" />
+            android:maxLines="5" />
 
         <ImageButton
             android:id="@+id/comments_send_btn"

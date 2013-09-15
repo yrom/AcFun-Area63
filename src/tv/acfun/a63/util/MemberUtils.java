@@ -70,16 +70,16 @@ public class MemberUtils{
 	        return map;
 	}
 	
-	public static boolean postComments(String comment,String aid,Cookie[] cks) throws HttpException, IOException{
+	public static boolean postComments(String comment,int aid,Cookie[] cks) throws HttpException, IOException{
 	    return postComments(comment, null, aid, cks);
 	}
-	public static boolean postComments(String comment, Comment quote,String aid, Cookie[] cks) throws HttpException, IOException{
+	public static boolean postComments(String comment, Comment quote,int aid, Cookie[] cks) throws HttpException, IOException{
 	    PostMethod post = new PostMethod("/comment.aspx");
         NameValuePair[] nps = { new NameValuePair("name", "sendComm()"),
                 new NameValuePair("name", "mimiko"), 
                 new NameValuePair("text", comment),
                 new NameValuePair("quoteId", quote == null ? "0" : quote.cid + ""),
-                new NameValuePair("contentId", aid), 
+                new NameValuePair("contentId", String.valueOf(aid)), 
                 new NameValuePair("cooldown", "5000"),
                 new NameValuePair("quoteName", quote == null ? "" : quote.userName) };
         post.setRequestBody(nps);

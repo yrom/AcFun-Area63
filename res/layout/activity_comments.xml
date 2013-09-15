@@ -1,48 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/content_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
 
         <ListView
             android:id="@android:id/list"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:paddingLeft="@dimen/activity_horizontal_margin"
         	android:paddingRight="@dimen/activity_horizontal_margin"
         	android:paddingTop="0dp"
             android:listSelector="?attr/selectableItemBackground"
-            android:visibility="gone"
             />
 
         <TextView
             android:id="@+id/time_out_text"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_gravity="center"
-            android:drawablePadding="4dp"
-            android:drawableLeft="@drawable/ac_30"
+            android:drawablePadding="8dp"
+            android:drawableTop="@drawable/ac_30"
             android:text="@string/time_out"
             android:textSize="16sp"
+            android:layout_centerInParent="true"
             android:textColor="@color/error"
              />
 
-        <include layout="@layout/comments_bottom" />
-    </LinearLayout>
+        <include layout="@layout/comments_bottom" android:id="@+id/comments_bar" />
 
     <ProgressBar
         android:id="@+id/time_progress"
-        android:layout_width="100dip"
-        android:layout_height="100dip"
-        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?attr/progressBarStyle"
+        android:layout_centerInParent="true"
         android:visibility="gone" />
 
-</FrameLayout>
+</RelativeLayout>

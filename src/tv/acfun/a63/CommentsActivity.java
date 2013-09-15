@@ -16,25 +16,33 @@
 
 package tv.acfun.a63;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.HttpException;
 
 import tv.acfun.a63.adapter.CommentsAdaper;
 import tv.acfun.a63.adapter.CommentsAdaper.OnQuoteClickListener;
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.Comment;
 import tv.acfun.a63.api.entity.Comments;
+import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.ArrayUtil;
 import tv.acfun.a63.util.CustomUARequest;
+import tv.acfun.a63.util.MemberUtils;
 import tv.acfun.a63.util.TextViewUtils;
 import tv.acfun.a63.view.EmotionView;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Spannable;
@@ -114,11 +122,18 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             return;
         setContentView(R.layout.activity_comments);
         ActionBar ab = getSupportActionBar();
+        
         ab.setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
         mKeyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         ActionBarUtil.setXiaomiFilterDisplayOptions(ab, false);
         ab.setTitle("ac" + aid + " / 评论");
-        initSendBar();
+        initCommentsBar();
+        initList();
+        requestData(1, true);
+        handleKeyboardStatus();
+    }
+
+    private void initList() {
         mList = (ListView) findViewById(android.R.id.list);
         mLoadingBar = (ProgressBar) findViewById(R.id.time_progress);
         mTimeOutText = (TextView) findViewById(R.id.time_out_text);
@@ -136,10 +151,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         mAdapter = new CommentsAdaper(this, data, commentIdList);
         mAdapter.setOnClickListener(this);
         mList.setAdapter(mAdapter);
-        requestData(1, true);
-        test();
     }
-    private void test(){
+    private void handleKeyboardStatus(){
         final View activityRootView = findViewById(R.id.content_frame);
         activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
@@ -155,7 +168,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         });
     }
     private boolean isInputShow;
-    private void initSendBar() {
+    private void initCommentsBar() {
+        mCommentBar = findViewById(R.id.comments_bar);
         mBtnSend = (ImageButton) findViewById(R.id.comments_send_btn);
         mCommentText = (EditText) findViewById(R.id.comments_edit);
         mBtnEmotion = findViewById(R.id.comments_emotion_btn);
@@ -167,7 +181,6 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO 直接插入图片表情
                 int index = mCommentText.getSelectionEnd();
                 Editable text = mCommentText.getText();
                 String emotion = parent.getItemAtPosition(position).toString();
@@ -211,7 +224,6 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     };
 
     private void requestData(int page, boolean requestNewData) {
-        // TODO Auto-generated method stub
         if (requestNewData) {
             mTimeOutText.setVisibility(View.GONE);
             mLoadingBar.setVisibility(View.VISIBLE);
@@ -224,8 +236,10 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
-            // TODO Auto-generated method stub
-
+            if(scrollState != SCROLL_STATE_IDLE && getSupportActionBar().isShowing()){
+                hideBar();
+            }else
+                showBar();
         }
 
         @Override
@@ -244,7 +258,13 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
 
     };
-
+    //TODO hide & show comment bar
+    void hideBar(){
+        getSupportActionBar().hide();
+    }
+    void showBar(){
+        getSupportActionBar().show();
+    }
     static class CommentsRequest extends CustomUARequest<Comments> {
 
         public CommentsRequest(int aid, int page, Listener<Comments> listener, ErrorListener errListener) {
@@ -285,7 +305,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     private boolean isreload;
     private Quote mQuoteSpan;
     private ImageSpan mQuoteImage;
-    
+    private User mUser;
+    private View mCommentBar;
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -294,6 +315,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             requestData(pageIndex, true);
             break;
         case R.id.comments_send_btn:
+            mKeyboard.hideSoftInputFromWindow(mEmotionGrid.getWindowToken(), 0);
             postComment();
             break;
         case R.id.comments_emotion_btn:
@@ -322,24 +344,49 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         int count = getQuoteCount();
         String comment = getComment();
         Comment quote = data == null? null:data.get(findCid(count));
-        final String rComment = comment;
-        
-        mBtnSend.setEnabled(false);
-        //TODO post comment
-        AcApp.showToast("post comment :%s,quoteId=%d",rComment,quote==null?0:quote.cid);
-        mCommentText.setText("");
-        mBtnSend.postDelayed(new Runnable() {
-            
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                mBtnSend.setEnabled(true);
-                
-            }
-        }, 1000);
-        
+        new CommentPostTask(comment, quote).execute();
     }
-
+    
+    class CommentPostTask extends AsyncTask<Void, Void, Boolean>{
+        protected void onPreExecute() {
+            mBtnSend.setEnabled(false);
+            dialog = ProgressDialog.show(CommentsActivity.this, null,"提交中", true, false);
+        }
+        String comment;
+        Comment quote;
+        ProgressDialog dialog;
+        public CommentPostTask(String comment,Comment quote){
+            this.comment = comment;
+            this.quote = quote;
+        }
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            Cookie[] cookies = JSON.parseObject(mUser.cookies, Cookie[].class);
+            for (int i = 0; i < 3; i++)
+                try {
+                    if (MemberUtils.postComments(comment, quote, aid, cookies))
+                        return true;
+                } catch (HttpException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            return false;
+        }
+        @Override
+        protected void onPostExecute(Boolean result) {
+            dialog.dismiss();
+            mBtnSend.setEnabled(true);
+            mCommentText.setText("");
+            if(result){
+                pageIndex = 1;
+                requestData(pageIndex, true);
+                Toast.makeText(getApplicationContext(), "提交成功!", 0).show();
+            }else{
+                Toast.makeText(getApplicationContext(), "提交失败!", 0).show();
+            }
+        }
+    }
     int findCid(int floorCount){
         for(int i=0;i<commentIdList.size();i++){
             int key = commentIdList.get(i);
@@ -384,6 +431,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
 
         if (response.page == 1) {
+            if(mAdapter != null)
+                mAdapter.notifyDataSetInvalidated();
             data.clear();
             commentIdList.clear();
             mLoadingBar.setVisibility(View.GONE);
@@ -441,6 +490,12 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
     }
     boolean validate(){
+        mUser = AcApp.getUser();
+        if(mUser == null){
+            Toast.makeText(this, "请先登录", 0).show();
+            startActivity(SigninActivity.createIntent(this));
+            return false;
+        }
         Editable text = mCommentText.getText();
         int len = text.length() - getQuoteSpanLength(text);
         if(len == 0 ){
@@ -506,7 +561,13 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             this.floosCount = count;
         }
     }
-    
+    @Override
+    public void onBackPressed() {
+        if(isInputShow)
+            mKeyboard.hideSoftInputFromWindow(mEmotionGrid.getWindowToken(), 0);
+        else
+            super.onBackPressed();
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
