@@ -602,10 +602,10 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         switch (item.getItemId()) {
         case android.R.id.home:
             this.finish();
-            break;
+            return true;
         case R.id.action_settings:
             SettingsActivity.start(this);
-            break;
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -620,5 +620,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     protected void onDestroy() {
         super.onDestroy();
         AcApp.cancelAllRequest(TAG);
+        if(mAdapter != null){
+            mAdapter.setData(null, null);
+        }
+            
     }
 }

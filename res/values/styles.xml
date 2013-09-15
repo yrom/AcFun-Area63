@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="AppTheme" parent="@style/Theme.Sherlock.Light.DarkActionBar">
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
@@ -9,7 +9,7 @@
         
         <item name="actionButtonStyle">@style/Widget.Styled.ActionButton</item>
         <item name="android:actionButtonStyle">@style/Widget.Styled.ActionButton</item>
-        
+        <item name="android:windowBackground">@drawable/background_main</item>
         <item name="android:listSelector">@drawable/abs__list_selector_holo_dark</item>
         
         <item name="spinnerDropDownItemStyle">@style/Widget.Sherlock.Light.DropDownItem.Spinner</item>
