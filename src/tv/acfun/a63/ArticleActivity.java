@@ -131,7 +131,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     if (matcher.find()) {
                         String acId = matcher.group(1);
                         try {
-                            intent.setData(Uri.parse("ac://" + acId));
+                            intent.setData(Uri.parse("ac://ac" + acId));
                             startActivity(intent);
                             return true;
                         } catch (Exception e) {
