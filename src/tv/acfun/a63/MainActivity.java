@@ -14,6 +14,7 @@ import tv.acfun.a63.util.FastJsonRequest;
 import tv.acfun.a63.util.TextViewUtils;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -134,7 +135,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         // opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
                 GravityCompat.START);
-
+        mDrawerLayout.setScrimColor(Color.argb(100, 0, 0, 0));
         int[] iconIds = { R.drawable.ic_home, R.drawable.ic_bell,
                 R.drawable.ic_heart };
         // set up the drawer's list view with items and click listener

@@ -106,8 +106,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         
         if(Intent.ACTION_VIEW.equalsIgnoreCase(getIntent().getAction())
                 &&getIntent().getData()!=null &&  getIntent().getData().getScheme().equals("ac")){
-            // ac://000000
-            aid = Integer.parseInt(getIntent().getDataString().substring(5));
+            // ac://ac000000
+            aid = Integer.parseInt(getIntent().getDataString().substring(7));
             title = "ac"+aid;
         }else{
             aid = getIntent().getIntExtra("aid", 0);

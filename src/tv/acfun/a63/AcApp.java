@@ -196,9 +196,13 @@ public class AcApp extends Application {
     public static void putFloat(String key, float value) {
         sp.edit().putFloat(key, value).commit();
     }
-
+    // FIXME : hard code
     public static int getViewMode() {
         return sp.getInt("view_mode", 0);
+    }
+    
+    public static int getNumOfFloors(){
+        return sp.getInt("num_of_floor", 50);
     }
 
     // ====================================

@@ -72,6 +72,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.alibaba.fastjson.JSON;
@@ -480,8 +481,10 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 requestData(pageIndex, false);
             }
         } else {
-            removeQuote(mCommentText.getText());
             Comment c = (Comment) parent.getItemAtPosition(position);
+            int quoteCount = getQuoteCount();
+            removeQuote(mCommentText.getText());
+            if(quoteCount == c.count) return; // 取消引用
             String pre = "引用:#" + c.count;
             mQuoteSpan = new Quote(c.count);
             /**
@@ -502,13 +505,6 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             sb.append("");
             mCommentText.setText(sb);
             mCommentText.setSelection(mCommentText.getText().length());
-            // view.postDelayed(new Runnable() {
-            //
-            // @Override
-            // public void run() {
-            // mKeyboard.showSoftInput(mCommentText, 0);
-            // }
-            // }, 200);
 
         }
     }
@@ -609,6 +605,12 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getSupportMenuInflater().inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

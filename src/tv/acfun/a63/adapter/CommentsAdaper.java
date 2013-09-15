@@ -50,7 +50,7 @@ public class CommentsAdaper extends BaseAdapter {
 		this.mContext = context;
 		this.data = data;
 		this.commentIdList = commentIdList;
-		maxNumOfFloor = AcApp.getConfig().getInt("num_of_floor", 40);
+		maxNumOfFloor = AcApp.getNumOfFloors();
 		if(maxNumOfFloor == 0)
 		    maxNumOfFloor = 10;
 	}
