@@ -145,9 +145,11 @@ public class TextViewUtils {
         text = text.replace("[img]","").replace("[/img]", "");
         text = text.replaceAll("\\[ac=\\d{5,}\\]", "").replace("[/ac]", "");
         text = text.replaceAll("\\[font[^\\]]*?\\]", "").replace("[/font]", "");
+        text = text.replaceAll("\\[align[^\\]]*?\\]", "").replace("[/align]", "");
         text = text.replaceAll("\\[back[^\\]]*?\\]", "").replace("[/back]", "");
         text = text.replace("[s]", "<strike>").replace("[/s]", "</strike>");
         text = text.replace("[b]", "<b>").replace("[/b]", "</b>");
+        text = text.replace("[u]", "<u>").replace("[/u]", "</u>");
         text = text.replace("[email]", "<font color=\"#FF9A03\"> ").replace("[/email]", "</font>");
         return text;
     }
