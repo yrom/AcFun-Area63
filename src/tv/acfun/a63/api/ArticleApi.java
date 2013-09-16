@@ -108,4 +108,8 @@ public final class ArticleApi {
 
         return isRecommended;
     }
+
+    public static String getRankListUrl(int page) {
+        return String.format(Constants.URL_RANK, (page-1)*20+1,page*20,System.currentTimeMillis()/100000*100000);
+    }
 }

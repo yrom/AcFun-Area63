@@ -11,8 +11,9 @@
     <string name="view_mode_comic">漫画</string>
 	<string-array name="planets">
 	    <item>主页</item>
-        <item>推送</item>
-        <item>收藏</item>
+        <!-- TODO: item>推送</item-->
+        <!-- TODO: item>收藏</item-->
+        <item>排行榜</item>
 	</string-array>
 	<string-array name="titles">
 	    <item>综合</item>
@@ -42,4 +43,5 @@
 	<string name="action_bar_save">保存到图片文件夹</string>
 	<string name="pull_to_retry">加载失败，下拉重试</string>
 	<string name="donate_url">https://m.alipay.com/personal/payment.htm?reason=帮我买杯咖啡吧 -_-&amp;amount=5&amp;userId=2088002476381643&amp;weChat=true</string>
+	<string name="about_url">http://yrom.sinaapp.com/ac_a63.html</string>
 </resources>

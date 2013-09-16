@@ -11,7 +11,7 @@
         android:listSelector="@drawable/article_item_background"
         android:dividerHeight="16dp"
         android:divider="@null"
-        android:layout_margin="8dp"
+        android:layout_margin="16dp"
 	    />
 	<TextView 
 	    android:layout_centerInParent="true"

@@ -1,5 +1,6 @@
 package tv.acfun.a63;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,10 +54,19 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Cache;
+import com.android.volley.Cache.Entry;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.ImageLoader;
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.handmark.pulltorefresh.library.ILoadingLayout;
@@ -136,8 +146,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
                 GravityCompat.START);
         mDrawerLayout.setScrimColor(Color.argb(100, 0, 0, 0));
-        int[] iconIds = { R.drawable.ic_home, R.drawable.ic_bell,
-                R.drawable.ic_heart };
+        int[] iconIds = { R.drawable.ic_home, /*TODO R.drawable.ic_bell,*/
+               /*TODO R.drawable.ic_heart*/ R.drawable.ic_hot };
         // set up the drawer's list view with items and click listener
         mDrawerList.setAdapter(new NavigationAdapter(mPlanetTitles, iconIds));
         mDrawerList.setOnItemClickListener(this);
@@ -240,11 +250,17 @@ public class MainActivity extends SherlockFragmentActivity implements
         while(position>=mFragments.size()){
             mFragments.add(null);
         }
-        f = new PlanetFragment();
         Bundle args = new Bundle();
-        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-        if(position == 0)
-            args.putStringArray(PlanetFragment.ARG_TITLES, mTitles);
+        if(position == 0){
+            f = new HomeFragment();
+            args.putInt(HomeFragment.ARG_PLANET_NUMBER, position);
+            args.putStringArray(HomeFragment.ARG_TITLES, mTitles);
+        }else{
+            f = new RankListFragment();
+            args.putInt(RankListFragment.ARG_LIST_MODE, 3);
+            args.putInt(RankListFragment.ARG_SECTION_NUMBER, 4);
+            f.setHasOptionsMenu(false);
+        }
         f.setArguments(args);
         mFragments.set(position,f);
         return f;
@@ -339,7 +355,11 @@ public class MainActivity extends SherlockFragmentActivity implements
         getSupportMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
+    
+    /**
+     * 四个频道列表
+     *
+     */
     public static class SectionsPagerAdapter extends FragmentPagerAdapter {
         String[] titles;
         int contentListMode = 0;
@@ -351,10 +371,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            Fragment fragment = new DummyCardFragment();
+            Fragment fragment = new ArticleListFragment();
             Bundle args = new Bundle();
-            args.putInt(DummyCardFragment.ARG_SECTION_NUMBER, position);
-            args.putInt(DummyCardFragment.ARG_LIST_MODE, contentListMode);
+            args.putInt(ArticleListFragment.ARG_SECTION_NUMBER, position);
+            args.putInt(ArticleListFragment.ARG_LIST_MODE, contentListMode);
             fragment.setArguments(args);
             return fragment;
         }
@@ -372,7 +392,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            DummyCardFragment fragment = (DummyCardFragment) super.instantiateItem(container, position);
+            ArticleListFragment fragment = (ArticleListFragment) super.instantiateItem(container, position);
             fragment.setContentListMode(contentListMode);
             return fragment;
             
@@ -391,9 +411,9 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     /**
-     * Fragment that appears in the "content_frame", shows a planet
+     * 主页，四个频道列表，三种阅读模式
      */
-    public static class PlanetFragment extends SherlockFragment {
+    public static class HomeFragment extends SherlockFragment {
         public static final String ARG_TITLES = "titles";
 
         public static final String ARG_PLANET_NUMBER = "planet_number";
@@ -403,7 +423,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         private SectionsPagerAdapter mSectionsPagerAdapter;
 
-        public PlanetFragment() {
+        public HomeFragment() {
             VIEW_MODE_CODE = AcApp.getViewMode();
         }
 
@@ -458,16 +478,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             View rootView = null;
             if (i == 0) {
                 setHasOptionsMenu(true);
-                rootView = inflater.inflate(R.layout.fragment_home, container,
-                        false);
-                if(mSectionsPagerAdapter == null)
-                mSectionsPagerAdapter = new SectionsPagerAdapter(
-                        getChildFragmentManager(), getArguments().getStringArray(ARG_TITLES));
-                PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) rootView.findViewById(R.id.tabs);
-                ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.pager);
-                viewPager.setOffscreenPageLimit(3);
-                viewPager.setAdapter(mSectionsPagerAdapter);
-                tabs.setViewPager(viewPager);
+                rootView = createHomeView(inflater, container);
             } else {
                 setHasOptionsMenu(false);
                 rootView = inflater.inflate(R.layout.fragment_planet,
@@ -476,14 +487,107 @@ public class MainActivity extends SherlockFragmentActivity implements
             }
             return rootView;
         }
+
+        private View createHomeView(LayoutInflater inflater, ViewGroup container) {
+            View rootView = inflater.inflate(R.layout.fragment_home, container,
+                    false);
+            if(mSectionsPagerAdapter == null)
+            mSectionsPagerAdapter = new SectionsPagerAdapter(
+                    getChildFragmentManager(), getArguments().getStringArray(ARG_TITLES));
+            PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) rootView.findViewById(R.id.tabs);
+            ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.pager);
+            viewPager.setOffscreenPageLimit(3);
+            viewPager.setAdapter(mSectionsPagerAdapter);
+            tabs.setViewPager(viewPager);
+            return rootView;
+        }
         
         public void changeContentListMode(int itemPosition) {
             Log.d(TAG, "on adapter change Content ListMode = " +itemPosition );
             mSectionsPagerAdapter.changeContentListMode(itemPosition);
         }
     }
+    
+    /**
+     * 排行榜
+     *
+     */
+    public static class RankListFragment extends ArticleListFragment{
 
-    public static class DummyCardFragment extends Fragment implements OnItemClickListener {
+        @Override
+        protected Request<?> getRequest(String url) {
+            
+            return new RankListRequest(url, listener, errorListner);
+        }
+
+        @Override
+        protected Contents loadDataFromCache(Entry entry) {
+            return parseJson(new String(entry.data));
+        }
+
+        
+    }
+    static Contents parseJson(String rankJson){
+        JSONObject rankList = JSON.parseObject(rankJson);
+        
+        if(!rankList.getBooleanValue("success")){
+            return null;
+        }
+        JSONArray jsonArr = rankList.getJSONObject("content").getJSONArray("json");
+        
+        List<Content> contents = new ArrayList<Content>();
+        for(int i=0;i<jsonArr.size();i++){
+            JSONArray carr = jsonArr.getJSONArray(i);
+            Content c = new Content();
+            c.aid = carr.getIntValue(0);
+            c.title =carr.getString(1);
+            c.description = carr.getString(2);
+            c.releaseDate = carr.getLongValue(5)*1000;
+            c.views = carr.getIntValue(10);
+            c.comments = carr.getIntValue(11);
+            c.stows = carr.getIntValue(12);
+            c.channelId = carr.getIntValue(17);
+            contents.add(c);
+        }
+        
+        Contents cs = new Contents();
+        cs.setContents(contents);
+        return cs;
+        
+    }
+    static class RankListRequest extends FastJsonRequest<Contents>{
+
+        public RankListRequest(String url, Listener<Contents> listener,
+                ErrorListener errorListner) {
+            super(url, Contents.class, listener, errorListner);
+        }
+        
+        @Override
+        protected Response<Contents> parseNetworkResponse(NetworkResponse response) {
+            try {
+                String json = new String(
+                        response.data, HttpHeaderParser.parseCharset(response.headers));
+                Contents contents = parseJson(json);
+                if(contents == null)
+                    throw new NullPointerException();
+                return Response.success(contents,HttpHeaderParser.parseCacheHeaders(response));
+            }catch (UnsupportedEncodingException e) {
+                String json = new String(response.data);
+                Contents contents = parseJson(json);
+                if(contents == null)
+                    throw new NullPointerException();
+                return Response.success(contents,HttpHeaderParser.parseCacheHeaders(response));
+            } catch(Exception e){
+                return Response.error(new ParseError(e));
+            }
+            
+        }
+    }
+    /**
+     * 文章列表
+     *
+     */
+    public static class ArticleListFragment extends Fragment implements OnItemClickListener {
 
         public static final String ARG_LIST_MODE = "list_mode";
         public static final String ARG_SECTION_NUMBER = "section_number";
@@ -494,9 +598,9 @@ public class MainActivity extends SherlockFragmentActivity implements
         boolean isLoading;
         View footView;
         int listMode;
-        private FastJsonRequest<Contents> request;
+        private Request<?> request;
         private ILoadingLayout loadingLayout;
-        public DummyCardFragment() {
+        public ArticleListFragment() {
         }
         
         public void setContentListMode(int contentListMode) {
@@ -570,7 +674,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             public void onResponse(Contents response) {
                 if(page <= 1){
                     if(adapter == null){
-                        adapter = new ArticleListAdapter(inflater,response.getContents());
+                        adapter = new ArticleListAdapter(inflater,response.getContents(),listMode);
                     } else
                         adapter.contents = response.getContents();
                     list.setAdapter(adapter);
@@ -614,16 +718,10 @@ public class MainActivity extends SherlockFragmentActivity implements
                 isLoading = false;
             }
         };
-        private int section;
-        private View timeOut;
-        private void loadData(boolean newData, boolean loadCache) {
-            timeOut.setVisibility(View.GONE);
-            TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
-            text.setText(R.string.loading);
-            footView.findViewById(R.id.list_footview_progress).setVisibility(View.VISIBLE);
-            footView.setOnClickListener(null);
-            
-            page = newData ? 1 : page + 1;
+        protected int section;
+        protected View timeOut;
+        final void loadData(boolean newData, boolean loadCache) {
+            initPage(newData);
             String url = getContentListUrl();
            
             // 缓存数据
@@ -638,10 +736,9 @@ public class MainActivity extends SherlockFragmentActivity implements
                     new Thread() {
                         @Override
                         public void run() {
-                            Contents contens = JSON.parseObject(new String(entry.data),
-                                    Contents.class);
+                            Contents contens = loadDataFromCache(entry);
                             if (contens != null && contens.getContents() != null) {
-                                adapter = new ArticleListAdapter(inflater, contens.getContents());
+                                adapter = new ArticleListAdapter(inflater, contens.getContents(),listMode);
                                 list.post(new Runnable() {
 
                                     @Override
@@ -653,18 +750,36 @@ public class MainActivity extends SherlockFragmentActivity implements
                                 });
                             }
                         }
-
                     }.start();
                     
                     return;
                 }
             }
             
-            request = new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
+            request = getRequest(url);
             request.setShouldCache(true);
             if(BuildConfig.DEBUG)
                 Log.d(TAG, String.format("[%d] new request: %s",section,request.getUrl()));
             mQueue.add(request);
+        }
+
+        protected Request<?> getRequest(String url) {
+            return new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
+        }
+        
+        protected Contents loadDataFromCache(final Cache.Entry entry) {
+            Contents contens = JSON.parseObject(new String(entry.data),
+                    Contents.class);
+            return contens;
+        }
+        protected void initPage(boolean newData) {
+            timeOut.setVisibility(View.GONE);
+            TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
+            text.setText(R.string.loading);
+            footView.findViewById(R.id.list_footview_progress).setVisibility(View.VISIBLE);
+            footView.setOnClickListener(null);
+            
+            page = newData ? 1 : page + 1;
         }
         //将默认列表调整为热门
         private String getContentListUrl() {
@@ -674,6 +789,8 @@ public class MainActivity extends SherlockFragmentActivity implements
                 return ArticleApi.getLatestRepliedUrl(Constants.CAT_IDS[section],page);
             case 2:
                 return ArticleApi.getDefaultUrl(Constants.CAT_IDS[section], DEFAULT_COUT, page);
+            case 3:
+                return ArticleApi.getRankListUrl(page);
             case 0:
             default:
                 return ArticleApi.getHotListUrl(Constants.CAT_IDS[section],page);
@@ -711,9 +828,11 @@ public class MainActivity extends SherlockFragmentActivity implements
     static class ArticleListAdapter extends BaseAdapter {
         List<Content> contents;
         LayoutInflater inflater;
-        public ArticleListAdapter(LayoutInflater inflater, List<Content> contents) {
+        int mode;
+        public ArticleListAdapter(LayoutInflater inflater, List<Content> contents, int listMode) {
             this.contents = contents;
             this.inflater = inflater;
+            this.mode = listMode;
         }
         @Override
         public int getCount() {
@@ -736,7 +855,11 @@ public class MainActivity extends SherlockFragmentActivity implements
         public View getView(int position, View convertView, ViewGroup parent) {
             ListViewHolder holder;
             if(convertView == null){
-                convertView = inflater.inflate(R.layout.article_list_item, parent,false);
+                if(mode <3){
+                    convertView = inflater.inflate(R.layout.article_list_item, parent,false);
+                }else{
+                    convertView = inflater.inflate(R.layout.rank_list_item, parent,false);
+                }
                 holder = new ListViewHolder();
                 holder.title = (TextView) convertView.findViewById(R.id.article_item_title);
                 holder.postTime = (TextView) convertView.findViewById(R.id.article_item_post_time);
@@ -751,25 +874,36 @@ public class MainActivity extends SherlockFragmentActivity implements
             else{
                 holder.comments.setText("无简介...");
             }
-            View tagHot = convertView.findViewById(R.id.item_tag);
-            if(ArticleApi.isRecommendedArticle(art)){
-                tagHot.setVisibility(View.VISIBLE);
-                ((ImageView)tagHot).setImageResource(R.drawable.ic_recommended);
-            }
-            else if(ArticleApi.isHotArticle(art)){
-                tagHot.setVisibility(View.VISIBLE);
-                ((ImageView)tagHot).setImageResource(R.drawable.ic_whats_hot);
-            }
             
-            else
-                tagHot.setVisibility(View.GONE);
+            if (mode < 3) {
+                View tagHot = convertView.findViewById(R.id.item_tag);
+                if (ArticleApi.isRecommendedArticle(art)) {
+                    tagHot.setVisibility(View.VISIBLE);
+                    ((ImageView) tagHot).setImageResource(R.drawable.ic_recommended);
+                } else if (ArticleApi.isHotArticle(art)) {
+                    tagHot.setVisibility(View.VISIBLE);
+                    ((ImageView) tagHot).setImageResource(R.drawable.ic_whats_hot);
+                }
+
+                else
+                    tagHot.setVisibility(View.GONE);
+            } else {
+                TextView rank = (TextView) convertView.findViewById(R.id.rank);
+                if (position < 10) {
+                    rank.setVisibility(View.VISIBLE);
+                    rank.setText(String.valueOf(position + 1));
+                    int rankColorIndex = position > 3? 3:position;
+                    rank.setBackgroundColor(rankColors[rankColorIndex]);
+                } else
+                    rank.setVisibility(View.GONE);
+            }
             String tip = String.format(" %s / %d条评论，%d人围观", AcApp.getPubDate(art.releaseDate),art.comments,art.views);
 //            holder.postTime.setText(AcApp.getPubDate(art.releaseDate));
             holder.postTime.setText(tip);
             return convertView;
         }
-
-
+        int rankColors[] = {0xffcc0000,0xffff4444,0xffff8800,0xffffbb33};
+        
     }
     
     static class ListViewHolder{
@@ -838,7 +972,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        ((PlanetFragment)mContentFragment).changeContentListMode(itemPosition);
+        ((HomeFragment)mContentFragment).changeContentListMode(itemPosition);
         return true;
     }
 
@@ -881,5 +1015,11 @@ public class MainActivity extends SherlockFragmentActivity implements
                 invalidateAvatarFrame();
             }
         }
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        
     }
 }

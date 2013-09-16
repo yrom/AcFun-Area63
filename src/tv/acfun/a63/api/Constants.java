@@ -8,6 +8,7 @@ public interface Constants {
     String URL_COMMENT = URL_HOME + "comment_list_json.aspx?contentId=%d&currentPage=%d";
     String URL_PROFILE = URL_HOME + "api/member.aspx?name=profile";
     String URL_SPLAH = URL_HOME + "api/member.aspx?name=splash";
+    String URL_RANK = "http://trend.acfun.tv/api.ntr?page=bd_article&mode=rank&cid=63&ttype=1&stype=1&tdetail=2&start=%d&end=%d&timestamp=%d";
     /**
      * 我关注的
      */
@@ -21,7 +22,7 @@ public interface Constants {
     int CAT_WORK_EMOTION = 73;
     int CAT_AN_CULTURE = 74;
     int CAT_COMIC_LIGHT_NOVEL = 75;
-    int[] CAT_IDS = {CAT_COLLECTION,CAT_WORK_EMOTION,CAT_AN_CULTURE,CAT_COMIC_LIGHT_NOVEL};
+    int[] CAT_IDS = {CAT_COLLECTION,CAT_WORK_EMOTION,CAT_AN_CULTURE,CAT_COMIC_LIGHT_NOVEL,CAT_ARTICLE};
     int TYPE_DEFAULT = 0;
     int TYPE_HOT = 6;
     int TYPE_LATEST_REPLY = 22;

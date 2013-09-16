@@ -19,11 +19,19 @@
             android:negativeButtonText="@null"
             android:text="层"
             android:title="评论最大楼层数" />
+
         <Preference
             android:key="update"
             android:title="检查更新" />
     </PreferenceCategory>
     <PreferenceCategory android:title="其他" >
+        <Preference
+            android:key="about"
+            android:title="关于" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/about_url" />
+        </Preference>
         <Preference
             android:key="rating"
             android:title="评分！" >
@@ -32,12 +40,10 @@
                 android:data="market://details?id=tv.acfun.a63" />
         </Preference>
         <Preference
-            key="about"
-            android:title="关于"/>
-         <Preference
-            key="feedback"
-            android:title="反馈"/>
+            android:key="feedback"
+            android:title="反馈" />
         <Preference
+            android:key="donate"
             android:summary="帮我买杯咖啡吧- -"
             android:title="捐助开发者" >
             <intent
