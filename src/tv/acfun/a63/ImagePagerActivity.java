@@ -194,7 +194,8 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
             
             Bitmap bitmap = AcApp.getBitmpInCache(mUri.toString());
             if(bitmap != null && !bitmap.isRecycled()){
-                Log.d("image", "got bitmap in cache: "+mUri.toString());
+//                if(BuildConfig.DEBUG)
+//                    Log.d("image", "got bitmap in cache: "+mUri.toString());
                 image.setImageBitmap(bitmap);
                 return rootView;
             }

@@ -2,13 +2,9 @@ package tv.acfun.a63.view;
 
 import tv.acfun.a63.R;
 import android.content.Context;
-import android.graphics.Color;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 /**

@@ -166,7 +166,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                             || url.startsWith("file:///android_asset") 
                             || AcApp.getViewMode() == Constants.MODE_NO_PIC) // 无图模式
                         return;
-                    Log.d(TAG, "on finished:" + url);
+//                    Log.d(TAG, "on finished:" + url);
                     if (url.equals(Constants.URL_HOME) && imgUrls.size() > 0 && !isDownloaded) {
                         String[] arr = new String[imgUrls.size()];
                         mDownloadTask = new DownloadImageTask();

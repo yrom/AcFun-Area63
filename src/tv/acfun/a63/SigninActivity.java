@@ -31,7 +31,7 @@ import com.umeng.analytics.MobclickAgent;
 
 public class SigninActivity extends SherlockActivity {
     public static final int REQUEST_SIGN_IN = 1;
-    private static final String TAG = "SigninActivity";
+//    private static final String TAG = "SigninActivity";
     private EditText mNameView;
     private EditText mPwdView;
 

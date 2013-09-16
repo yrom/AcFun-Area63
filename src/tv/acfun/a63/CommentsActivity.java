@@ -547,9 +547,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         Quote quote = TextViewUtils.getLast(text, Quote.class);
         int start = text.getSpanStart(quote);
         int end = text.getSpanEnd(quote);
-        Log.d(TAG, String.format("start=%d, end=%d", start, end));
+//        Log.d(TAG, String.format("start=%d, end=%d", start, end));
         if (start >= 0) {
-            Log.d(TAG, text.subSequence(start, end).toString());
+//            Log.d(TAG, text.subSequence(start, end).toString());
             text.delete(start, end);
         }
     }

@@ -27,7 +27,6 @@ import android.graphics.BitmapFactory.Options;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 
 /**
@@ -35,7 +34,7 @@ import android.view.View;
  * 
  */
 public class EmotionView extends View {
-    private static final String TAG = "EmotionView";
+//    private static final String TAG = "EmotionView";
     private int mId;
     private int mWidth;
     private int mHeight;
@@ -60,13 +59,13 @@ public class EmotionView extends View {
                     if (opts.outWidth > mWidth || opts.outHeight > mHeight) {
                         int sample = Math.max(opts.outWidth / mWidth, opts.outHeight / mHeight);
                         opts.inSampleSize = sample;
-                        Log.d(TAG, String.format("ow=%d,oh=%d, mw=%d,mh=%d, scale to sample=%d",opts.outWidth,opts.outHeight,mWidth,mHeight,sample));
+//                        Log.d(TAG, String.format("ow=%d,oh=%d, mw=%d,mh=%d, scale to sample=%d",opts.outWidth,opts.outHeight,mWidth,mHeight,sample));
                     }
                     opts.inJustDecodeBounds = false;
                     bm = BitmapFactory
                             .decodeStream(getContext().getAssets().open(name), null, opts);
                     AcApp.putBitmapInCache(name, bm);
-                    Log.d(TAG, "put emotion in cache : " + name);
+//                    Log.d(TAG, "put emotion in cache : " + name);
                 }
                 mDrawable = new BitmapDrawable(getResources(), bm);
                 mDrawable.setBounds(0, 0, mWidth, mHeight);

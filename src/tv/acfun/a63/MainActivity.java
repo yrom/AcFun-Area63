@@ -519,7 +519,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
         
         public void changeContentListMode(int itemPosition) {
-            Log.d(TAG, "on adapter change Content ListMode = " +itemPosition );
+            if(BuildConfig.DEBUG)
+                Log.d(TAG, "on adapter change Content ListMode = " +itemPosition );
             mSectionsPagerAdapter.changeContentListMode(itemPosition);
         }
     }
@@ -715,7 +716,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         public void setContentListMode(int contentListMode) {
             if(listMode != contentListMode){
                 listMode = contentListMode;
-                Log.d(TAG, String.format("[%d] framgent change Content ListMode =%d",section,listMode));
+                if(BuildConfig.DEBUG) Log.d(TAG, String.format("[%d] framgent change Content ListMode =%d",section,listMode));
                 list.setRefreshing();
             }
         }
@@ -741,7 +742,8 @@ public class MainActivity extends SherlockFragmentActivity implements
                 @Override
                 public void onRefresh(PullToRefreshBase<ListView> refreshView) {
                     // Do work to refresh the list here.
-                    Log.i(TAG, String.format("[%d] on refresh ",section));
+                    if(BuildConfig.DEBUG) 
+                        Log.d(TAG, String.format("[%d] on refresh ",section));
                     isLoading = true;
                     String label = DateUtils.formatDateTime(getActivity() == null?getActivity():AcApp.context(), System.currentTimeMillis(),
                             DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
@@ -754,7 +756,8 @@ public class MainActivity extends SherlockFragmentActivity implements
                 @Override
                 public void onLastItemVisible() {
                     if(!isLoading){
-                        Log.i(TAG, String.format("[%d] 加载下一页, mode=%d",section,listMode));
+                        if(BuildConfig.DEBUG)
+                            Log.d(TAG, String.format("[%d] 加载下一页, mode=%d",section,listMode));
                         loadData(false,false);
                     }
                 }
@@ -767,7 +770,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         @Override
         public void onResume() {
             super.onResume();
-            Log.d(TAG, String.format("[%d] on fragment resume, showing = %b",section,isShowing));
+            if(BuildConfig.DEBUG) 
+                Log.d(TAG, String.format("[%d] on fragment resume, showing = %b",section,isShowing));
             if(!isShowing){
                 loadding.setVisibility(View.VISIBLE);
                 loadData(true, true);
@@ -837,7 +841,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 if (newData && !entry.isExpired()) {
 //                    entry.ttl = entry.softTtl = System.currentTimeMillis() - 1000;
                     mQueue.getCache().invalidate(url, true);
-                    Log.i(TAG, String.format("[%d] 刷新数据",section));
+                    if(BuildConfig.DEBUG) Log.d(TAG, String.format("[%d] 刷新数据",section));
                 }
                 if (loadCache) {
                     new Thread() {
@@ -918,7 +922,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         public void onDestroy() {
             super.onDestroy();
             if(adapter != null && adapter.contents != null){
-                Log.d(TAG, String.format("[%d] destory adapter,size=%d", section,adapter.getCount()));
+                if(BuildConfig.DEBUG)
+                    Log.d(TAG, String.format("[%d] destory adapter,size=%d", section,adapter.getCount()));
                 adapter.contents.clear();
                 adapter = null;
             }
