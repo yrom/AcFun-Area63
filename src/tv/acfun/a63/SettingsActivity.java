@@ -33,6 +33,11 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.fb.FeedbackAgent;
+import com.umeng.update.UmengUpdateAgent;
+import com.umeng.update.UmengUpdateListener;
+import com.umeng.update.UpdateResponse;
 
 /**
  * @author Yrom
@@ -40,6 +45,8 @@ import com.actionbarsherlock.view.MenuItem;
  */
 @SuppressWarnings("deprecation")
 public class SettingsActivity extends SherlockPreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
+    private static final String KEY_UPDATE = "update";
+    private static final String KEY_FEED_BACK = "feedback";
     private static final String KEY_IMAGE_CACHE = "image_cache";
     private static final String KEY_CLEAR_CACHE = "clear_cache";
     private String oldPath;
@@ -49,6 +56,16 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
         getListView().setFooterDividersEnabled(false);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
         addPreferencesFromResource(R.xml.preferences);
+        setCache();
+        Preference feedback = findPreference(KEY_FEED_BACK);
+        feedback.setOnPreferenceClickListener(this);
+        
+        Preference update = findPreference(KEY_UPDATE);
+        update.setSummary(AcApp.instance().getVersionName());
+        update.setOnPreferenceClickListener(this);
+        
+    }
+    private void setCache() {
         Preference cache = findPreference(KEY_CLEAR_CACHE);
         String size = FileUtil.getFormatFolderSize(getExternalCacheDir());
         cache.setSummary(size);
@@ -78,6 +95,11 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
             else
                 Toast.makeText(getApplicationContext(), "清除失败", 0).show();
             return true;
+        }else if(KEY_FEED_BACK.equals(preference.getKey())){
+            new FeedbackAgent(this).startFeedbackActivity();
+        }else if(KEY_UPDATE.equals(preference.getKey())){
+            preference.setEnabled(false);
+            update();
         }
         return false;
     }
@@ -94,6 +116,38 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
             }
         }
         return false;
+    }
+    private void update() {
+        UmengUpdateAgent.update(this);
+        UmengUpdateAgent.setUpdateAutoPopup(false);
+        UmengUpdateAgent.setUpdateListener(new UmengUpdateListener() {
+
+            @Override
+            public void onUpdateReturned(int updateStatus, UpdateResponse updateInfo) {
+                switch (updateStatus) {
+                case 0: // has update
+                    UmengUpdateAgent.showUpdateDialog(SettingsActivity.this, updateInfo);
+                    break;
+                case 1: // has no update
+                    Toast.makeText(SettingsActivity.this, "已是最新版", Toast.LENGTH_SHORT).show();
+                    break;
+                case 2: // none wifi
+                    Toast.makeText(SettingsActivity.this, "没有wifi连接， 只在wifi下更新", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3: // time out
+                    Toast.makeText(SettingsActivity.this, "超时", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+            }
+
+        });
+    }
+    protected void onDestroy() {
+        super.onDestroy();
+        UmengUpdateAgent.setUpdateListener(null);
+        UmengUpdateAgent.setDownloadListener(null);
+        UmengUpdateAgent.setDialogListener(null);
+        UmengUpdateAgent.setUpdateAutoPopup(true);
     }
     OnClickListener listener = new OnClickListener() {
         
@@ -132,5 +186,15 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
             .setMessage("请重新输入！")
             .setNegativeButton("好",null)
             .show();
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 }

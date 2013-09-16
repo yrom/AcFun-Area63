@@ -29,6 +29,7 @@ import android.webkit.WebView;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
+import com.umeng.analytics.MobclickAgent;
 
 /**
  * @author Yrom
@@ -89,5 +90,15 @@ public class BaseWebViewActivity extends SherlockActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 }

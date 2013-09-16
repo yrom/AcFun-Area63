@@ -76,6 +76,9 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.fb.FeedbackAgent;
+import com.umeng.update.UmengUpdateAgent;
 
 public class MainActivity extends SherlockFragmentActivity implements
         OnItemClickListener, OnNavigationListener, OnClickListener {
@@ -125,9 +128,15 @@ public class MainActivity extends SherlockFragmentActivity implements
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         initDrawerLayout(savedInstanceState);
         mQueue = AcApp.getGloableQueue();
-        
-        
-        
+        // umeng
+        initUmeng();
+    }
+
+    private void initUmeng() {
+        MobclickAgent.setDebugMode(BuildConfig.DEBUG);
+        UmengUpdateAgent.update(this);
+        MobclickAgent.onError(this);
+        new FeedbackAgent(this).sync();
     }
 
     private void initDrawerLayout(Bundle savedInstanceState) {
@@ -254,15 +263,18 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
         Bundle args = new Bundle();
         if(position == 0){
+            MobclickAgent.onEvent(this, "main");
             f = new HomeFragment();
             args.putInt(HomeFragment.ARG_PLANET_NUMBER, position);
             args.putStringArray(HomeFragment.ARG_TITLES, mTitles);
         }else if( position == 1){
+            MobclickAgent.onEvent(this, "rank");
             f = new RankListFragment();
             args.putInt(RankListFragment.ARG_LIST_MODE, 3);
             args.putInt(RankListFragment.ARG_SECTION_NUMBER, 4);
             f.setHasOptionsMenu(false);
         }else if(position == 2){
+            MobclickAgent.onEvent(this, "fav");
             f = new FavListFragment();
         }
         f.setArguments(args);
@@ -519,7 +531,6 @@ public class MainActivity extends SherlockFragmentActivity implements
             mEmptyView.setVisibility(View.GONE);
             loadData();
         }
-        
         LayoutInflater inflater;
         private ListView mList;
         private View mProgress;
@@ -752,11 +763,6 @@ public class MainActivity extends SherlockFragmentActivity implements
             return rootView;
         }
 
-//        @Override
-//        public void onActivityCreated(Bundle savedInstanceState) {
-//            super.onActivityCreated(savedInstanceState);
-//            loadData(true, true);
-//        }
         boolean isShowing;
         @Override
         public void onResume() {
@@ -1123,5 +1129,15 @@ public class MainActivity extends SherlockFragmentActivity implements
     protected void onDestroy() {
         super.onDestroy();
         
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 }

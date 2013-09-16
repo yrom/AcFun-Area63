@@ -17,4 +17,6 @@
 	<color name="error">#ffee0000</color>
     
 	<drawable name="ab_bg_trans">#990099cc</drawable>
+	<color name="umeng_fb_color_btn_pressed">#0099cc</color>
+	<color name="umeng_fb_color_btn_normal">#33B5E5</color>
 </resources>

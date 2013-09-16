@@ -69,6 +69,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.umeng.analytics.MobclickAgent;
 
 /**
  * 文章页 结构： {@code <div id="title"> <h1 class="article-title"></h1>
@@ -120,6 +121,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             throw new IllegalArgumentException("没有 id");
         } else {
             getSupportActionBar().setTitle("ac" + aid);
+            MobclickAgent.onEvent(this, "view_article","ac"+aid);
             db = new DB(this);
             isFaved = db.isFav(aid); 
             mWeb.getSettings().setAppCachePath(ARTICLE_PATH);
@@ -577,4 +579,5 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             ImagePagerActivity.startCacheImage(ArticleActivity.this, (ArrayList<File>) imageCaches, imgUrls.indexOf(url),aid,title);
         }
     }
+
 }

@@ -5,7 +5,6 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.PostMethod;
 
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.db.DB;
@@ -28,6 +27,7 @@ import android.widget.TextView.OnEditorActionListener;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.alibaba.fastjson.JSONException;
+import com.umeng.analytics.MobclickAgent;
 
 public class SigninActivity extends SherlockActivity {
     public static final int REQUEST_SIGN_IN = 1;
@@ -118,6 +118,7 @@ public class SigninActivity extends SherlockActivity {
         @Override
         protected void onPostExecute(Boolean result) {
             if(result.booleanValue()){
+                MobclickAgent.onEvent(SigninActivity.this, "sign_in");
                 Intent data = new Intent();
                 data.putExtra("user", user);
                 setResult(RESULT_OK, data);
@@ -138,5 +139,15 @@ public class SigninActivity extends SherlockActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 }

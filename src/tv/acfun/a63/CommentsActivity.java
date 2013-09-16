@@ -85,6 +85,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.umeng.analytics.MobclickAgent;
 
 /**
  * @author Yrom
@@ -123,6 +124,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         if (aid == 0)
             return;
         setContentView(R.layout.activity_comments);
+        MobclickAgent.onEvent(this,"view_comment", "ac"+aid);
         ActionBar ab = getSupportActionBar();
 
         ab.setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
@@ -355,6 +357,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         if (!validate()) {
             return;
         }
+        MobclickAgent.onEvent(this, "post_comment");
         int count = getQuoteCount();
         String comment = getComment();
         Comment quote = data == null ? null : data.get(findCid(count));
@@ -624,5 +627,15 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             mAdapter.setData(null, null);
         }
             
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 }

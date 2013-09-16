@@ -56,6 +56,7 @@ import com.actionbarsherlock.widget.ShareActionProvider;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
+import com.umeng.analytics.MobclickAgent;
 
 
 /**
@@ -87,7 +88,7 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
         aid = extras.getInt("aid");
         mList = extras.getStringArrayList(EXTRA_IMAGES);
         int index = extras.getInt(EXTRA_INDEX,0);
-        
+        MobclickAgent.onEvent(this, "view_big_pic", "ac"+aid+"/"+index);
         setContentView(R.layout.activity_images);
         
         indexText = (TextView) findViewById(R.id.index);
@@ -298,6 +299,7 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
             success = FileUtil.copy(cache, dest);
         }
         if(success){
+            MobclickAgent.onEvent(this, "save_pic");
             AcApp.showToast("保存成功");
         }else
             AcApp.showToast("保存失败！");
@@ -345,5 +347,15 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
     public void onPageSelected(int arg0) {
         mCurrentImage = arg0;
         indexText.setText(String.format("%d/%d",mCurrentImage+1,mList.size()));
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 }

@@ -34,6 +34,7 @@ import com.alibaba.fastjson.JSON;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.umeng.analytics.MobclickAgent;
 
 /**
  * @author Yrom
@@ -123,6 +124,7 @@ public class ProfileActivity extends BaseWebViewActivity {
         public void logout(){
             AcApp.logout();
             setResult(RESULT_OK);
+            MobclickAgent.onEvent(ProfileActivity.this, "log_out");
             finish();
         }
 //        @android.webkit.JavascriptInterface
