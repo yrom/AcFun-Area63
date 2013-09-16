@@ -24,7 +24,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -517,6 +516,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         @Override
         public void onResume() {
             super.onResume();
+            mEmptyView.setVisibility(View.GONE);
             loadData();
         }
         

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="max_num_columns">12</integer>
+    <integer name="max_floors_w">15</integer>
 </resources>

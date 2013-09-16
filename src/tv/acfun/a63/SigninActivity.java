@@ -53,7 +53,10 @@ public class SigninActivity extends SherlockActivity {
             
             @Override
             public void onClick(View v) {
-                new LoginTask().execute();
+                if(mNameView.getText().length() == 0 || mPwdView.getText().length() == 0){
+                    mNameView.setError("用户名和密码不能为空！");
+                }else
+                    new LoginTask().execute();
 //                setResult(RESULT_OK);
 //                finish();
             }
@@ -108,7 +111,7 @@ public class SigninActivity extends SherlockActivity {
             } catch (IOException e) {
                 e.printStackTrace();
                 response = "错误: 登录失败";
-            }
+            } 
             
             return false;
         }
@@ -120,6 +123,7 @@ public class SigninActivity extends SherlockActivity {
                 setResult(RESULT_OK, data);
                 finish();
             }else{
+                mNameView.setError(response);
                 AcApp.showToast(response);
             }
             dialog.dismiss();

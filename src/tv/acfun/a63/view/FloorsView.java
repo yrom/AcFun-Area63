@@ -33,6 +33,7 @@ import android.widget.TextView;
  */
 public class FloorsView extends LinearLayout {
 	private Drawable mBorder;
+    private int mMaxNum;
 	
 	public FloorsView(Context context) {
 		this(context, null);
@@ -45,6 +46,7 @@ public class FloorsView extends LinearLayout {
 
 	private void initView(Context context) {
 		setOrientation(VERTICAL);
+		mMaxNum = getResources().getInteger(R.integer.max_floors_w);
 	}
 
 	public void setQuoteList(List<View> quoteList) {
@@ -57,8 +59,8 @@ public class FloorsView extends LinearLayout {
 		for(int i=quoteList.size()-1;i>=0;i--){
 			LinearLayout.LayoutParams params = generateDefaultLayoutParams();
 			int k = spacing * i;
-			if(quoteList.size()>15 && i>10){
-			    k = spacing*10;
+			if(quoteList.size()>mMaxNum+2 && i>mMaxNum){
+			    k = spacing*mMaxNum;
 			}
 			params.leftMargin = k;
 			params.rightMargin = k;
