@@ -15,6 +15,7 @@
  */
 package tv.acfun.a63.db;
 
+import tv.acfun.a63.api.entity.Article;
 import tv.acfun.a63.api.entity.User;
 import android.content.Context;
 import android.database.Cursor;
@@ -56,6 +57,13 @@ public final class DB {
     public void logout() {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL("DELETE FROM " + DBOpenHelper.TABLE_USER);
+        db.close();
+    }
+    // TODO : fav
+    public void addFav(Article article){
+        SQLiteDatabase db = helper.getWritableDatabase();
+//        db.execSQL("INSERT INTO "+DBOpenHelper.TABLE_FAV + "aid, title, article_json,", new Object[]{article.id, article.title, article.});
+        
         db.close();
     }
 }

@@ -28,6 +28,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "ac.db";
     public static final int DB_VERSION = 1;
     public static final String TABLE_USER = "user";
+    public static final String TABLE_FAV = "fav";
     public DBOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
@@ -37,7 +38,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE "+TABLE_USER+" (_id INTEGER PRIMARY KEY AUTOINCREMENT,uid INTEGER, name VARCHAR(25),avatar TEXT,signature TEXT,cookies TEXT)");
+        db.execSQL("CREATE TABLE "+TABLE_USER+" (_id INTEGER PRIMARY KEY AUTOINCREMENT,uid INTEGER,name VARCHAR(25),avatar TEXT,signature TEXT,cookies TEXT)");
+        db.execSQL("CREATE TABLE "+TABLE_FAV+" (_id INTEGER PRIMARY KEY AUTOINCREMENT,aid INTEGER,title VARCHAR(25),article_json TEXT)");
     }
 
     /* (non-Javadoc)
