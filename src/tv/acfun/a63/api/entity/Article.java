@@ -90,6 +90,7 @@ public class Article {
     public ArrayList<String> imgUrls;
     public ArrayList<SubContent> contents;
     public User poster;
+    public String description;
 
     public static class SubContent {
         public String subTitle;
@@ -111,6 +112,7 @@ public class Article {
             article.title = info.getString("title");
             article.postTime = info.getLong("posttime");
             article.id = info.getIntValue("id");
+            article.description = info.getString("description");
             article.poster = parseUser(info);
             // statistics
             JSONArray statistics = info.getJSONArray("statistics");
@@ -154,5 +156,5 @@ public class Article {
         poster.avatar = postuser.getString("avastar");
         return poster;
     }
-
+    
 }

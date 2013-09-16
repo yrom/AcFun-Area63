@@ -33,4 +33,49 @@ public interface Constants {
     int MODE_MIX = 0;
     int MODE_NO_PIC = 1;
     int MODE_COMMIC = 2;
+    
+    public static final class id {
+
+        public static final int ANIMATION = 1;
+        public static final int MUSIC     = 58;
+        public static final int GAME      = 59;
+        public static final int FUN       = 60;
+        public static final int BANGUMI   = 67;
+        public static final int VIDEO     = 68;
+        public static final int SPORT     = 69;
+        public static final int SCIENCE   = 70;
+        public static final int FLASH     = 71;
+        public static final int MUGEN     = 72;
+
+        public static final class ARTICLE {
+            
+            public static final int ARTICLE           = 63;
+            public static final int COLLECTION        = 110;
+            public static final int WORK_EMOTION      = 73;
+            public static final int AN_CULTURE        = 74;
+            public static final int COMIC_LIGHT_NOVEL = 75;
+        }
+        public static final int BEST_GAME   = 83;
+        public static final int LIVE_OB     = 84;
+        public static final int LOL         = 85;
+        public static final int FUNY        = 86;
+        public static final int KICHIKU     = 87;
+        public static final int PET         = 88;
+        public static final int EAT         = 89;
+        public static final int MOVIE       = 96;
+        public static final int TV          = 97;
+        public static final int VARIETY     = 98;
+        
+        public static final int PILI        = 99;
+        public static final int DOCUMENTARY = 100;
+        public static final int SING        = 101;
+        public static final int DANCE       = 102;
+        public static final int VOCALOID    = 103;
+        public static final int ACG         = 104;
+        public static final int POP         = 105;
+        public static final int AN_LITE     = 106;
+        public static final int MAD_AMV     = 107;
+        public static final int MMD_3D      = 108;
+        public static final int AN_COMP     = 109;
+    }
 }

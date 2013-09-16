@@ -5,6 +5,7 @@ import java.util.List;
 
 import tv.acfun.a63.AcApp;
 import tv.acfun.a63.api.entity.Content;
+import android.util.SparseArray;
 
 import com.alibaba.fastjson.JSON;
 
@@ -110,6 +111,56 @@ public final class ArticleApi {
     }
 
     public static String getRankListUrl(int page) {
-        return String.format(Constants.URL_RANK, (page-1)*20+1,page*20,System.currentTimeMillis()/100000*100000);
+        return String.format(Constants.URL_RANK, (page-1)*20+1,page*20,System.currentTimeMillis()/300000*300000);
+    }
+    static SparseArray<String> channels = new SparseArray<String>();
+    
+    static{
+        channels.put(Constants.id.ANIMATION, "动画");
+        channels.put(Constants.id.AN_LITE, "动画短片");
+        channels.put(Constants.id.MAD_AMV, "MAD·AMV");
+        channels.put(Constants.id.MMD_3D, "MMD·3D");
+        channels.put(Constants.id.AN_COMP, "动画合集");
+        
+        channels.put(Constants.id.MUSIC, "音乐");
+        channels.put(Constants.id.SING, "演唱");
+        channels.put(Constants.id.DANCE, "宅舞");
+        channels.put(Constants.id.VOCALOID, "Vocaloid");
+        channels.put(Constants.id.ACG, "ACG音乐");
+        channels.put(Constants.id.POP, "流行音乐");
+        
+        channels.put(Constants.id.FUN, "娱乐");
+        channels.put(Constants.id.FUNY, "生活娱乐");
+        channels.put(Constants.id.KICHIKU, "鬼畜调教");
+        channels.put(Constants.id.PET, "萌宠");
+        channels.put(Constants.id.EAT, "美食");
+        channels.put(Constants.id.SCIENCE, "科技");
+        channels.put(Constants.id.SPORT, "体育");
+        
+        channels.put(Constants.id.VIDEO, "影视");
+        channels.put(Constants.id.MOVIE, "电影");
+        channels.put(Constants.id.TV, "剧集");
+        channels.put(Constants.id.VARIETY, "综艺");
+        channels.put(Constants.id.DOCUMENTARY, "纪录片");
+        channels.put(Constants.id.PILI, "特摄·霹雳");
+        
+        channels.put(Constants.id.GAME, "游戏");
+        channels.put(Constants.id.BEST_GAME, "游戏集锦");
+        channels.put(Constants.id.LIVE_OB, "实况解说");
+        channels.put(Constants.id.FLASH, "FLASH");
+        channels.put(Constants.id.MUGEN, "MUGEN");
+        channels.put(Constants.id.LOL, "撸啊撸");
+        
+        
+        channels.put(Constants.id.BANGUMI, "新番连载");
+        
+        channels.put(Constants.id.ARTICLE.ARTICLE, "文章");
+        channels.put(Constants.id.ARTICLE.COLLECTION, "综合");
+        channels.put(Constants.id.ARTICLE.WORK_EMOTION, "工作·情感");
+        channels.put(Constants.id.ARTICLE.AN_CULTURE, "动漫文化");
+        channels.put(Constants.id.ARTICLE.COMIC_LIGHT_NOVEL, "漫画·轻小说");
+    }
+    public static String getChannelName(int channelId){
+        return channels.get(channelId);
     }
 }

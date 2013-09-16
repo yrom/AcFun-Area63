@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_item_fov_action_provider_action_bar"
+        android:id="@+id/menu_item_fav_action"
         android:icon="@drawable/rating_favorite"
         android:showAsAction="ifRoom"
         android:title="@string/action_bar_fov"/>

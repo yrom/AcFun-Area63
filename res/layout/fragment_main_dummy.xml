@@ -13,6 +13,12 @@
         android:divider="@null"
         android:layout_margin="16dp"
 	    />
+	<ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        />
 	<TextView 
 	    android:layout_centerInParent="true"
 	    android:drawableTop="@drawable/ac_30"

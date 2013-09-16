@@ -9,6 +9,7 @@ import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Content;
 import tv.acfun.a63.api.entity.Contents;
 import tv.acfun.a63.api.entity.User;
+import tv.acfun.a63.db.DB;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.FastJsonRequest;
@@ -23,6 +24,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -41,6 +43,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -147,7 +150,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 GravityCompat.START);
         mDrawerLayout.setScrimColor(Color.argb(100, 0, 0, 0));
         int[] iconIds = { R.drawable.ic_home, /*TODO R.drawable.ic_bell,*/
-               /*TODO R.drawable.ic_heart*/ R.drawable.ic_hot };
+                 R.drawable.ic_hot, R.drawable.ic_heart};
         // set up the drawer's list view with items and click listener
         mDrawerList.setAdapter(new NavigationAdapter(mPlanetTitles, iconIds));
         mDrawerList.setOnItemClickListener(this);
@@ -255,11 +258,13 @@ public class MainActivity extends SherlockFragmentActivity implements
             f = new HomeFragment();
             args.putInt(HomeFragment.ARG_PLANET_NUMBER, position);
             args.putStringArray(HomeFragment.ARG_TITLES, mTitles);
-        }else{
+        }else if( position == 1){
             f = new RankListFragment();
             args.putInt(RankListFragment.ARG_LIST_MODE, 3);
             args.putInt(RankListFragment.ARG_SECTION_NUMBER, 4);
             f.setHasOptionsMenu(false);
+        }else if(position == 2){
+            f = new FavListFragment();
         }
         f.setArguments(args);
         mFragments.set(position,f);
@@ -507,6 +512,98 @@ public class MainActivity extends SherlockFragmentActivity implements
             mSectionsPagerAdapter.changeContentListMode(itemPosition);
         }
     }
+    public static class FavListFragment extends Fragment{
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            loadData();
+        }
+        
+        LayoutInflater inflater;
+        private ListView mList;
+        private View mProgress;
+        private View mEmptyView;
+        private OnItemClickListener mOnItemclick = new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Content c = (Content) parent.getItemAtPosition(position);
+                ArticleActivity.start(getActivity(), c.aid, c.title);
+            }
+            
+        };
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                Bundle savedInstanceState) {
+            this.inflater = inflater;
+            View root = inflater.inflate(R.layout.fragment_list,container,false);
+            mList = (ListView) root.findViewById(R.id.list);
+            mList.setOnItemClickListener(mOnItemclick);
+            mProgress = root.findViewById(R.id.loading);
+            mEmptyView = root.findViewById(R.id.time_out_text);
+            return root;
+        }
+
+        private void loadData() {
+            new Thread(){
+                public void run() {
+                    final List<Content> favList = new DB(getActivity()).getFavList();
+                    mList.post(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            mProgress.setVisibility(View.GONE);
+                            setListAdapter(favList);
+                        }
+                    });
+                }
+            }.start();
+        }
+        private void setListAdapter(final List<Content> favList) {
+            if(favList == null || favList.isEmpty()){
+                mEmptyView.setVisibility(View.VISIBLE);
+            }else
+                setListAdapter(new ArticleListAdapter(inflater, favList, 0){
+
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    ListViewHolder holder;
+                    if(convertView == null){
+                        convertView = inflater.inflate(R.layout.fav_list_item,parent,false);
+                        holder = new ListViewHolder();
+                        holder.title = (TextView) convertView.findViewById(R.id.article_item_title);
+                        holder.postTime = (TextView) convertView.findViewById(R.id.article_item_post_time);
+                        holder.comments = (TextView) convertView.findViewById(R.id.article_desc);
+                        holder.channel = (TextView) convertView.findViewById(R.id.item_tag_channel);
+                        convertView.setTag(holder);
+                    }else{
+                        holder = (ListViewHolder) convertView.getTag();
+                    }
+                    Content content = getItem(position);
+                    holder.title.setText(TextViewUtils.getSource(content.title));
+                    if(!TextUtils.isEmpty(content.description))
+                        holder.comments.setText(Html.fromHtml(TextViewUtils.getSource(content.description)));
+                    else{
+                        holder.comments.setText("无简介...");
+                    }
+                    String tip = String.format(" 于%s收藏，有%d人同好", AcApp.getPubDate(content.releaseDate),content.stows);
+                    holder.postTime.setText(tip);
+                    holder.channel.setText(ArticleApi.getChannelName(content.channelId));
+                    return convertView;
+                }
+                
+            });
+        }
+
+
+        private void setListAdapter(ListAdapter adapter) {
+            if(adapter == null) return;
+            mList.setVisibility(View.VISIBLE);
+            mList.setAdapter(adapter);
+            
+        }
+    }
     
     /**
      * 排行榜
@@ -600,6 +697,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         int listMode;
         private Request<?> request;
         private ILoadingLayout loadingLayout;
+        private View loadding;
         public ArticleListFragment() {
         }
         
@@ -624,6 +722,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                     container, false);
             list = (PullToRefreshListView) rootView.findViewById(R.id.list);
             timeOut = rootView.findViewById(R.id.time_out_text);
+            loadding = rootView.findViewById(R.id.loading);
             footView = inflater.inflate(R.layout.list_footerview, list.getRefreshableView(),false);
             list.getRefreshableView().addFooterView(footView, null, false);
             loadingLayout = list.getLoadingLayoutProxy(true, false);
@@ -664,6 +763,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             super.onResume();
             Log.d(TAG, String.format("[%d] on fragment resume, showing = %b",section,isShowing));
             if(!isShowing){
+                loadding.setVisibility(View.VISIBLE);
                 loadData(true, true);
                 isShowing = true;
             }
@@ -681,6 +781,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 }else{
                     adapter.addData(response.getContents());
                 }
+                loadding.setVisibility(View.GONE);
                 adapter.notifyDataSetChanged();
                 list.onRefreshComplete();
                 needReload = false;
@@ -746,6 +847,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                                         list.setAdapter(adapter);
                                         isLoading = false;
                                         list.setRefreshing();
+                                        loadding.setVisibility(View.GONE);
                                     }
                                 });
                             }
@@ -909,7 +1011,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     static class ListViewHolder{
         TextView comments,
         postTime,
-        upman,
+        channel,
         views,
         title;
         ImageView titleImage;

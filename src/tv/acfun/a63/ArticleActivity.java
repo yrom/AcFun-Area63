@@ -40,6 +40,7 @@ import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Article;
 import tv.acfun.a63.api.entity.Article.SubContent;
+import tv.acfun.a63.db.DB;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
 import android.annotation.TargetApi;
@@ -99,6 +100,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     private DownloadImageTask mDownloadTask;
     private String title;
     private boolean isDownloaded;
+    private DB db;
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
@@ -118,6 +120,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             throw new IllegalArgumentException("没有 id");
         } else {
             getSupportActionBar().setTitle("ac" + aid);
+            db = new DB(this);
+            isFaved = db.isFav(aid); 
             mWeb.getSettings().setAppCachePath(ARTICLE_PATH);
             mWeb.getSettings().setBlockNetworkImage(true);
             mWeb.addJavascriptInterface(new ACJSObject(), "AC");
@@ -185,6 +189,11 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
             actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
             actionProvider.setShareIntent(createShareIntent());
+            if(isFaved){
+                MenuItem fav = menu.findItem(R.id.menu_item_fav_action);
+                fav.setIcon(R.drawable.rating_favorite_p);
+                fav.setTitle("取消收藏");
+            }
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -206,10 +215,19 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 CommentsActivity.start(ArticleActivity.this, mArticle.id);
             }
             return true;
-        case R.id.menu_item_fov_action_provider_action_bar:
-            //TODO
-            AcApp.showToast("收藏");
-            break;
+        case R.id.menu_item_fav_action:
+            if(isFaved){
+                db.deleteFav(aid);
+                AcApp.showToast("取消收藏");
+                isFaved = false;
+                item.setIcon(R.drawable.rating_favorite);
+            }else{
+                db.addFav(mArticle);
+                isFaved = true;
+                item.setIcon(R.drawable.rating_favorite_p);
+                AcApp.showToast("收藏成功");
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -305,6 +323,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
     List<File> imageCaches;
     private int aid;
+    private boolean isFaved;
     
     private class BuildDocTask extends AsyncTask<Article, Void, Boolean> {
         boolean hasUseMap;

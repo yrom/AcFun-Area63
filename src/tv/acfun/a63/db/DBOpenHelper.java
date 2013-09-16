@@ -39,7 +39,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE "+TABLE_USER+" (_id INTEGER PRIMARY KEY AUTOINCREMENT,uid INTEGER,name VARCHAR(25),avatar TEXT,signature TEXT,cookies TEXT)");
-        db.execSQL("CREATE TABLE "+TABLE_FAV+" (_id INTEGER PRIMARY KEY AUTOINCREMENT,aid INTEGER,title VARCHAR(25),article_json TEXT)");
+        db.execSQL("CREATE TABLE "+TABLE_FAV+" (_id INTEGER PRIMARY KEY AUTOINCREMENT,aid INTEGER,title VARCHAR(200),description TEXT, channelId INTEGER, stows INTEGER, time INTEGER)");
     }
 
     /* (non-Javadoc)
