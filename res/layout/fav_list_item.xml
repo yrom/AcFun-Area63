@@ -12,7 +12,7 @@
 	        android:id="@+id/article_item_title"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_toLeftOf="@+id/item_tag"
+	        android:layout_toLeftOf="@+id/item_tag_channel"
 	        android:textColor="@color/text_color_default"
 	        android:textSize="18sp" />
 		<TextView
@@ -22,8 +22,8 @@
 		    android:layout_alignParentRight="true"
 		    android:layout_alignParentTop="true"
 		    android:text="综合"
-		    android:padding="8dp"
-		    android:background="@drawable/oval"
+		    android:layout_marginTop="8dp"
+		    android:background="@drawable/item_tag_background"
 		    android:textSize="14sp"
 		    />
 	    <TextView
