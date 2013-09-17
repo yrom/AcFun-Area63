@@ -224,10 +224,12 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 isFaved = false;
                 item.setIcon(R.drawable.rating_favorite);
             }else{
-                db.addFav(mArticle);
-                isFaved = true;
-                item.setIcon(R.drawable.rating_favorite_p);
-                AcApp.showToast("收藏成功");
+                if(mArticle!= null){
+                    db.addFav(mArticle);
+                    isFaved = true;
+                    item.setIcon(R.drawable.rating_favorite_p);
+                    AcApp.showToast("收藏成功");
+                }
             }
             return true;
         }
