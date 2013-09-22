@@ -4,46 +4,46 @@
 
     <PreferenceCategory android:title="设置" >
         <Preference
-            android:key="clear_cache"
+            android:key="@string/key_clear_cache"
             android:title="清空缓存" />
 
         <EditTextPreference
-            android:key="image_cache"
+            android:key="@string/key_image_cache"
             android:title="图片保存路径" />
 
         <tv.acfun.a63.view.SeekBarPreference
+            android:key="@string/key_num_of_floor"
             android:defaultValue="50"
             android:dialogMessage="请选择滑动最流畅的一档"
-            android:key="num_of_floor"
             android:max="150"
             android:negativeButtonText="@null"
             android:text="层"
             android:title="评论最大楼层数" />
-
+        
         <Preference
-            android:key="update"
+            android:key="@string/key_update"
             android:title="检查更新" />
     </PreferenceCategory>
     <PreferenceCategory android:title="其他" >
         <Preference
-            android:key="about"
+            android:key="@string/key_about"
             android:title="关于" >
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/about_url" />
         </Preference>
         <Preference
-            android:key="rating"
+            android:key="@string/key_rating"
             android:title="评分！" >
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="market://details?id=tv.acfun.a63" />
         </Preference>
         <Preference
-            android:key="feedback"
+            android:key="@string/key_feedback"
             android:title="反馈" />
         <Preference
-            android:key="donate"
+            android:key="@string/key_donate"
             android:summary="帮我买杯咖啡吧- -"
             android:title="捐助开发者" >
             <intent

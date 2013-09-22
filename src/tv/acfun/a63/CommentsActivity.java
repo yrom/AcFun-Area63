@@ -36,8 +36,10 @@ import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.MemberUtils;
 import tv.acfun.a63.util.TextViewUtils;
 import tv.acfun.a63.view.EmotionView;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -322,6 +324,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     private Quote mQuoteSpan;
     private ImageSpan mQuoteImage;
     private User mUser;
+    private AlertDialog sizeChooser;
 
     @Override
     public void onClick(View v) {
@@ -606,6 +609,28 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         case android.R.id.home:
             this.finish();
             return true;
+        case android.R.id.button1:
+            if(sizeChooser == null){
+                final int checked = AcApp.getConfig().getInt("text_size", 0);
+                sizeChooser = new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setTitle("评论文字大小")
+                .setSingleChoiceItems(R.array.title_sizes, checked, new DialogInterface.OnClickListener() {
+                    int lastSelected = checked;
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(lastSelected != which){
+                            AcApp.putInt("text_size", which);
+                            if(mAdapter != null)
+                            mAdapter.notifyDataSetChanged();
+                            dialog.dismiss();
+                            lastSelected = which;
+                        }
+                    }
+                }).create();
+            }
+            sizeChooser.show();
+            return true;
         case R.id.action_settings:
             SettingsActivity.start(this);
             return true;
@@ -615,6 +640,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        
+        menu.add(0,android.R.id.button1,0,"文字大小").setIcon(R.drawable.ic_text_size).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         getSupportMenuInflater().inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
     }

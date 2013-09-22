@@ -27,6 +27,17 @@
 	    <item>最近发布</item>
         <!--item>本区推荐</item-->
 	</string-array>
+	<string-array name="title_sizes">
+	    <item>小号</item>
+        <item>中号</item>
+        <item>大号</item>
+        <item>特大</item>
+	</string-array>
+	<string-array name="value_sizes">
+	    <item>small</item>
+        <item>medium</item>
+        <item>large</item>
+	</string-array>
 	<string name="user_name">用户名</string>
 	<string name="signin">登录</string>
 	<string name="password">密码</string>
@@ -45,4 +56,12 @@
 	<string name="donate_url">https://m.alipay.com/personal/payment.htm?reason=帮我买杯咖啡吧 -_-&amp;amount=5&amp;userId=2088002476381643&amp;weChat=true</string>
 	<string name="about_url">http://yrom.sinaapp.com/ac_a63.html</string>
 	<string name="umeng_fb_powered_by">powered by</string>
+	<string name="key_clear_cache">clear_cache</string>
+	<string name="key_image_cache">image_cache</string>
+	<string name="key_num_of_floor">num_of_floor</string>
+	<string name="key_update">update</string>
+	<string name="key_about">about</string>
+	<string name="key_rating">rating</string>
+	<string name="key_feedback">feedback</string>
+	<string name="key_donate">donate</string>
 </resources>

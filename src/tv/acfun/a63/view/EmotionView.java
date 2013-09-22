@@ -58,6 +58,7 @@ public class EmotionView extends View {
                     BitmapFactory.decodeStream(getContext().getAssets().open(name), null, opts);
                     if (opts.outWidth > mWidth || opts.outHeight > mHeight) {
                         int sample = Math.max(opts.outWidth / mWidth, opts.outHeight / mHeight);
+                        
                         opts.inSampleSize = sample;
 //                        Log.d(TAG, String.format("ow=%d,oh=%d, mw=%d,mh=%d, scale to sample=%d",opts.outWidth,opts.outHeight,mWidth,mHeight,sample));
                     }
@@ -68,7 +69,8 @@ public class EmotionView extends View {
 //                    Log.d(TAG, "put emotion in cache : " + name);
                 }
                 mDrawable = new BitmapDrawable(getResources(), bm);
-                mDrawable.setBounds(0, 0, mWidth, mHeight);
+                
+                mDrawable.setBounds(0, 0, mWidth, mDrawable.getIntrinsicHeight()*mHeight/mDrawable.getIntrinsicWidth());
             } catch (IOException e) {
                 e.printStackTrace();
             }

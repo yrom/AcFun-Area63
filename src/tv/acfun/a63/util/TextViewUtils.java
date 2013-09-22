@@ -26,6 +26,7 @@ import tv.acfun.a63.R;
 import tv.acfun.a63.api.entity.Comment;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -43,7 +44,7 @@ import android.view.View.MeasureSpec;
 import android.widget.TextView;
 
 public class TextViewUtils {
-	
+    
 	public static void setCommentContent(final TextView comment, Comment c) {
         String text = c.content;
         text = replace(text);
@@ -52,10 +53,20 @@ public class TextViewUtils {
             @Override
             public Drawable getDrawable(String source) {
                 try {
-                    Drawable drawable = Drawable.createFromStream(comment.getContext().getAssets().open(source),source);
-                    if(drawable!=null)
-                        drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*AcApp.density), (int)(drawable.getIntrinsicHeight()*AcApp.density));
+                    Bitmap bm = AcApp.getBitmpInCache(source);
+                    if(bm == null){
+                        bm = BitmapFactory
+                                .decodeStream(comment.getContext().getAssets().open(source));
+                        AcApp.putBitmapInCache(source, bm);
+                    }
+                    Drawable drawable = new BitmapDrawable(comment.getResources(), bm);
+                    if(drawable!=null){
+                        int w = comment.getResources().getDimensionPixelSize(R.dimen.emotions_column_width);
+                        drawable.setBounds(0, 0, w, drawable.getIntrinsicHeight()*w/drawable.getIntrinsicWidth());
+                    }
+                    
                     return drawable;
+                        
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
@@ -79,6 +90,7 @@ public class TextViewUtils {
             }
         }));
         comment.setTextColor(Color.BLACK);
+        comment.setTextSize(AcApp.getPreferenceFontSize());
         Pattern http = Pattern.compile("http://[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?",
                 Pattern.CASE_INSENSITIVE);
         Linkify.addLinks(comment, http, "http://");

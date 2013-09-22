@@ -204,7 +204,17 @@ public class AcApp extends Application {
     public static int getNumOfFloors(){
         return sp.getInt("num_of_floor", 50);
     }
-
+    
+    static int lastSize;
+    public static int getPreferenceFontSize() {
+        int preference = sp.getInt("text_size", 0);
+        if(lastSize == preference && lastSize> 0){
+            return lastSize;
+        }
+        lastSize = 4 * (preference + 3);
+        return lastSize;
+        
+    }
     // ====================================
     // statics
     // ====================================
@@ -372,5 +382,6 @@ public class AcApp extends Application {
             }
         }
     }
+
 
 }
