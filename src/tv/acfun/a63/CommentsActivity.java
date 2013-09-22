@@ -53,8 +53,10 @@ import android.text.style.ImageSpan;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
@@ -154,6 +156,31 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         mList.setFooterDividersEnabled(false);
         mList.setOnScrollListener(mScrollListener);
         mList.setOnItemClickListener(this);
+        mList.setOnTouchListener(new OnTouchListener() {
+            private int mMotionY;
+
+            public boolean onTouch(View v, MotionEvent event) {
+                int y = (int) event.getY();
+                switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    mMotionY = y;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    int delta = y - mMotionY;
+                    if(Math.abs(delta) < 100) break;
+                    if (delta > 0) {
+                        if(!getSupportActionBar().isShowing())
+                            showBar();
+                    } else{
+                        if(getSupportActionBar().isShowing())
+                            hideBar();
+                    }
+                    mMotionY = y;
+                    break;
+                }
+                return false;
+            }
+        });
         mAdapter = new CommentsAdaper(this, data, commentIdList);
         mAdapter.setOnClickListener(this);
         mList.setAdapter(mAdapter);
@@ -171,15 +198,16 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 activityRootView.getWindowVisibleDisplayFrame(r);
 
                 int heightDiff = activityRootView.getRootView().getHeight() - (r.bottom - r.top);
-                isInputShow = heightDiff > 100; // TODO
+                isInputShow = heightDiff > 100; // FIXME: may be a larger number
             }
         });
     }
 
     private boolean isInputShow;
+    private View mCommentBar;
 
     private void initCommentsBar() {
-        // TODO mCommentBar = findViewById(R.id.comments_bar);
+        mCommentBar = findViewById(R.id.comments_bar);
         mBtnSend = (ImageButton) findViewById(R.id.comments_send_btn);
         mCommentText = (EditText) findViewById(R.id.comments_edit);
         mBtnEmotion = findViewById(R.id.comments_emotion_btn);
@@ -250,10 +278,6 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if (scrollState != SCROLL_STATE_IDLE && getSupportActionBar().isShowing()) {
-                hideBar();
-            } else
-                showBar();
         }
 
         @Override
@@ -273,13 +297,15 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
     };
 
-    // TODO hide & show comment bar
+    // TODO hide & show comment bar antimated
     void hideBar() {
         getSupportActionBar().hide();
+        mCommentBar.setVisibility(View.GONE);
     }
 
     void showBar() {
         getSupportActionBar().show();
+        mCommentBar.setVisibility(View.VISIBLE);
     }
 
     static class CommentsRequest extends CustomUARequest<Comments> {

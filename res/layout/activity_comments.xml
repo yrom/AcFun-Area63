@@ -14,8 +14,8 @@
         	android:paddingTop="0dp"
         	android:drawSelectorOnTop="true"
             android:listSelector="@drawable/article_item_background"
-            android:layout_above="@+id/comments_bar"
             />
+<!--             android:layout_above="@+id/comments_bar" -->
 
         <TextView
             android:id="@+id/time_out_text"
