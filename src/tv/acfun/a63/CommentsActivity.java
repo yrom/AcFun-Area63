@@ -32,10 +32,12 @@ import tv.acfun.a63.api.entity.Comments;
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.ArrayUtil;
+import tv.acfun.a63.util.BaseAnimationListener;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.MemberUtils;
 import tv.acfun.a63.util.TextViewUtils;
 import tv.acfun.a63.view.EmotionView;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -45,6 +47,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Spannable;
@@ -59,6 +62,9 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Animation.AnimationListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -113,7 +119,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     private EditText mCommentText;
     private View mBtnEmotion;
     private GridView mEmotionGrid;
-
+    private boolean isBarShowing;
+    
     public static void start(Context context, int aid) {
         Intent intent = new Intent(context, CommentsActivity.class);
         intent.putExtra("aid", aid);
@@ -169,11 +176,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                     int delta = y - mMotionY;
                     if(Math.abs(delta) < 100) break;
                     if (delta > 0) {
-                        if(!getSupportActionBar().isShowing())
-                            showBar();
+                        showBar();
                     } else{
-                        if(getSupportActionBar().isShowing())
-                            hideBar();
+                        hideBar();
                     }
                     mMotionY = y;
                     break;
@@ -296,16 +301,49 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
 
     };
+    AnimationListener mHideListener = new BaseAnimationListener(){
+        
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+        public void onAnimationEnd(Animation animation) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                mCommentBar.setTranslationY(mCommentBar.getHeight());
+            mCommentBar.setVisibility(View.GONE);
+        }
+    };
+    AnimationListener mShowListener = new BaseAnimationListener(){
+        
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+        public void onAnimationStart(Animation animation) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                mCommentBar.setTranslationY(0);
+            mCommentBar.setVisibility(View.VISIBLE);
+        }
+    };
+    Animation mAnim;
 
-    // TODO hide & show comment bar antimated
     void hideBar() {
+        if(!isBarShowing) return;
+        isBarShowing = false;
         getSupportActionBar().hide();
-        mCommentBar.setVisibility(View.GONE);
+        if(mAnim != null)
+            mAnim.cancel();
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_out);
+        anim.setAnimationListener(mHideListener);
+        mAnim = anim;
+        mCommentBar.startAnimation(mAnim);
     }
 
     void showBar() {
+        if(isBarShowing)
+            return;
+        isBarShowing = true;
         getSupportActionBar().show();
-        mCommentBar.setVisibility(View.VISIBLE);
+        if(mAnim != null)
+            mAnim.cancel();
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_in);
+        anim.setAnimationListener(mShowListener);
+        mAnim = anim;
+        mCommentBar.startAnimation(mAnim);
     }
 
     static class CommentsRequest extends CustomUARequest<Comments> {
@@ -432,9 +470,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             if (result) {
                 pageIndex = 1;
                 requestData(pageIndex, true);
-                Toast.makeText(getApplicationContext(), "提交成功!", 0).show();
+                Toast.makeText(getApplicationContext(), "提交成功!", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getApplicationContext(), "提交失败!", 0).show();
+                Toast.makeText(getApplicationContext(), "提交失败!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -513,6 +551,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 requestData(pageIndex, false);
             }
         } else {
+            showBar(); // show input bar when selected comment
             Comment c = (Comment) parent.getItemAtPosition(position);
             int quoteCount = getQuoteCount();
             removeQuote(mCommentText.getText());
@@ -544,7 +583,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     boolean validate() {
         mUser = AcApp.getUser();
         if (mUser == null) {
-            Toast.makeText(this, "请先登录", 0).show();
+            Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
             startActivity(SigninActivity.createIntent(this));
             return false;
         }
