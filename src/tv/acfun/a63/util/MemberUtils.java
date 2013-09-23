@@ -91,13 +91,13 @@ public class MemberUtils{
         NameValuePair[] nps = new NameValuePair[2];
         nps[0] = new NameValuePair("cId", cid);
         nps[1] = new NameValuePair("operate", "1");
-        return Connectivity.postResultJson("/member/collect.aspx", nps, cks);
+        return Connectivity.postResultJson("/member/collect.aspx", nps, cks).getBooleanValue("success");
 	}
 	public static boolean deleteFavourite(String cid, Cookie[] cookies){
 	    NameValuePair[] nps = new NameValuePair[2];
 	    nps[0] = new NameValuePair("cId", cid);
         nps[1] = new NameValuePair("operate", "0");
-        return Connectivity.postResultJson("/member/collect.aspx", nps, cookies);
+        return Connectivity.postResultJson("/member/collect.aspx", nps, cookies).getBooleanValue("success");
 	}
 //	public static List<Favorite> getFavouriteOnline(Cookie[] cookies, int pageNo){
 //	    return getFavouriteOnline(cookies, 15, pageNo);
@@ -131,7 +131,7 @@ public class MemberUtils{
 //        }
 //        return favs;
 //	}
-	public static boolean checkIn(Cookie[] cks){
+	public static JSONObject checkIn(Cookie[] cks){
 	    return Connectivity.postResultJson("/member/checkin.aspx", null, cks);
 	}
 }

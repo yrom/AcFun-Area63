@@ -26,11 +26,13 @@ import org.jsoup.nodes.Document;
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.util.DocumentRequest;
+import tv.acfun.a63.util.MemberUtils;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.actionbarsherlock.view.Menu;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
@@ -107,8 +109,7 @@ public class ProfileActivity extends BaseWebViewActivity {
                 doc.getElementById("area-cont-splash").html(htmlFromNet);
                 doc.getElementsByClass("alert-info").remove();
                 doc.getElementById("hint-unread-splash").remove();
-                //TODO <a class=\"button\" href=\"javascript:window.AC.checkin();\">签到</a>
-                String html = "<div id=\"control\"><a class=\"button\" href=\"javascript:window.AC.logout();\" >注销</a> </div>";
+                String html = "<div id=\"control\"><a class=\"button\" href=\"javascript:window.AC.logout();\" >注销</a> &nbsp;&nbsp;&nbsp; <a class=\"button\" href=\"javascript:window.AC.checkin();\">签到</a> </div>";
                 doc.getElementById("list-info-splash").before(html);
                 return doc;
             } catch (IOException e) {
@@ -127,10 +128,21 @@ public class ProfileActivity extends BaseWebViewActivity {
             MobclickAgent.onEvent(ProfileActivity.this, "log_out");
             finish();
         }
-//        @android.webkit.JavascriptInterface
-//        public void checkin(){
-//            MemberUtils.checkIn(cookies);
-//        }
+        @android.webkit.JavascriptInterface
+        public void checkin(){
+            JSONObject checkIn = MemberUtils.checkIn(cookies);
+            if(checkIn != null){
+                if(checkIn.getBooleanValue("success")){
+                    AcApp.showToast("签到成功");
+                }else{
+                    AcApp.showToast("签到失败："+checkIn.getString("result"));
+                }
+            }else{
+                AcApp.showToast("签到失败：请重试");
+            }
+            
+                            
+        }
     }
     @Override
     protected void onDestroy() {

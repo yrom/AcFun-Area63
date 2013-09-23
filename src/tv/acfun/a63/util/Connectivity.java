@@ -17,8 +17,6 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import tv.acfun.a63.AcApp;
 import android.net.http.AndroidHttpClient;
@@ -26,16 +24,16 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Network;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HttpClientStack;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.JsonObjectRequest;
 
 /**
  * 
@@ -97,11 +95,6 @@ public class Connectivity {
         return newRequestQueue(null);
     }
     
-    public static JsonObjectRequest newJsonObjectRequest(String url,
-            Listener<JSONObject> listener, ErrorListener errorListener) {
-        return new JsonObjectRequest(url, null, listener, errorListener);
-    }
-    
     public static int request(HttpMethodBase httpMethod, String host, int port, String protocal, Cookie[] cookies)
             throws HttpException, IOException {
         HttpClient client = new HttpClient();
@@ -128,7 +121,7 @@ public class Connectivity {
         return doPost(post, "www.acfun.tv", 0, null, cks);
     }
 
-    public static boolean postResultJson(String url, NameValuePair[] nps, Cookie[] cks) {
+    public static JSONObject postResultJson(String url, NameValuePair[] nps, Cookie[] cks) {
         if (TextUtils.isEmpty(url))
             throw new NullPointerException("url cannot be null!");
         PostMethod post = new PostMethod(url);
@@ -140,13 +133,13 @@ public class Connectivity {
             int state = Connectivity.doPost(post, cks);
             if (state == 200) {
                 String json = post.getResponseBodyAsString();
-                JSONObject re = new JSONObject(json);
-                return re.getBoolean("success");
+                JSONObject re = JSON.parseObject(json);
+                return re;
             }
         } catch (Exception e) {
             Log.e(TAG, "try to post Result Json :"+url ,e);
         }
-        return false;
+        return null;
     }
 
     public static int doGet(GetMethod get, String host, int port, String protocal, Cookie[] cookies)
@@ -190,7 +183,7 @@ public class Connectivity {
     public static JSONObject getResultJson(String url, String queryString, Cookie[] cookies) {
         String result = doGet(url, queryString, cookies);
         try {
-            return TextUtils.isEmpty(result) ? null : new JSONObject(result);
+            return TextUtils.isEmpty(result) ? null : JSON.parseObject(result);
         } catch (JSONException e) {
             Log.e(TAG, "try to get Result Json :"+url ,e);
             return null;

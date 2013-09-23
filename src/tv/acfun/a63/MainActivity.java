@@ -211,11 +211,6 @@ public class MainActivity extends SherlockFragmentActivity implements
                 signatureText.setText(mUser.signature);
                 signatureText.setVisibility(View.VISIBLE);
             }
-//            logout
-//            View signout = mAvatarFrame.findViewById(R.id.signout);
-//            signout.setVisibility(View.VISIBLE);
-//            signout.setOnClickListener(this);
-//            avatar.setOnClickListener(this);
         }
     }
     /**
@@ -1127,12 +1122,13 @@ public class MainActivity extends SherlockFragmentActivity implements
             if(request == SigninActivity.REQUEST_SIGN_IN){
                 mUser = data.getExtras().getParcelable("user");
                 setUserInfo();
+                startActivity(new Intent(this,ProfileActivity.class));
             }else{
                 invalidateAvatarFrame();
             }
         }
     }
-    
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
