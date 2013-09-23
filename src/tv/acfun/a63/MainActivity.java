@@ -78,6 +78,10 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.fb.FeedbackAgent;
+import com.umeng.fb.model.Conversation;
+import com.umeng.fb.model.Conversation.SyncListener;
+import com.umeng.fb.model.DevReply;
+import com.umeng.fb.model.Reply;
 import com.umeng.update.UmengUpdateAgent;
 
 public class MainActivity extends SherlockFragmentActivity implements
@@ -136,7 +140,23 @@ public class MainActivity extends SherlockFragmentActivity implements
         MobclickAgent.setDebugMode(BuildConfig.DEBUG);
         UmengUpdateAgent.update(this);
         MobclickAgent.onError(this);
-        new FeedbackAgent(this).sync();
+        SyncListener listener = new Conversation.SyncListener() {
+
+            @Override
+            public void onSendUserReply(List<Reply> replyList) {
+            }
+
+            @Override
+            public void onReceiveDevReply(List<DevReply> replyList) {
+                if(replyList == null || replyList.isEmpty()){
+                    return;
+                }
+                Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
+                String text = replyList.get(0).getContent();
+                AcApp.showNotification(intent, R.id.comments_content, text, R.drawable.notify_chat, "有新的回复");
+            }
+        };
+        new FeedbackAgent(this).getDefaultConversation().sync(listener);
     }
 
     private void initDrawerLayout(Bundle savedInstanceState) {

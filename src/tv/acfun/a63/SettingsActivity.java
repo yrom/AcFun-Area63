@@ -96,7 +96,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
                 Toast.makeText(getApplicationContext(), "清除失败", 0).show();
             return true;
         }else if(KEY_FEED_BACK.equals(preference.getKey())){
-            new FeedbackAgent(this).startFeedbackActivity();
+//            new FeedbackAgent(this).startFeedbackActivity();
+            startActivity(new Intent(this,ConversationActivity.class));
         }else if(KEY_UPDATE.equals(preference.getKey())){
             preference.setEnabled(false);
             update();

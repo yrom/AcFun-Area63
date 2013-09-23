@@ -64,4 +64,5 @@
 	<string name="key_rating">rating</string>
 	<string name="key_feedback">feedback</string>
 	<string name="key_donate">donate</string>
+	<string name="comment_hint">不吐嘈不舒服斯基</string>
 </resources>
