@@ -305,6 +305,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 mNavAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
             }
             mBar.setListNavigationCallbacks(mNavAdapter, this);
+            mBar.setSelectedNavigationItem(AcApp.getConfig().getInt("nav_item", 0));
         }
         
         Fragment f = getFragment(position);
@@ -378,7 +379,7 @@ public class MainActivity extends SherlockFragmentActivity implements
      */
     public static class SectionsPagerAdapter extends FragmentPagerAdapter {
         String[] titles;
-        int contentListMode = 0;
+        int contentListMode;
         public SectionsPagerAdapter(FragmentManager fragmentManager,
                 String[] titles) {
             super(fragmentManager);
@@ -390,6 +391,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             Fragment fragment = new ArticleListFragment();
             Bundle args = new Bundle();
             args.putInt(ArticleListFragment.ARG_SECTION_NUMBER, position);
+            contentListMode = AcApp.getConfig().getInt("nav_item", 0);
             args.putInt(ArticleListFragment.ARG_LIST_MODE, contentListMode);
             fragment.setArguments(args);
             return fragment;
@@ -717,7 +719,8 @@ public class MainActivity extends SherlockFragmentActivity implements
             if(listMode != contentListMode){
                 listMode = contentListMode;
                 if(BuildConfig.DEBUG) Log.d(TAG, String.format("[%d] framgent change Content ListMode =%d",section,listMode));
-                list.setRefreshing();
+                if(list != null) // ensure list
+                    list.setRefreshing();
             }
         }
         @Override
