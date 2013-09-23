@@ -211,7 +211,7 @@ public class AcApp extends Application {
         if(lastSize == preference && lastSize> 0){
             return lastSize;
         }
-        lastSize = 4 * (preference + 3);
+        lastSize = (6 + preference*(preference + 1)) << 1;
         return lastSize;
         
     }

@@ -312,11 +312,11 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     public void onResponse(Article response) {
         mArticle = response;
         imgUrls = response.imgUrls;
-        if(AcApp.getViewMode() == Constants.MODE_COMMIC){
+        if(AcApp.getViewMode() == Constants.MODE_COMMIC && imgUrls != null && !imgUrls.isEmpty()){
             ImagePagerActivity.startNetworkImage(this, (ArrayList<String>) imgUrls,0,aid,title);
             finish();
         }else
-        new BuildDocTask().execute(mArticle);
+            new BuildDocTask().execute(mArticle);
 
     }
     @Override

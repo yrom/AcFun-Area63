@@ -194,19 +194,21 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
             
             Bitmap bitmap = AcApp.getBitmpInCache(mUri.toString());
             if(bitmap != null && !bitmap.isRecycled()){
-//                if(BuildConfig.DEBUG)
-//                    Log.d("image", "got bitmap in cache: "+mUri.toString());
                 image.setImageBitmap(bitmap);
                 return rootView;
             }
-            if(mUri.getScheme().equals("file")){
+            if("file".equals(mUri.getScheme())){
                 File img = new File(mUri.getPath());
                 if(img.exists()){
                     if(bitmap == null || bitmap.isRecycled()){
                         bitmap= AcApp.decodeBitmap(mUri.getPath(), Bitmap.Config.RGB_565);
-                        AcApp.putBitmapInCache(mUri.toString(), bitmap);
+                        if(bitmap == null) //could not be decoded
+                            img.delete();
+                        else
+                            AcApp.putBitmapInCache(mUri.toString(), bitmap);
                     }
-                    image.setImageBitmap(bitmap);
+                    if(bitmap != null)
+                        image.setImageBitmap(bitmap);
                 }else{
                     timeOut.setVisibility(View.VISIBLE);
                     timeOut.setText("加载失败，可能还没下载到数据，请重试");

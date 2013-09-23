@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="max_floors_w">8</integer>
+    <integer name="max_floors_w">6</integer>
 </resources>

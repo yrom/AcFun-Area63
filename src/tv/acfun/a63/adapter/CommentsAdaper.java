@@ -105,7 +105,7 @@ public class CommentsAdaper extends BaseAdapter {
         CommentViewHolder holder = null;
         if (convertView == null) {
             holder = new CommentViewHolder();
-            convertView = mInflater.inflate(R.layout.comments_listitem, null);
+            convertView = mInflater.inflate(R.layout.comments_listitem, parent,false);
             holder.user = (TextView) convertView.findViewById(R.id.user_name);
             holder.content = (TextView) convertView.findViewById(R.id.comments_content);
             holder.quoteImage = convertView.findViewById(R.id.quote_img);
@@ -128,20 +128,25 @@ public class CommentsAdaper extends BaseAdapter {
         holder.quoteFrame.setQuoteList(quoteList);
         if (!quoteList.isEmpty()) {
             RelativeLayout.LayoutParams floorsLayoutParams = new LayoutParams(-1, -2);
-            floorsLayoutParams.setMargins(4, 4, 4, 4);
+            int margin = DensityUtil.dip2px(mContext, 4);
+            floorsLayoutParams.setMargins(margin, 0, margin, margin);
             ((ViewGroup) convertView).addView(holder.quoteFrame, floorsLayoutParams);
         }
         RelativeLayout.LayoutParams userLayoutParams = (LayoutParams) holder.user.getLayoutParams();
         userLayoutParams.addRule(RelativeLayout.BELOW, holder.quoteFrame.getChildCount() > 0 ? frameId : R.id.requote);
         holder.user.setLayoutParams(userLayoutParams);
+        handlePadding(position, convertView);
+        return convertView;
+    }
+
+    private void handlePadding(int position, View convertView) {
         int padding = DensityUtil.dip2px(mContext, 8);
         if (position == 0) {
             int paddingTop = mInflater.getContext().getResources()
                     .getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
-            convertView.setPadding(padding, paddingTop + padding, padding, padding);
+            convertView.setPadding(padding, paddingTop + padding, padding, padding*2);
         } else
-            convertView.setPadding(padding, padding, padding, padding);
-        return convertView;
+            convertView.setPadding(padding, padding*2, padding, padding*2);
     }
 
     private void handleQuoteList(int position, View convertView, CommentViewHolder holder, int quoteId,
