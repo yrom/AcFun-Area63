@@ -16,8 +16,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@null"
     android:padding="6dp"
+    android:duplicateParentState="true"
     android:descendantFocusability="blocksDescendants"
      >
     <TextView
@@ -45,6 +45,6 @@
         android:layout_marginTop="5dip"
         android:textColorLink="@color/main_color"
         android:focusable="false"
-        android:textColor="#000000" />
+        android:textColor="@color/text_color_selector" />
 
 </RelativeLayout>

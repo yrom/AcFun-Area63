@@ -89,7 +89,7 @@ public class TextViewUtils {
                 }
             }
         }));
-        comment.setTextColor(Color.BLACK);
+//        comment.setTextColor(Color.BLACK);
         comment.setTextSize(AcApp.getPreferenceFontSize());
         Pattern http = Pattern.compile("http://[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?",
                 Pattern.CASE_INSENSITIVE);

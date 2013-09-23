@@ -21,6 +21,7 @@ import tv.acfun.a63.R;
 import tv.acfun.a63.util.DensityUtil;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -34,7 +35,10 @@ import android.widget.TextView;
 public class FloorsView extends LinearLayout {
 	private Drawable mBorder;
     private int mMaxNum;
-	
+	@Override
+	public boolean isDuplicateParentStateEnabled() {
+	    return true;
+	}
 	public FloorsView(Context context) {
 		this(context, null);
 	}
@@ -47,6 +51,7 @@ public class FloorsView extends LinearLayout {
 	private void initView(Context context) {
 		setOrientation(VERTICAL);
 		mMaxNum = getResources().getInteger(R.integer.max_floors_w);
+		setBackgroundResource(R.drawable.item_background);
 	}
 
 	public void setQuoteList(List<View> quoteList) {
@@ -78,18 +83,20 @@ public class FloorsView extends LinearLayout {
 
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
-		int i = getChildCount();
-		if(this.mBorder == null){
-			this.mBorder = getContext().getResources().getDrawable(R.drawable.comment_floor_bg);
-		}
-		if ((this.mBorder != null) && (i > 0))
-			for (int j = i - 1; j >= 0; j--) {
-				View child = getChildAt(j);
-				this.mBorder.setBounds(child.getLeft(), child.getLeft(),
-						child.getRight(), child.getBottom());
-				this.mBorder.draw(canvas);
-			}
+	    
+	    if(!isPressed()){
+    		int i = getChildCount();
+    		if(this.mBorder == null){
+    			this.mBorder = getContext().getResources().getDrawable(R.drawable.comment_floor_bg);
+    		}
+    		if ((this.mBorder != null) && (i > 0))
+    			for (int j = i - 1; j >=0; j--) {
+    				View child = getChildAt(j);
+    				this.mBorder.setBounds(child.getLeft(), child.getLeft(),
+    						child.getRight(), child.getBottom());
+    				this.mBorder.draw(canvas);
+    			}
+	    }
 		super.dispatchDraw(canvas);
 	}
-
 }

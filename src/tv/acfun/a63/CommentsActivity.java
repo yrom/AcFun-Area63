@@ -119,7 +119,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     private EditText mCommentText;
     private View mBtnEmotion;
     private GridView mEmotionGrid;
-    private boolean isBarShowing;
+    private boolean isBarShowing = true;
     
     public static void start(Context context, int aid) {
         Intent intent = new Intent(context, CommentsActivity.class);

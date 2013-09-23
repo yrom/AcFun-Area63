@@ -12,8 +12,7 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
         	android:paddingRight="@dimen/activity_horizontal_margin"
         	android:paddingTop="0dp"
-        	android:drawSelectorOnTop="true"
-            android:listSelector="@drawable/article_item_background"
+            android:listSelector="@drawable/item_background"
             />
 <!--             android:layout_above="@+id/comments_bar" -->
 
