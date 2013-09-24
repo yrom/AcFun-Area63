@@ -18,6 +18,7 @@ package tv.acfun.a63;
 
 import java.io.IOException;
 
+import tv.acfun.a63.swipe.SwipeSherlockActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.Connectivity;
 import android.app.AlertDialog;
@@ -26,7 +27,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.webkit.WebView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.umeng.analytics.MobclickAgent;
@@ -35,7 +35,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  *
  */
-public class BaseWebViewActivity extends SherlockActivity {
+public class BaseWebViewActivity extends SwipeSherlockActivity {
     protected WebView mWeb;
 
     @Override

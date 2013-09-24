@@ -30,6 +30,7 @@ import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.Comment;
 import tv.acfun.a63.api.entity.Comments;
 import tv.acfun.a63.api.entity.User;
+import tv.acfun.a63.swipe.SwipeSherlockActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.ArrayUtil;
 import tv.acfun.a63.util.BaseAnimationListener;
@@ -63,8 +64,8 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -81,7 +82,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
@@ -101,8 +101,8 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  * 
  */
-public class CommentsActivity extends SherlockActivity implements OnClickListener, OnQuoteClickListener,
-        Listener<Comments>, ErrorListener, OnItemClickListener {
+public class CommentsActivity extends SwipeSherlockActivity implements OnClickListener,
+        OnQuoteClickListener, Listener<Comments>, ErrorListener, OnItemClickListener {
 
     private static final String TAG = "Comments";
     private int aid;
@@ -120,7 +120,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     private View mBtnEmotion;
     private GridView mEmotionGrid;
     private boolean isBarShowing = true;
-    
+
     public static void start(Context context, int aid) {
         Intent intent = new Intent(context, CommentsActivity.class);
         intent.putExtra("aid", aid);
@@ -135,7 +135,7 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         if (aid == 0)
             return;
         setContentView(R.layout.activity_comments);
-        MobclickAgent.onEvent(this,"view_comment", "ac"+aid);
+        MobclickAgent.onEvent(this, "view_comment", "ac" + aid);
         ActionBar ab = getSupportActionBar();
 
         ab.setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
@@ -174,10 +174,11 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                     break;
                 case MotionEvent.ACTION_MOVE:
                     int delta = y - mMotionY;
-                    if(Math.abs(delta) < 100) break;
+                    if (Math.abs(delta) < 100)
+                        break;
                     if (delta > 0) {
                         showBar();
-                    } else{
+                    } else {
                         hideBar();
                     }
                     mMotionY = y;
@@ -193,19 +194,23 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
     private void handleKeyboardStatus() {
         final View activityRootView = findViewById(R.id.content_frame);
-        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
 
-            @Override
-            public void onGlobalLayout() {
-                Rect r = new Rect();
-                // r will be populated with the coordinates of your view that
-                // area still visible.
-                activityRootView.getWindowVisibleDisplayFrame(r);
+                    @Override
+                    public void onGlobalLayout() {
+                        Rect r = new Rect();
+                        // r will be populated with the coordinates of your view
+                        // that
+                        // area still visible.
+                        activityRootView.getWindowVisibleDisplayFrame(r);
 
-                int heightDiff = activityRootView.getRootView().getHeight() - (r.bottom - r.top);
-                isInputShow = heightDiff > 100; // FIXME: may be a larger number
-            }
-        });
+                        int heightDiff = activityRootView.getRootView().getHeight()
+                                - (r.bottom - r.top);
+                        isInputShow = heightDiff > 100; // FIXME: may be a
+                                                        // larger number
+                    }
+                });
     }
 
     private boolean isInputShow;
@@ -230,7 +235,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                 text.insert(index, emotion);
                 EmotionView v = (EmotionView) parent.getAdapter().getView(position, null, null);
                 Drawable drawable = TextViewUtils.convertViewToDrawable(v);
-                drawable.setBounds(0, 0, drawable.getIntrinsicWidth() / 2, drawable.getIntrinsicHeight() / 2);
+                drawable.setBounds(0, 0, drawable.getIntrinsicWidth() / 2,
+                        drawable.getIntrinsicHeight() / 2);
                 text.setSpan(new ImageSpan(drawable), index, index + emotion.length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
@@ -286,7 +292,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
 
         @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                int totalItemCount) {
             if (view.getLastVisiblePosition() == (view.getCount() - 1) && !isloading) {
                 if (!hasNextPage || pageIndex + 1 > totalPage) {
                     mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
@@ -301,20 +308,20 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         }
 
     };
-    AnimationListener mHideListener = new BaseAnimationListener(){
-        
+    AnimationListener mHideListener = new BaseAnimationListener() {
+
         @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         public void onAnimationEnd(Animation animation) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                 mCommentBar.setTranslationY(mCommentBar.getHeight());
             mCommentBar.setVisibility(View.GONE);
         }
     };
-    AnimationListener mShowListener = new BaseAnimationListener(){
-        
+    AnimationListener mShowListener = new BaseAnimationListener() {
+
         @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         public void onAnimationStart(Animation animation) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                 mCommentBar.setTranslationY(0);
             mCommentBar.setVisibility(View.VISIBLE);
         }
@@ -322,10 +329,11 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     Animation mAnim;
 
     void hideBar() {
-        if(!isBarShowing) return;
+        if (!isBarShowing)
+            return;
         isBarShowing = false;
         getSupportActionBar().hide();
-        if(mAnim != null)
+        if (mAnim != null)
             mAnim.cancel();
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_out);
         anim.setAnimationListener(mHideListener);
@@ -334,11 +342,11 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     }
 
     void showBar() {
-        if(isBarShowing)
+        if (isBarShowing)
             return;
         isBarShowing = true;
         getSupportActionBar().show();
-        if(mAnim != null)
+        if (mAnim != null)
             mAnim.cancel();
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_in);
         anim.setAnimationListener(mShowListener);
@@ -348,7 +356,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
     static class CommentsRequest extends CustomUARequest<Comments> {
 
-        public CommentsRequest(int aid, int page, Listener<Comments> listener, ErrorListener errListener) {
+        public CommentsRequest(int aid, int page, Listener<Comments> listener,
+                ErrorListener errListener) {
             super(ArticleApi.getCommentUrl(aid, page), Comments.class, listener, errListener);
 
         }
@@ -356,7 +365,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         @Override
         protected Response<Comments> parseNetworkResponse(NetworkResponse response) {
             try {
-                String json = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                String json = new String(response.data,
+                        HttpHeaderParser.parseCharset(response.headers));
                 JSONObject parseObject = JSON.parseObject(json);
                 Comments comments = JSON.toJavaObject(parseObject, Comments.class);
                 JSONObject commentContentArr = parseObject.getJSONObject("commentContentArr");
@@ -370,7 +380,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
         private SparseArray<Comment> parseContentAttr(JSONObject commentContentArr) {
             SparseArray<Comment> attr = new SparseArray<Comment>();
-            for (Iterator<String> iterator = commentContentArr.keySet().iterator(); iterator.hasNext();) {
+            for (Iterator<String> iterator = commentContentArr.keySet().iterator(); iterator
+                    .hasNext();) {
                 String key = iterator.next();
                 JSONObject content = commentContentArr.getJSONObject(key);
                 Comment comment = JSON.toJavaObject(content, Comment.class);
@@ -414,7 +425,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
                         }
                     }, 20);
             } else {
-                mEmotionGrid.setVisibility(mEmotionGrid.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+                mEmotionGrid.setVisibility(mEmotionGrid.getVisibility() == View.VISIBLE ? View.GONE
+                        : View.VISIBLE);
             }
             break;
         }
@@ -555,11 +567,12 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             Comment c = (Comment) parent.getItemAtPosition(position);
             int quoteCount = getQuoteCount();
             removeQuote(mCommentText.getText());
-            if(quoteCount == c.count) return; // 取消引用
+            if (quoteCount == c.count)
+                return; // 取消引用
             String pre = "引用:#" + c.count;
             mQuoteSpan = new Quote(c.count);
             /**
-             * @see http
+             * @see http 
              *      ://www.kpbird.com/2013/02/android-chips-edittext-token-edittext
              *      .html
              */
@@ -615,9 +628,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         Quote quote = TextViewUtils.getLast(text, Quote.class);
         int start = text.getSpanStart(quote);
         int end = text.getSpanEnd(quote);
-//        Log.d(TAG, String.format("start=%d, end=%d", start, end));
+        // Log.d(TAG, String.format("start=%d, end=%d", start, end));
         if (start >= 0) {
-//            Log.d(TAG, text.subSequence(start, end).toString());
+            // Log.d(TAG, text.subSequence(start, end).toString());
             text.delete(start, end);
         }
     }
@@ -632,7 +645,8 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
         else if (start == 0) {
             return text.subSequence(end, text.length()).toString();
         } else
-            return text.subSequence(0, start).toString() + text.subSequence(end, text.length()).toString();
+            return text.subSequence(0, start).toString()
+                    + text.subSequence(end, text.length()).toString();
     }
 
     /**
@@ -675,24 +689,26 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
             this.finish();
             return true;
         case android.R.id.button1:
-            if(sizeChooser == null){
+            if (sizeChooser == null) {
                 final int checked = AcApp.getConfig().getInt("text_size", 0);
                 sizeChooser = new AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle("评论文字大小")
-                .setSingleChoiceItems(R.array.title_sizes, checked, new DialogInterface.OnClickListener() {
-                    int lastSelected = checked;
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(lastSelected != which){
-                            AcApp.putInt("text_size", which);
-                            if(mAdapter != null)
-                            mAdapter.notifyDataSetChanged();
-                            dialog.dismiss();
-                            lastSelected = which;
-                        }
-                    }
-                }).create();
+                        .setCancelable(true)
+                        .setTitle("评论文字大小")
+                        .setSingleChoiceItems(R.array.title_sizes, checked,
+                                new DialogInterface.OnClickListener() {
+                                    int lastSelected = checked;
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (lastSelected != which) {
+                                            AcApp.putInt("text_size", which);
+                                            if (mAdapter != null)
+                                                mAdapter.notifyDataSetChanged();
+                                            dialog.dismiss();
+                                            lastSelected = which;
+                                        }
+                                    }
+                                }).create();
             }
             sizeChooser.show();
             return true;
@@ -705,8 +721,9 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
-        menu.add(0,android.R.id.button1,0,"文字大小").setIcon(R.drawable.ic_text_size).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        menu.add(0, android.R.id.button1, 0, "文字大小").setIcon(R.drawable.ic_text_size)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         getSupportMenuInflater().inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -715,16 +732,18 @@ public class CommentsActivity extends SherlockActivity implements OnClickListene
     protected void onDestroy() {
         super.onDestroy();
         AcApp.cancelAllRequest(TAG);
-        if(mAdapter != null){
+        if (mAdapter != null) {
             mAdapter.setData(null, null);
         }
-            
+
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         MobclickAgent.onResume(this);
     }
+
     @Override
     protected void onPause() {
         super.onPause();

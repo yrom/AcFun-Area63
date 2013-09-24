@@ -8,6 +8,7 @@ import org.apache.commons.httpclient.HttpException;
 
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.db.DB;
+import tv.acfun.a63.swipe.SwipeSherlockActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.MemberUtils;
 import android.app.ProgressDialog;
@@ -24,12 +25,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.alibaba.fastjson.JSONException;
 import com.umeng.analytics.MobclickAgent;
 
-public class SigninActivity extends SherlockActivity {
+public class SigninActivity extends SwipeSherlockActivity {
     public static final int REQUEST_SIGN_IN = 1;
 //    private static final String TAG = "SigninActivity";
     private EditText mNameView;

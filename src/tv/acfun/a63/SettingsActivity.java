@@ -16,6 +16,7 @@
 
 package tv.acfun.a63;
 
+import tv.acfun.a63.swipe.SwipeSherlockPreferenceActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FileUtil;
 import android.app.AlertDialog;
@@ -31,10 +32,8 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.umeng.analytics.MobclickAgent;
-import com.umeng.fb.FeedbackAgent;
 import com.umeng.update.UmengUpdateAgent;
 import com.umeng.update.UmengUpdateListener;
 import com.umeng.update.UpdateResponse;
@@ -44,7 +43,7 @@ import com.umeng.update.UpdateResponse;
  *
  */
 @SuppressWarnings("deprecation")
-public class SettingsActivity extends SherlockPreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
+public class SettingsActivity extends SwipeSherlockPreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
     private static final String KEY_UPDATE = "update";
     private static final String KEY_FEED_BACK = "feedback";
     private static final String KEY_IMAGE_CACHE = "image_cache";

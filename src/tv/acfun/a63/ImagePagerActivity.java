@@ -19,6 +19,7 @@ package tv.acfun.a63;
 import java.io.File;
 import java.util.ArrayList;
 
+import tv.acfun.a63.swipe.SwipeSherlockFragmentActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.BaseAnimationListener;
 import tv.acfun.a63.util.FileUtil;
@@ -48,7 +49,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
@@ -63,7 +63,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  *
  */
-public class ImagePagerActivity extends SherlockFragmentActivity implements OnPageChangeListener {
+public class ImagePagerActivity extends SwipeSherlockFragmentActivity implements OnPageChangeListener {
     private static final String EXTRA_IMAGES = "images";
     private static final String EXTRA_INDEX = "index";
     private ViewPager pager;
@@ -78,8 +78,8 @@ public class ImagePagerActivity extends SherlockFragmentActivity implements OnPa
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        super.onCreate(savedInstanceState);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
         getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
         Bundle extras = getIntent().getExtras();

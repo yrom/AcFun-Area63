@@ -29,9 +29,13 @@ Acfun 63区（文章区），来，战个痛～
 3. [Pager Sliding TabStrip][3]
 4. [Pull To Refresh][4]
 5. [Photo view][5]
+6. [SwipeBackLayout*][6]
+
+*请用我fork的分支
 
 [1]: https://github.com/JakeWharton/ActionBarSherlock
 [2]: https://android.googlesource.com/platform/frameworks/volley
 [3]: https://github.com/astuetz/PagerSlidingTabStrip
 [4]: https://github.com/chrisbanes/Android-PullToRefresh
 [5]: https://github.com/chrisbanes/PhotoView
+[6]: https://github.com/Issacw0ng/SwipeBackLayout

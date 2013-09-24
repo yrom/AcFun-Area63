@@ -4,6 +4,7 @@ package tv.acfun.a63;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import tv.acfun.a63.swipe.SwipeSherlockActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import android.content.Context;
 import android.os.Bundle;
@@ -20,7 +21,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.umeng.fb.FeedbackAgent;
 import com.umeng.fb.model.Conversation;
@@ -32,7 +32,7 @@ import com.umeng.fb.model.Reply;
  * {@code https://github.com/umeng/umeng-android-sdk-theme/blob/master/fb/v4.3/src/com/umeng/fb/ConversationActivity.java}
  * 
  */
-public class ConversationActivity extends SherlockActivity {
+public class ConversationActivity extends SwipeSherlockActivity {
 
     private FeedbackAgent agent;
     private Conversation defaultConversation;
