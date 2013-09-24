@@ -4,6 +4,9 @@ AcFun-Area63
 Acfun 63区（文章区），来，战个痛～
 
 一个"学习"Android Design的产物。。。
+<a href="https://play.google.com/store/apps/details?id=tv.acfun.a63"><img src="http://www.android.com/images/brand/get_it_on_play_logo_large.png"/></a>
+
+欢迎 加入Google+ 社群，参与讨论： https://plus.google.com/communities/109973498842592117118
 
 计划功能列表
 ============
