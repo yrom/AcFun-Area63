@@ -86,7 +86,7 @@ public class BaseWebViewActivity extends SwipeSherlockActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case android.R.id.home:
-            finish();
+            scrollToFinishActivity();
             return true;
         }
         return super.onOptionsItemSelected(item);

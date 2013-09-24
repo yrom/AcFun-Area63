@@ -136,7 +136,7 @@ public class SigninActivity extends SwipeSherlockActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home){
             setResult(RESULT_CANCELED);
-            finish();
+            scrollToFinishActivity();
         }
         return super.onOptionsItemSelected(item);
     }

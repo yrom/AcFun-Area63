@@ -272,7 +272,7 @@ public class ImagePagerActivity extends SwipeSherlockFragmentActivity implements
 
         switch (item.getItemId()) {
         case android.R.id.home:
-            this.finish();
+            scrollToFinishActivity();
             return true;
         case R.id.menu_item_comment:
             CommentsActivity.start(this, aid);

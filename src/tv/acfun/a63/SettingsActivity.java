@@ -164,7 +164,7 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case android.R.id.home:
-            finish();
+            scrollToFinishActivity();
             break;
 
         default:

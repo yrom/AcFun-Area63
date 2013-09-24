@@ -686,7 +686,7 @@ public class CommentsActivity extends SwipeSherlockActivity implements OnClickLi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case android.R.id.home:
-            this.finish();
+            scrollToFinishActivity();
             return true;
         case android.R.id.button1:
             if (sizeChooser == null) {
