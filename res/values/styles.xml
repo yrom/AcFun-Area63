@@ -2,6 +2,8 @@
 
     <style name="AppTheme" parent="@style/Theme.Sherlock.Light.DarkActionBar">
         <item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="android:windowAnimationStyle">@style/Animation</item>
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
         
@@ -29,7 +31,8 @@
         <item name="android:popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
         <item name="actionBarWidgetTheme">@style/Widget.Styled</item>
         <item name="android:actionBarWidgetTheme">@style/Widget.Styled</item>
-		<item name="android:editTextBackground">@drawable/edit_text_holo_light</item>    
+		<item name="android:editTextBackground">@drawable/edit_text_holo_light</item> 
+		<item name="SwipeBackLayoutStyle">@style/Widget.Styled.SwipeBackLayout</item>
     </style>
     
 	<style name="Widget.Styled" parent="Theme.Sherlock">
@@ -65,5 +68,12 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:background">@drawable/divider_light</item>
+    </style>
+    <style name="Widget.Styled.SwipeBackLayout" parent="SwipeBackLayout">
+        <item name="edge_size">@dimen/edge_size</item>
+    </style>
+    <style name="Animation" parent="@android:style/Animation.Translucent">
+        <item name="android:windowEnterAnimation">@anim/activity_open_enter</item>
+        <item name="android:windowExitAnimation">@anim/activity_close_exit</item>
     </style>
 </resources>

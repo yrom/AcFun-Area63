@@ -1,0 +1,5 @@
+<resources>
+
+	<dimen name="emotions_height">200dp</dimen>
+	<dimen name="edge_size">200dp</dimen>
+</resources>
