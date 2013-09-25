@@ -3,5 +3,5 @@
     <dimen name="left_drawer_width">250dp</dimen>
     <dimen name="emotions_height">110dp</dimen>
     <dimen name="emotions_column_width">48dp</dimen>
-	<dimen name="edge_size">100dp</dimen>
+	<dimen name="edge_size">70dp</dimen>
 </resources>
