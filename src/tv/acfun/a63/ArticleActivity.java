@@ -40,6 +40,7 @@ import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Article;
 import tv.acfun.a63.api.entity.Article.SubContent;
+import tv.acfun.a63.base.BaseWebViewActivity;
 import tv.acfun.a63.db.DB;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;

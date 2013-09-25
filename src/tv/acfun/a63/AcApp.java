@@ -204,6 +204,9 @@ public class AcApp extends Application {
     public static int getNumOfFloors(){
         return sp.getInt("num_of_floor", 50);
     }
+    public static boolean isViratorEnabled(){
+        return sp.getBoolean("enable_vibrator", true);
+    }
     
     static int lastSize;
     public static int getPreferenceFontSize() {

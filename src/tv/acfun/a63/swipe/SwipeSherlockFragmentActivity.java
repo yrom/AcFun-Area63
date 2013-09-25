@@ -17,8 +17,8 @@
 package tv.acfun.a63.swipe;
 
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
+import me.imid.swipebacklayout.lib.SwipeBackLayout.SwipeListener;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityBase;
-import me.imid.swipebacklayout.lib.app.SwipeBackActivityHelper;
 import android.os.Bundle;
 import android.view.View;
 
@@ -30,12 +30,12 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
  */
 public class SwipeSherlockFragmentActivity extends SherlockFragmentActivity implements SwipeBackActivityBase{
     
-    private SwipeBackActivityHelper mHelper;
+    private SwipeBackHelper mHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHelper = new SwipeBackActivityHelper(this);
+        mHelper = new SwipeBackHelper(this);
         mHelper.onActivtyCreate();
     }
 
@@ -61,10 +61,17 @@ public class SwipeSherlockFragmentActivity extends SherlockFragmentActivity impl
     public void setSwipeBackEnable(boolean enable) {
         getSwipeBackLayout().setEnableGesture(enable);
     }
-
+    
+    protected void setViratorEnable(boolean enable){
+        mHelper.setVibratorEnabled(enable);
+    }
+    
+    public void setSwipeListener(SwipeListener l){
+        mHelper.setSwipeListener(l);
+    }
+    
     @Override
     public void scrollToFinishActivity() {
         getSwipeBackLayout().scrollToFinishActivity();
     }
-
 }

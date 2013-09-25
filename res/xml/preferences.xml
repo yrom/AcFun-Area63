@@ -23,6 +23,12 @@
         <Preference
             android:key="@string/key_update"
             android:title="检查更新" />
+        <CheckBoxPreference 
+            android:key="@string/key_enable_vibrator"
+            android:title="震动反馈"
+            android:summary="滑动返回时的反馈"
+            android:defaultValue="true"
+            />
     </PreferenceCategory>
     <PreferenceCategory android:title="其他" >
         <Preference

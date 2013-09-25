@@ -19,7 +19,7 @@ package tv.acfun.a63;
 import java.io.File;
 import java.util.ArrayList;
 
-import tv.acfun.a63.swipe.SwipeSherlockFragmentActivity;
+import tv.acfun.a63.base.BaseFragmentActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.BaseAnimationListener;
 import tv.acfun.a63.util.FileUtil;
@@ -63,7 +63,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  *
  */
-public class ImagePagerActivity extends SwipeSherlockFragmentActivity implements OnPageChangeListener {
+public class ImagePagerActivity extends BaseFragmentActivity implements OnPageChangeListener {
     private static final String EXTRA_IMAGES = "images";
     private static final String EXTRA_INDEX = "index";
     private ViewPager pager;
@@ -271,9 +271,6 @@ public class ImagePagerActivity extends SwipeSherlockFragmentActivity implements
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
 
         switch (item.getItemId()) {
-        case android.R.id.home:
-            scrollToFinishActivity();
-            return true;
         case R.id.menu_item_comment:
             CommentsActivity.start(this, aid);
             return true;
@@ -310,7 +307,6 @@ public class ImagePagerActivity extends SwipeSherlockFragmentActivity implements
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.image, menu);
         MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
         ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
         actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);

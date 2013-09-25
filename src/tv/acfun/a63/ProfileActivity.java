@@ -25,6 +25,7 @@ import org.jsoup.nodes.Document;
 
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.User;
+import tv.acfun.a63.base.BaseWebViewActivity;
 import tv.acfun.a63.util.DocumentRequest;
 import tv.acfun.a63.util.MemberUtils;
 import android.os.Bundle;
@@ -83,15 +84,6 @@ public class ProfileActivity extends BaseWebViewActivity {
         SplashDocumentRequest request = new SplashDocumentRequest(cookies, mSplashListener, mErrorListner);
         request.setTag(TAG);
         AcApp.addRequest(request);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        
-        
-        
-        return super.onCreateOptionsMenu(menu);
     }
     
     private class SplashDocumentRequest extends DocumentRequest{

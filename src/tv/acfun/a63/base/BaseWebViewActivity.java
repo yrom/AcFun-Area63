@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package tv.acfun.a63;
+package tv.acfun.a63.base;
 
 import java.io.IOException;
 
+import tv.acfun.a63.R;
+import tv.acfun.a63.R.id;
+import tv.acfun.a63.R.layout;
 import tv.acfun.a63.swipe.SwipeSherlockActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.Connectivity;
@@ -35,7 +38,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  *
  */
-public class BaseWebViewActivity extends SwipeSherlockActivity {
+public class BaseWebViewActivity extends BaseActivity {
     protected WebView mWeb;
 
     @Override
@@ -82,23 +85,4 @@ public class BaseWebViewActivity extends SwipeSherlockActivity {
         setSupportProgressBarIndeterminateVisibility(true);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case android.R.id.home:
-            scrollToFinishActivity();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        MobclickAgent.onResume(this);
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        MobclickAgent.onPause(this);
-    }
 }

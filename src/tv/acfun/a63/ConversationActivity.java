@@ -4,7 +4,7 @@ package tv.acfun.a63;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import tv.acfun.a63.swipe.SwipeSherlockActivity;
+import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import android.content.Context;
 import android.os.Bundle;
@@ -32,7 +32,7 @@ import com.umeng.fb.model.Reply;
  * {@code https://github.com/umeng/umeng-android-sdk-theme/blob/master/fb/v4.3/src/com/umeng/fb/ConversationActivity.java}
  * 
  */
-public class ConversationActivity extends SwipeSherlockActivity {
+public class ConversationActivity extends BaseActivity {
 
     private FeedbackAgent agent;
     private Conversation defaultConversation;
@@ -97,14 +97,6 @@ public class ConversationActivity extends SwipeSherlockActivity {
             this.finish();
         }
 
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
-            scrollToFinishActivity();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     void sync() {

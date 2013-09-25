@@ -30,6 +30,7 @@ import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.Comment;
 import tv.acfun.a63.api.entity.Comments;
 import tv.acfun.a63.api.entity.User;
+import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.swipe.SwipeSherlockActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.ArrayUtil;
@@ -101,7 +102,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  * 
  */
-public class CommentsActivity extends SwipeSherlockActivity implements OnClickListener,
+public class CommentsActivity extends BaseActivity implements OnClickListener,
         OnQuoteClickListener, Listener<Comments>, ErrorListener, OnItemClickListener {
 
     private static final String TAG = "Comments";
@@ -685,9 +686,6 @@ public class CommentsActivity extends SwipeSherlockActivity implements OnClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case android.R.id.home:
-            scrollToFinishActivity();
-            return true;
         case android.R.id.button1:
             if (sizeChooser == null) {
                 final int checked = AcApp.getConfig().getInt("text_size", 0);
@@ -712,9 +710,6 @@ public class CommentsActivity extends SwipeSherlockActivity implements OnClickLi
             }
             sizeChooser.show();
             return true;
-        case R.id.action_settings:
-            SettingsActivity.start(this);
-            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -724,7 +719,6 @@ public class CommentsActivity extends SwipeSherlockActivity implements OnClickLi
 
         menu.add(0, android.R.id.button1, 0, "文字大小").setIcon(R.drawable.ic_text_size)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        getSupportMenuInflater().inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.apache.commons.httpclient.HttpException;
 
 import tv.acfun.a63.api.entity.User;
+import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.db.DB;
 import tv.acfun.a63.swipe.SwipeSherlockActivity;
 import tv.acfun.a63.util.ActionBarUtil;
@@ -29,7 +30,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.alibaba.fastjson.JSONException;
 import com.umeng.analytics.MobclickAgent;
 
-public class SigninActivity extends SwipeSherlockActivity {
+public class SigninActivity extends BaseActivity {
     public static final int REQUEST_SIGN_IN = 1;
 //    private static final String TAG = "SigninActivity";
     private EditText mNameView;
@@ -136,18 +137,8 @@ public class SigninActivity extends SwipeSherlockActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home){
             setResult(RESULT_CANCELED);
-            scrollToFinishActivity();
+//            scrollToFinishActivity();
         }
         return super.onOptionsItemSelected(item);
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        MobclickAgent.onResume(this);
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        MobclickAgent.onPause(this);
     }
 }
