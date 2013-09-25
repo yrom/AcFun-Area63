@@ -2,4 +2,5 @@
 
 	<dimen name="emotions_height">200dp</dimen>
 	<dimen name="edge_size">150dp</dimen>
+	<dimen name="logo_margin_left">240dp</dimen>
 </resources>
