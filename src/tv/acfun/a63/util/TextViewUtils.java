@@ -28,7 +28,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
@@ -39,6 +38,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.widget.TextView;
@@ -48,47 +48,58 @@ public class TextViewUtils {
 	public static void setCommentContent(final TextView comment, Comment c) {
         String text = c.content;
         text = replace(text);
-        comment.setText(Html.fromHtml(text,new ImageGetter() {
-            
-            @Override
-            public Drawable getDrawable(String source) {
-                try {
-                    Bitmap bm = AcApp.getBitmpInCache(source);
-                    if(bm == null){
-                        bm = BitmapFactory
-                                .decodeStream(comment.getContext().getAssets().open(source));
-                        AcApp.putBitmapInCache(source, bm);
+        try{
+            comment.setText(Html.fromHtml(text, new ImageGetter() {
+
+                @Override
+                public Drawable getDrawable(String source) {
+                    try {
+                        Bitmap bm = AcApp.getBitmpInCache(source);
+                        if (bm == null) {
+                            bm = BitmapFactory.decodeStream(comment.getContext().getAssets()
+                                    .open(source));
+                            AcApp.putBitmapInCache(source, bm);
+                        }
+                        Drawable drawable = new BitmapDrawable(comment.getResources(), bm);
+                        if (drawable != null) {
+                            int w = comment.getResources().getDimensionPixelSize(
+                                    R.dimen.emotions_column_width);
+                            drawable.setBounds(0, 0, w, drawable.getIntrinsicHeight() * w
+                                    / drawable.getIntrinsicWidth());
+                        }
+
+                        return drawable;
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
                     }
-                    Drawable drawable = new BitmapDrawable(comment.getResources(), bm);
-                    if(drawable!=null){
-                        int w = comment.getResources().getDimensionPixelSize(R.dimen.emotions_column_width);
-                        drawable.setBounds(0, 0, w, drawable.getIntrinsicHeight()*w/drawable.getIntrinsicWidth());
-                    }
-                    
-                    return drawable;
-                        
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
+
                 }
-                
-            }
-        },new Html.TagHandler() {
-            
-            @Override
-            public void handleTag(boolean opening, String tag, Editable output, XMLReader xmlReader) {
-                int len = output.length();
-                if(opening){
-                    if(tag.equalsIgnoreCase("strike")){
-                        output.setSpan(new StrikethroughSpan(), len, len, Spannable.SPAN_MARK_MARK);
-                    }
-                }else{
-                    if(tag.equalsIgnoreCase("strike")){
-                        end((SpannableStringBuilder) output,StrikethroughSpan.class,new StrikethroughSpan());
+            }, new Html.TagHandler() {
+
+                @Override
+                public void handleTag(boolean opening, String tag, Editable output,
+                        XMLReader xmlReader) {
+                    int len = output.length();
+                    if (opening) {
+                        if (tag.equalsIgnoreCase("strike")) {
+                            output.setSpan(new StrikethroughSpan(), len, len,
+                                    Spannable.SPAN_MARK_MARK);
+                        }
+                    } else {
+                        if (tag.equalsIgnoreCase("strike")) {
+                            end((SpannableStringBuilder) output, StrikethroughSpan.class,
+                                    new StrikethroughSpan());
+                        }
                     }
                 }
-            }
-        }));
+            }));
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // FIXME: text 的格式可能有问题
+            comment.setText(text);
+            Log.e("wtf", "set comment",e);
+        }
 //        comment.setTextColor(Color.BLACK);
         comment.setTextSize(AcApp.getPreferenceFontSize());
         Pattern http = Pattern.compile("http://[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?",
