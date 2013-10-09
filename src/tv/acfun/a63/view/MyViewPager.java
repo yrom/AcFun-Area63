@@ -28,7 +28,9 @@ public class MyViewPager extends ViewPager {
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         try {
             return super.onInterceptTouchEvent(ev);
-        } catch (IllegalArgumentException e) {
+        } catch(ArrayIndexOutOfBoundsException e){
+            return false;
+        }catch (IllegalArgumentException e) {
             return false;
         }
     }
