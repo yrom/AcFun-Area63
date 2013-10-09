@@ -800,11 +800,11 @@ public class MainActivity extends SherlockFragmentActivity implements
         Response.Listener<Contents> listener = new Response.Listener<Contents>() {
             @Override
             public void onResponse(Contents response) {
+                if(adapter == null){
+                    adapter = new ArticleListAdapter(inflater,response.getContents(),listMode);
+                }
                 if(page <= 1){
-                    if(adapter == null){
-                        adapter = new ArticleListAdapter(inflater,response.getContents(),listMode);
-                    } else
-                        adapter.contents = response.getContents();
+                    adapter.contents = response.getContents();
                     list.setAdapter(adapter);
                 }else{
                     adapter.addData(response.getContents());
