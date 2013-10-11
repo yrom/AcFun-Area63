@@ -287,6 +287,7 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
         Uri uri = Uri.parse(path);
         boolean success;
         if(uri.getScheme().equals("http")){
+            //  FIXME: volley 的缓存任务还没有被执行的时候是会获取不到数据的
             byte[] diskCache = AcApp.getDataInDiskCache(path);
             if(diskCache != null)
                 success = FileUtil.save(diskCache,dest+"/"+FileUtil.getHashName(path));
@@ -302,7 +303,7 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
             MobclickAgent.onEvent(this, "save_pic");
             AcApp.showToast("保存成功");
         }else
-            AcApp.showToast("保存失败！");
+            AcApp.showToast("保存失败！请稍后重试"); 
     }
     
     @Override

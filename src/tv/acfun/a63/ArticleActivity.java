@@ -97,7 +97,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
 
     private Request<?> request;
-    private Document mDoc;
+    private static Document _Doc;
     private List<String> imgUrls;
     private DownloadImageTask mDownloadTask;
     private String title;
@@ -340,12 +340,14 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         @Override
         protected Boolean doInBackground(Article... params) {
             try {
-                InputStream in = getAssets().open("article.html");
-                mDoc = Jsoup.parse(in, "utf-8", "");
+                if(_Doc == null){
+                    InputStream in = getAssets().open("article.html");
+                    _Doc = Jsoup.parse(in, "utf-8", "");
+                }
                 initCaches();
-                Element title = mDoc.getElementById("title");
-                title.append(buildTitle(params[0]));
-                Element content = mDoc.getElementById("content");
+                Element title = _Doc.getElementById("title");
+                title.html(buildTitle(params[0]));
+                Element content = _Doc.getElementById("content");
 
                 ArrayList<SubContent> contents = params[0].contents;
 
@@ -362,6 +364,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         }
 
         private void handleSubContent(Element content, SubContent sub, Article article) {
+            content.empty();
             if (!article.title.equals(sub.subTitle)) {
                 content.append("<h2 class=\"article-subtitle\">" + sub.subTitle + "</h2><hr>");
             }
@@ -443,7 +446,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         protected void onPostExecute(Boolean result) {
             setSupportProgressBarIndeterminateVisibility(false);
             if (result) {
-                mWeb.loadDataWithBaseURL("http://www.acfun.tv/", mDoc.html(), "text/html", "UTF-8",
+                mWeb.loadDataWithBaseURL("http://www.acfun.tv/", _Doc.html(), "text/html", "UTF-8",
                         null);
                 if (hasUseMap)
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);

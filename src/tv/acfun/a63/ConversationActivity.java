@@ -21,7 +21,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.MenuItem;
 import com.umeng.fb.FeedbackAgent;
 import com.umeng.fb.model.Conversation;
 import com.umeng.fb.model.DevReply;

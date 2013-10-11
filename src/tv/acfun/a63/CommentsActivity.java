@@ -31,7 +31,6 @@ import tv.acfun.a63.api.entity.Comment;
 import tv.acfun.a63.api.entity.Comments;
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.base.BaseActivity;
-import tv.acfun.a63.swipe.SwipeSherlockActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.ArrayUtil;
 import tv.acfun.a63.util.BaseAnimationListener;
