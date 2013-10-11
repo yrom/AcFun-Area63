@@ -163,4 +163,10 @@ public final class ArticleApi {
     public static String getChannelName(int channelId){
         return channels.get(channelId);
     }
+    /**
+     * http://www.acfun.tv/api/member.aspx?name=mentions&pageNo=1&pageSize=10
+     */
+    public static String getMentionsUrl(int size, int page) {
+        return String.format("http://www.acfun.tv/api/member.aspx?name=mentions&pageNo=%d&pageSize=%d", page, size);
+    }
 }

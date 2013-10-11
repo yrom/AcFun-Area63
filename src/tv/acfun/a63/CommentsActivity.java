@@ -24,8 +24,8 @@ import java.util.List;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.HttpException;
 
-import tv.acfun.a63.adapter.CommentsAdaper;
-import tv.acfun.a63.adapter.CommentsAdaper.OnQuoteClickListener;
+import tv.acfun.a63.adapter.CommentsAdapter;
+import tv.acfun.a63.adapter.CommentsAdapter.OnQuoteClickListener;
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.Comment;
 import tv.acfun.a63.api.entity.Comments;
@@ -111,7 +111,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     private ProgressBar mLoadingBar;
     private TextView mTimeOutText;
     private View mFootview;
-    private CommentsAdaper mAdapter;
+    private CommentsAdapter mAdapter;
     private int pageIndex = 1;
     private int totalPage = 1;
     private boolean hasNextPage;
@@ -187,7 +187,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
                 return false;
             }
         });
-        mAdapter = new CommentsAdaper(this, data, commentIdList);
+        mAdapter = new CommentsAdapter(this, data, commentIdList);
         mAdapter.setOnClickListener(this);
         mList.setAdapter(mAdapter);
     }

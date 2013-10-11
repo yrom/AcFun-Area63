@@ -11,9 +11,9 @@
     <string name="view_mode_comic">漫画</string>
 	<string-array name="planets">
 	    <item>主页</item>
-        <!-- TODO: item>推送</item-->
         <item>排行榜</item>
         <item>收藏夹</item>
+        <item>召唤</item>
 	</string-array>
 	<string-array name="titles">
 	    <item>综合</item>

@@ -177,8 +177,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
                 GravityCompat.START);
         mDrawerLayout.setScrimColor(Color.argb(100, 0, 0, 0));
-        int[] iconIds = { R.drawable.ic_home, /*TODO R.drawable.ic_bell,*/
-                 R.drawable.ic_hot, R.drawable.ic_heart};
+        int[] iconIds = { R.drawable.ic_home,
+                 R.drawable.ic_hot, R.drawable.ic_heart,  R.drawable.ic_bell};
         // set up the drawer's list view with items and click listener
         mDrawerList.setAdapter(new NavigationAdapter(mPlanetTitles, iconIds));
         mDrawerList.setOnItemClickListener(this);
@@ -1098,6 +1098,10 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int position,
             long arg3) {
+        if(position == arg0.getCount() -1){
+            MentionActivity.start(this);
+            return;
+        }
         if (mCurrentNavPosition != position)
             selectItem(position);
     }
