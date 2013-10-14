@@ -19,6 +19,7 @@ package tv.acfun.a63;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.httpclient.Cookie;
 
@@ -49,6 +50,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.ActionBar;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Cache;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -57,6 +59,10 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.umeng.analytics.MobclickAgent;
 
 /**
@@ -78,14 +84,14 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
     private boolean isloading;
     private boolean isreload;
     private Cookie[] mCookies;
-    protected int totalPage;
-    protected boolean hasNextPage;
+    private int totalPage;
+    private boolean hasNextPage;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        setContentView(R.layout.activity_mentions);
+        setContentView(R.layout.fragment_main_dummy);
         MobclickAgent.onEvent(this, "view_mentions");
         ActionBar ab = getSupportActionBar();
         ActionBarUtil.setXiaomiFilterDisplayOptions(ab, false);
@@ -103,10 +109,27 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         requestData(1, true);
     }
     private void initList() {
-        mList = (ListView) findViewById(R.id.list);
-        mLoadingBar = (ProgressBar) findViewById(R.id.time_progress);
+        PullToRefreshListView ptr = (PullToRefreshListView)findViewById(R.id.list);
+        ptr.setOnRefreshListener(new OnRefreshListener<ListView>() {
+
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+                pageIndex = 1;
+                requestData(pageIndex,true);
+            }
+        });
+        ptr.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
+
+            @Override
+            public void onLastItemVisible() {
+                // TODO Auto-generated method stub
+                
+            }
+        });
+        mList = ptr.getRefreshableView();
+        mLoadingBar = (ProgressBar) findViewById(R.id.loading);
         mTimeOutText = (TextView) findViewById(R.id.time_out_text);
-        mTimeOutText.setOnClickListener(this);
+//        mTimeOutText.setOnClickListener(this);
         mList.setVisibility(View.INVISIBLE);
         mFootview = LayoutInflater.from(this).inflate(R.layout.list_footerview, mList, false);
         mFootview.setOnClickListener(this);
@@ -119,7 +142,6 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
     }
     @Override
     public void onClick(View v) {
-        // TODO Auto-generated method stub
         switch (v.getId()) {
         case R.id.time_out_text:
             pageIndex = 1;
@@ -213,7 +235,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
                 Mentions comments = JSON.toJavaObject(parseObject, Mentions.class);
                 JSONObject commentContentArr = parseObject.getJSONObject("commentContentArr");
                 comments.commentArr = parseContentAttr(commentContentArr);
-                return Response.success(comments, HttpHeaderParser.parseCacheHeaders(response));
+                return Response.success(comments, cache(response));
             } catch (Exception e) {
                 Log.e(TAG, "parse mentions error", e);
                 return Response.error(new ParseError(e));
@@ -232,6 +254,32 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
             return attr;
 
         }
+        private Cache.Entry cache(NetworkResponse response){
+            long now = System.currentTimeMillis();
+
+            Map<String, String> headers = response.headers;
+
+            long serverDate = 0;
+            long softExpire = 0;
+            long maxAge = 60;
+
+            String serverEtag = null;
+            String headerValue;
+
+            headerValue = headers.get("Date");
+            if (headerValue != null) {
+                serverDate = HttpHeaderParser.parseDateAsEpoch(headerValue);
+            }
+            softExpire = now + maxAge * 1000;
+            Cache.Entry entry = new Cache.Entry();
+            entry.data = response.data;
+            entry.etag = serverEtag;
+            entry.softTtl = softExpire;
+            entry.ttl = entry.softTtl;
+            entry.serverDate = serverDate;
+            entry.responseHeaders = headers;
+            return entry;
+        }
     }
     public static void start(Context context) {
         Intent intent = new Intent(context, MentionActivity.class);
@@ -241,4 +289,5 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         CommentsActivity.start(this, (int) mAdapter.getItemId(position));
     }
+
 }
