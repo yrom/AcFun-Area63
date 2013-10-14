@@ -23,8 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/item_tag_channel"
-        android:padding="8dp"
-        android:textColor="@color/text_color_default"
+        android:padding="4dp"
+        android:layout_marginTop="8dp"
         android:textSize="16sp" />
 
     <TextView
@@ -34,8 +34,10 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="8dp"
-        android:background="@drawable/item_tag_background"
+        android:background="#ff4444"
+        android:padding="4dp"
         android:text="综合"
+        android:textColor="#fff"
         android:textSize="14sp" />
 
     <LinearLayout
@@ -43,10 +45,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/article_item_title"
-        android:background="@drawable/requote_bg"
         android:orientation="vertical"
         android:padding="8dp" >
-
+		<View android:layout_width="match_parent"
+		    android:layout_height="1dp"
+		    android:background="@color/backgroud_main"
+		    />
         <RelativeLayout
             android:id="@+id/quote"
             android:layout_width="match_parent"
@@ -90,7 +94,6 @@
             android:layout_below="@id/user_name"
             android:layout_marginTop="5dip"
             android:focusable="false"
-            android:textColor="@color/text_color_selector"
             android:textColorLink="@color/main_color" />
     </LinearLayout>
 

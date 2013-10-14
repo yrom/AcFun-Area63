@@ -24,6 +24,7 @@ import tv.acfun.a63.api.entity.Comment;
 import tv.acfun.a63.api.entity.Content;
 import tv.acfun.a63.util.TextViewUtils;
 import android.content.Context;
+import android.text.Html;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,7 +70,7 @@ public class MentionsAdapter extends BaseAdapter {
             holder = (MentionsHolder) convertView.getTag();
         }
         holder.channel.setText(ArticleApi.getChannelName(article.channelId));
-        holder.contentTitle.setText(article.title+"(ac"+article.aid+")");
+        holder.contentTitle.setText(Html.fromHtml("<font color=\"#33B5E5\">"+article.title+"</font> <font color=\"#cccccc\">(ac"+article.aid+")</font>"));
         holder.user.setText("#" + c.count + " " + c.userName);
         TextViewUtils.setCommentContent(holder.comments, c);
         int quoteId = c.quoteId;
@@ -103,7 +104,7 @@ public class MentionsAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return getItem(position).aid;
     }
 
     public void setData(List<Content> contentList, SparseArray<Comment> data,

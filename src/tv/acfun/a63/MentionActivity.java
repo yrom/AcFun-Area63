@@ -40,6 +40,8 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -62,7 +64,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  *
  */
-public class MentionActivity extends BaseActivity implements OnClickListener {
+public class MentionActivity extends BaseActivity implements OnClickListener, OnItemClickListener {
     
     private static final String TAG = "Mentions";
     private ListView mList;
@@ -86,7 +88,6 @@ public class MentionActivity extends BaseActivity implements OnClickListener {
         setContentView(R.layout.activity_mentions);
         MobclickAgent.onEvent(this, "view_mentions");
         ActionBar ab = getSupportActionBar();
-        ab.setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
         ActionBarUtil.setXiaomiFilterDisplayOptions(ab, false);
         initList();
         if(AcApp.getUser()!=null){
@@ -112,7 +113,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener {
         mList.addFooterView(mFootview);
         mFootview.setClickable(false);
         mList.setFooterDividersEnabled(false);
-//TODO        mList.setOnItemClickListener(this);
+        mList.setOnItemClickListener(this);
         mAdapter = new MentionsAdapter(this, contentList, data, commentIdList);
         mList.setAdapter(mAdapter);
     }
@@ -133,8 +134,14 @@ public class MentionActivity extends BaseActivity implements OnClickListener {
         }
         isloading = true;
         Request<?> request = new MentionsRequest(page, mCookies, listener, error);
+        request.setShouldCache(true);
         request.setTag(TAG);
         AcApp.addRequest(request);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AcApp.cancelAllRequest(TAG);
     }
     private Listener<Mentions> listener = new Listener<Mentions>() {
 
@@ -229,5 +236,9 @@ public class MentionActivity extends BaseActivity implements OnClickListener {
     public static void start(Context context) {
         Intent intent = new Intent(context, MentionActivity.class);
         context.startActivity(intent);
+    }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        CommentsActivity.start(this, (int) mAdapter.getItemId(position));
     }
 }
