@@ -5,8 +5,8 @@
     android:layout_height="match_parent" >
 
 
-        <ListView
-            android:id="@android:id/list"
+        <com.handmark.pulltorefresh.library.PullToRefreshListView
+	    	android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingLeft="@dimen/activity_horizontal_margin"

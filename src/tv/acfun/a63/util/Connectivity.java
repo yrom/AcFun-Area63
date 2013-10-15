@@ -30,11 +30,14 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Cache;
 import com.android.volley.Network;
+import com.android.volley.NetworkResponse;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HttpClientStack;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.HurlStack;
 
@@ -203,5 +206,30 @@ public class Connectivity {
         NetworkInfo info = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))
                 .getActiveNetworkInfo();
         return (info != null) && (info.isConnected());
+    }
+    
+    public static Cache.Entry newCache(NetworkResponse response, long maxAge){
+        long now = System.currentTimeMillis();
+        if(maxAge == 0) maxAge = 60;
+        Map<String, String> headers = response.headers;
+
+        long serverDate = 0;
+        long softExpire = 0;
+        String serverEtag = null;
+        String headerValue;
+
+        headerValue = headers.get("Date");
+        if (headerValue != null) {
+            serverDate = HttpHeaderParser.parseDateAsEpoch(headerValue);
+        }
+        softExpire = now + maxAge * 1000;
+        Cache.Entry entry = new Cache.Entry();
+        entry.data = response.data;
+        entry.etag = serverEtag;
+        entry.softTtl = softExpire;
+        entry.ttl = entry.softTtl;
+        entry.serverDate = serverDate;
+        entry.responseHeaders = headers;
+        return entry;
     }
 }

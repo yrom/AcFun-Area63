@@ -34,6 +34,7 @@ import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.ArrayUtil;
 import tv.acfun.a63.util.BaseAnimationListener;
+import tv.acfun.a63.util.Connectivity;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.MemberUtils;
 import tv.acfun.a63.util.TextViewUtils;
@@ -87,6 +88,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Cache;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -95,6 +97,10 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.umeng.analytics.MobclickAgent;
 
 /**
@@ -120,6 +126,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     private View mBtnEmotion;
     private GridView mEmotionGrid;
     private boolean isBarShowing = true;
+    private PullToRefreshListView mPtr;
 
     public static void start(Context context, int aid) {
         Intent intent = new Intent(context, CommentsActivity.class);
@@ -149,19 +156,43 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     }
 
     private void initList() {
-        mList = (ListView) findViewById(android.R.id.list);
+        mPtr = (PullToRefreshListView) findViewById(R.id.list);
+        mPtr.setOnRefreshListener(new OnRefreshListener<ListView>() {
+
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+                if(!isloading){
+                    pageIndex = 1;
+                    requestData(pageIndex, true);
+                }
+            }
+        });
+        mPtr.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
+
+            @Override
+            public void onLastItemVisible() {
+                if(hasNextPage){
+                    if(!isloading){
+                        requestData(++pageIndex,false);
+                    }
+                } else{
+                    mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
+                    ((TextView)mFootview.findViewById(R.id.list_footview_text)).setText(R.string.no_more);
+                }
+            }
+        });
+        mList = mPtr.getRefreshableView();
         mLoadingBar = (ProgressBar) findViewById(R.id.time_progress);
         mTimeOutText = (TextView) findViewById(R.id.time_out_text);
-        mTimeOutText.setOnClickListener(this);
+//        mTimeOutText.setOnClickListener(this);
         mList.setVisibility(View.INVISIBLE);
         mList.setDivider(getResources().getDrawable(R.drawable.listview_divider));
         mList.setDividerHeight(2);
         mFootview = LayoutInflater.from(this).inflate(R.layout.list_footerview, mList, false);
-        mFootview.setOnClickListener(this);
+//        mFootview.setOnClickListener(this);
         mList.addFooterView(mFootview);
-        mFootview.setClickable(false);
         mList.setFooterDividersEnabled(false);
-        mList.setOnScrollListener(mScrollListener);
+//        mList.setOnScrollListener(mScrollListener);
         mList.setOnItemClickListener(this);
         mList.setOnTouchListener(new OnTouchListener() {
             private int mMotionY;
@@ -277,11 +308,13 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     private void requestData(int page, boolean requestNewData) {
         if (requestNewData) {
             mTimeOutText.setVisibility(View.GONE);
-            mLoadingBar.setVisibility(View.VISIBLE);
+            if(mAdapter == null) 
+                mLoadingBar.setVisibility(View.VISIBLE);
         }
         isloading = true;
         Request<?> request = new CommentsRequest(aid, page, this, this);
         request.setTag(TAG);
+        request.setShouldCache(true);
         AcApp.addRequest(request);
     }
 
@@ -371,7 +404,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
                 Comments comments = JSON.toJavaObject(parseObject, Comments.class);
                 JSONObject commentContentArr = parseObject.getJSONObject("commentContentArr");
                 comments.commentArr = parseContentAttr(commentContentArr);
-                return Response.success(comments, HttpHeaderParser.parseCacheHeaders(response));
+                return Response.success(comments, cache(response));
             } catch (Exception e) {
                 Log.e(TAG, "parse article error", e);
                 return Response.error(new ParseError(e));
@@ -390,6 +423,10 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
             return attr;
 
         }
+        private Cache.Entry cache(NetworkResponse response){
+            return Connectivity.newCache(response,60);
+        }
+        
     }
 
     SparseArray<Comment> data = new SparseArray<Comment>();
@@ -522,6 +559,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     public void onResponse(Comments response) {
         Log.i(TAG, "on response");
         isloading = false;
+        mPtr.onRefreshComplete();
         if (response.totalCount == 0) {
             mLoadingBar.setVisibility(View.GONE);
             mTimeOutText.setVisibility(View.VISIBLE);
@@ -555,42 +593,43 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (position == parent.getCount() - 1) {
+        int count = mAdapter.getCount();
+        if(position>=count){
             if (isreload) {
                 mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.VISIBLE);
                 TextView textview = (TextView) mFootview.findViewById(R.id.list_footview_text);
                 textview.setText(R.string.loading);
                 requestData(pageIndex, false);
             }
-        } else {
-            showBar(); // show input bar when selected comment
-            Comment c = (Comment) parent.getItemAtPosition(position);
-            int quoteCount = getQuoteCount();
-            removeQuote(mCommentText.getText());
-            if (quoteCount == c.count)
-                return; // 取消引用
-            String pre = "引用:#" + c.count;
-            mQuoteSpan = new Quote(c.count);
-            /**
-             * @see http 
-             *      ://www.kpbird.com/2013/02/android-chips-edittext-token-edittext
-             *      .html
-             */
-            SpannableStringBuilder sb = SpannableStringBuilder.valueOf(mCommentText.getText());// new
-                                                                                               // SpannableStringBuilder();
-            TextView tv = TextViewUtils.createBubbleTextView(this, pre);
-            BitmapDrawable bd = (BitmapDrawable) TextViewUtils.convertViewToDrawable(tv);
-            bd.setBounds(0, 0, bd.getIntrinsicWidth(), bd.getIntrinsicHeight());
-            sb.insert(0, pre);
-            mQuoteImage = new ImageSpan(bd);
-            sb.setSpan(mQuoteImage, 0, pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            // mCommentText.setMovementMethod(LinkMovementMethod.getInstance());
-            sb.setSpan(mQuoteSpan, 0, pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            sb.append("");
-            mCommentText.setText(sb);
-            mCommentText.setSelection(mCommentText.getText().length());
-
+            return;
         }
+        showBar(); // show input bar when selected comment
+        Comment c = mAdapter.getItem(position);
+        if(c == null) return;
+        int quoteCount = getQuoteCount();
+        removeQuote(mCommentText.getText());
+        if (quoteCount == c.count)
+            return; // 取消引用
+        String pre = "引用:#" + c.count;
+        mQuoteSpan = new Quote(c.count);
+        /**
+         * @see http 
+         *      ://www.kpbird.com/2013/02/android-chips-edittext-token-edittext
+         *      .html
+         */
+        SpannableStringBuilder sb = SpannableStringBuilder.valueOf(mCommentText.getText());// new
+                                                                                           // SpannableStringBuilder();
+        TextView tv = TextViewUtils.createBubbleTextView(this, pre);
+        BitmapDrawable bd = (BitmapDrawable) TextViewUtils.convertViewToDrawable(tv);
+        bd.setBounds(0, 0, bd.getIntrinsicWidth(), bd.getIntrinsicHeight());
+        sb.insert(0, pre);
+        mQuoteImage = new ImageSpan(bd);
+        sb.setSpan(mQuoteImage, 0, pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        // mCommentText.setMovementMethod(LinkMovementMethod.getInstance());
+        sb.setSpan(mQuoteSpan, 0, pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.append("");
+        mCommentText.setText(sb);
+        mCommentText.setSelection(mCommentText.getText().length());
     }
 
     boolean validate() {
@@ -727,6 +766,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         AcApp.cancelAllRequest(TAG);
         if (mAdapter != null) {
             mAdapter.setData(null, null);
+            mAdapter = null;
         }
 
     }

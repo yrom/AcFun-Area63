@@ -31,6 +31,7 @@ import tv.acfun.a63.api.entity.Mentions;
 import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.ArrayUtil;
+import tv.acfun.a63.util.Connectivity;
 import tv.acfun.a63.util.UsingCookiesRequest;
 import android.content.Context;
 import android.content.Intent;
@@ -162,7 +163,8 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
     private void requestData(int page, boolean requestNewData) {
         if (requestNewData) {
             mTimeOutText.setVisibility(View.GONE);
-            mLoadingBar.setVisibility(View.VISIBLE);
+            if(mAdapter == null) 
+                mLoadingBar.setVisibility(View.VISIBLE);
         }
         isloading = true;
         Request<?> request = new MentionsRequest(page, mCookies, listener, error);
@@ -266,31 +268,9 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
             return attr;
 
         }
+        
         private Cache.Entry cache(NetworkResponse response){
-            long now = System.currentTimeMillis();
-
-            Map<String, String> headers = response.headers;
-
-            long serverDate = 0;
-            long softExpire = 0;
-            long maxAge = 60;
-
-            String serverEtag = null;
-            String headerValue;
-
-            headerValue = headers.get("Date");
-            if (headerValue != null) {
-                serverDate = HttpHeaderParser.parseDateAsEpoch(headerValue);
-            }
-            softExpire = now + maxAge * 1000;
-            Cache.Entry entry = new Cache.Entry();
-            entry.data = response.data;
-            entry.etag = serverEtag;
-            entry.softTtl = softExpire;
-            entry.ttl = entry.softTtl;
-            entry.serverDate = serverDate;
-            entry.responseHeaders = headers;
-            return entry;
+            return Connectivity.newCache(response,120);
         }
     }
     public static void start(Context context) {
