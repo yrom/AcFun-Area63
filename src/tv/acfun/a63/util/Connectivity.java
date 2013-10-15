@@ -19,6 +19,9 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import tv.acfun.a63.AcApp;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.os.Build;
 import android.text.TextUtils;
@@ -190,4 +193,15 @@ public class Connectivity {
         }
     }
     
+    public static boolean isWifiConnected(Context context){
+        NetworkInfo info = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))
+                .getActiveNetworkInfo();
+        return info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI;
+    }
+    
+    public static boolean isNetworkAvailable(Context context) {
+        NetworkInfo info = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))
+                .getActiveNetworkInfo();
+        return (info != null) && (info.isConnected());
+    }
 }

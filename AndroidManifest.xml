@@ -70,7 +70,7 @@
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="GooglePlay" />
-
+		<service android:name="tv.acfun.a63.service.PushService"/>
         <service
             android:name="com.umeng.common.net.DownloadingService"
             android:exported="true"

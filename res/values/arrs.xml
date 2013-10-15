@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="planets">
+        <item>主页</item>
+        <item>排行榜</item>
+        <item>收藏夹</item>
+        <item>召唤</item>
+    </string-array>
+    <string-array name="titles">
+        <item>综合</item>
+        <item>工作·情感</item>
+        <item>动漫文化</item>
+        <item>漫画·轻小说</item>
+    </string-array>
+    <string-array name="modes">
+        <item>热门文章</item>
+        <item>最新回复</item>
+        <item>最近发布</item>
+        <!-- item>本区推荐</item -->
+    </string-array>
+    <string-array name="title_sizes">
+        <item>小号</item>
+        <item>中号</item>
+        <item>大号</item>
+        <item>特大</item>
+    </string-array>
+    <string-array name="value_sizes">
+        <item>small</item>
+        <item>medium</item>
+        <item>large</item>
+    </string-array>
+    <string-array name="title_interval">
+        <item>15分钟</item>
+        <item>30分钟</item>
+        <item>60分钟</item>
+        <item>2个小时</item>
+        <item>6个小时</item>
+    </string-array>
+
+    <string-array name="value_interval">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>360</item>
+    </string-array>
+
+</resources>

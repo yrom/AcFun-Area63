@@ -82,10 +82,11 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
     private List<Content> contentList = new ArrayList<Content>();
     private List<Integer> commentIdList = new ArrayList<Integer>();
     private boolean isloading;
-    private boolean isreload;
+    private boolean shouldReload;
     private Cookie[] mCookies;
     private int totalPage;
     private boolean hasNextPage;
+    private PullToRefreshListView mPtr;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,24 +110,32 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         requestData(1, true);
     }
     private void initList() {
-        PullToRefreshListView ptr = (PullToRefreshListView)findViewById(R.id.list);
-        ptr.setOnRefreshListener(new OnRefreshListener<ListView>() {
+        mPtr = (PullToRefreshListView)findViewById(R.id.list);
+        mPtr.setOnRefreshListener(new OnRefreshListener<ListView>() {
 
             @Override
             public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-                pageIndex = 1;
-                requestData(pageIndex,true);
+                if(!isloading){
+                    pageIndex = 1;
+                    requestData(pageIndex,true);
+                }
             }
         });
-        ptr.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
+        mPtr.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
 
             @Override
             public void onLastItemVisible() {
-                // TODO Auto-generated method stub
-                
+                if(hasNextPage){
+                    if(!isloading){
+                        requestData(++pageIndex,false);
+                    }
+                } else{
+                    mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
+                    ((TextView)mFootview.findViewById(R.id.list_footview_text)).setText(R.string.no_more);
+                }
             }
         });
-        mList = ptr.getRefreshableView();
+        mList = mPtr.getRefreshableView();
         mLoadingBar = (ProgressBar) findViewById(R.id.loading);
         mTimeOutText = (TextView) findViewById(R.id.time_out_text);
 //        mTimeOutText.setOnClickListener(this);
@@ -142,11 +151,12 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
     }
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-        case R.id.time_out_text:
-            pageIndex = 1;
-            requestData(pageIndex, true);
-            break;
+        if(mFootview == v){
+            if(shouldReload){
+                mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.VISIBLE);
+                ((TextView)mFootview.findViewById(R.id.list_footview_text)).setText(R.string.loading);
+                requestData(pageIndex, false);
+            }
         }
     }
     private void requestData(int page, boolean requestNewData) {
@@ -170,6 +180,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         @Override
         public void onResponse(Mentions response) {
             isloading = false;
+            mPtr.onRefreshComplete();
             if (response.totalCount == 0) {
                 mLoadingBar.setVisibility(View.GONE);
                 mTimeOutText.setVisibility(View.VISIBLE);
@@ -197,7 +208,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
             hasNextPage = response.nextPage > response.page;
             if (data != null && data.size() > 0) {
                 mAdapter.setData(contentList, data, commentIdList);
-                isreload = false;
+                shouldReload = false;
             }
         }
     };
@@ -207,7 +218,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         @Override
         public void onErrorResponse(VolleyError error) {
             if (pageIndex > 1) {
-                isreload = true;
+                shouldReload = true;
                 mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
                 TextView textview = (TextView) mFootview.findViewById(R.id.list_footview_text);
                 textview.setText(R.string.reloading);
@@ -219,7 +230,8 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         }
         
     };
-    static class MentionsRequest extends UsingCookiesRequest<Mentions>{
+
+    public static class MentionsRequest extends UsingCookiesRequest<Mentions>{
       
         public MentionsRequest(int page, Cookie[] cookies, Listener<Mentions> listener,
                 ErrorListener errorListner) {
@@ -287,7 +299,11 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
     }
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        CommentsActivity.start(this, (int) mAdapter.getItemId(position));
+        try{
+            CommentsActivity.start(this, (int) mAdapter.getItemId(position));
+        }catch(IndexOutOfBoundsException e){
+            onClick(mFootview);
+        }
     }
 
 }
