@@ -106,7 +106,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
             mTimeOutText.setText("尚未登录");
             mList.setVisibility(View.GONE);
         }
-        
+        MobclickAgent.onEvent(this, "view_mentions");
         requestData(1, true);
     }
     private void initList() {
