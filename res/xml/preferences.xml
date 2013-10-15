@@ -30,6 +30,29 @@
             android:defaultValue="true"
             />
     </PreferenceCategory>
+    <PreferenceCategory 
+        android:title="召唤"
+        >
+        <CheckBoxPreference 
+            android:key="@string/key_enable_mention"
+            android:title="启用召唤检查"
+            android:defaultValue="true"
+            />
+        <CheckBoxPreference 
+            android:key="@string/key_enable_mention_wifi_only"
+            android:dependency="@string/key_enable_mention"
+            android:title="仅在WIFI网络下检查"
+            android:defaultValue="true"
+            />
+        <ListPreference
+            android:dependency="@string/key_enable_mention"
+            android:key="@string/key_mention_interval"
+            android:title="检查间隔"
+            android:entryValues="@array/value_interval"
+            android:entries="@array/title_interval"
+            android:defaultValue="15"
+            />        
+    </PreferenceCategory>
     <PreferenceCategory android:title="其他" >
         <Preference
             android:key="@string/key_about"

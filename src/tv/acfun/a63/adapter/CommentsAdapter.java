@@ -39,15 +39,15 @@ import android.widget.TextView;
  * @author Yrom
  * 
  */
-public class CommentsAdaper extends BaseAdapter {
+public class CommentsAdapter extends BaseAdapter {
 
-    private LayoutInflater mInflater;
+    protected LayoutInflater mInflater;
     private SparseArray<Comment> data;
     private List<Integer> commentIdList;
     private Context mContext;
     private int maxNumOfFloor;
 
-    public CommentsAdaper(Context context, SparseArray<Comment> data, List<Integer> commentIdList) {
+    public CommentsAdapter(Context context, SparseArray<Comment> data, List<Integer> commentIdList) {
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.data = data;

@@ -16,6 +16,7 @@
 
 package tv.acfun.a63;
 
+import tv.acfun.a63.service.PushService;
 import tv.acfun.a63.swipe.SwipeSherlockPreferenceActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FileUtil;
@@ -40,15 +41,20 @@ import com.umeng.update.UpdateResponse;
 
 /**
  * @author Yrom
- *
+ * 
  */
 @SuppressWarnings("deprecation")
-public class SettingsActivity extends SwipeSherlockPreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
+public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
+        OnPreferenceClickListener, OnPreferenceChangeListener {
     private static final String KEY_UPDATE = "update";
     private static final String KEY_FEED_BACK = "feedback";
     private static final String KEY_IMAGE_CACHE = "image_cache";
     private static final String KEY_CLEAR_CACHE = "clear_cache";
+    private static final String KEY_INTERVAL = "mention_interval";
+    private static final String KEY_MENTION_ENABLE = "mention_enable";
+    private static final String KEY_MENTION_WIFI_ONLY = "mention_enable_wifi_only";
     private String oldPath;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,65 +64,79 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
         setCache();
         Preference feedback = findPreference(KEY_FEED_BACK);
         feedback.setOnPreferenceClickListener(this);
-        
+
         Preference update = findPreference(KEY_UPDATE);
         update.setSummary(AcApp.instance().getVersionName());
         update.setOnPreferenceClickListener(this);
-        
+
+        findPreference(KEY_INTERVAL).setOnPreferenceChangeListener(this);
+        findPreference(KEY_MENTION_ENABLE).setOnPreferenceChangeListener(this);
+        findPreference(KEY_MENTION_WIFI_ONLY).setOnPreferenceChangeListener(this);
     }
+
     private void setCache() {
         Preference cache = findPreference(KEY_CLEAR_CACHE);
         String size = FileUtil.getFormatFolderSize(getExternalCacheDir());
         cache.setSummary(size);
         cache.setOnPreferenceClickListener(this);
-        
+
         savePath = (EditTextPreference) findPreference(KEY_IMAGE_CACHE);
         savePath.setPersistent(true);
         String defaultPath = AcApp.getDefaultImageSaveDir();
         savePath.setDefaultValue(defaultPath);
-        if(TextUtils.isEmpty(savePath.getText())){
+        if (TextUtils.isEmpty(savePath.getText())) {
             savePath.setText(defaultPath);
             oldPath = defaultPath;
-        }else
+        } else
             oldPath = savePath.getText();
         savePath.setSummary(savePath.getText());
         savePath.setOnPreferenceChangeListener(this);
     }
-    public static void start(Context context){
+
+    public static void start(Context context) {
         context.startActivity(new Intent(context, SettingsActivity.class));
     }
+
     @Override
     public boolean onPreferenceClick(Preference preference) {
-        if(KEY_CLEAR_CACHE.equals(preference.getKey())){
+        if (KEY_CLEAR_CACHE.equals(preference.getKey())) {
             preference.setEnabled(false);
-            if(FileUtil.deleteFiles(getExternalCacheDir()))
+            if (FileUtil.deleteFiles(getExternalCacheDir()))
                 preference.setSummary("清除完毕");
             else
                 Toast.makeText(getApplicationContext(), "清除失败", 0).show();
             return true;
-        }else if(KEY_FEED_BACK.equals(preference.getKey())){
-//            new FeedbackAgent(this).startFeedbackActivity();
-            startActivity(new Intent(this,ConversationActivity.class));
-        }else if(KEY_UPDATE.equals(preference.getKey())){
+        } else if (KEY_FEED_BACK.equals(preference.getKey())) {
+            // new FeedbackAgent(this).startFeedbackActivity();
+            startActivity(new Intent(this, ConversationActivity.class));
+        } else if (KEY_UPDATE.equals(preference.getKey())) {
             preference.setEnabled(false);
             update();
         }
         return false;
     }
+
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if(KEY_IMAGE_CACHE.equals(preference.getKey())){
-            if(FileUtil.validate(newValue.toString())){
+        if (KEY_IMAGE_CACHE.equals(preference.getKey())) {
+            if (FileUtil.validate(newValue.toString())) {
                 preference.setSummary(newValue.toString());
                 showPathChangeDialog();
                 return true;
-            }else{
+            } else {
                 showPathInvalidateDialog();
                 return false;
             }
+        } else if (KEY_INTERVAL.equals(preference.getKey())
+                || KEY_MENTION_ENABLE.equals(preference.getKey())
+                || KEY_MENTION_WIFI_ONLY.equals(preference.getKey())) {
+
+            PushService.start(this); // 重启服务
+            return true;
         }
         return false;
     }
+
     private void update() {
         UmengUpdateAgent.update(this);
         UmengUpdateAgent.setUpdateAutoPopup(false);
@@ -132,7 +152,8 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
                     Toast.makeText(SettingsActivity.this, "已是最新版", Toast.LENGTH_SHORT).show();
                     break;
                 case 2: // none wifi
-                    Toast.makeText(SettingsActivity.this, "没有wifi连接， 只在wifi下更新", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SettingsActivity.this, "没有wifi连接， 只在wifi下更新", Toast.LENGTH_SHORT)
+                            .show();
                     break;
                 case 3: // time out
                     Toast.makeText(SettingsActivity.this, "超时", Toast.LENGTH_SHORT).show();
@@ -142,6 +163,7 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
 
         });
     }
+
     protected void onDestroy() {
         super.onDestroy();
         UmengUpdateAgent.setUpdateListener(null);
@@ -149,17 +171,19 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
         UmengUpdateAgent.setDialogListener(null);
         UmengUpdateAgent.setUpdateAutoPopup(true);
     }
+
     OnClickListener listener = new OnClickListener() {
-        
+
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            if(which==DialogInterface.BUTTON_POSITIVE){
-                FileUtil.move(oldPath,savePath.getText());
+            if (which == DialogInterface.BUTTON_POSITIVE) {
+                FileUtil.move(oldPath, savePath.getText());
             }
         }
     };
 
     private EditTextPreference savePath;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -172,26 +196,23 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
         }
         return super.onOptionsItemSelected(item);
     }
-    void showPathChangeDialog(){
-        new AlertDialog.Builder(this)
-            .setTitle("位置已改变")
-            .setMessage("是否将原有缓存迁移到新的位置？")
-            .setPositiveButton("是", listener)
-            .setNegativeButton("否",null)
-            .show();
+
+    void showPathChangeDialog() {
+        new AlertDialog.Builder(this).setTitle("位置已改变").setMessage("是否将原有缓存迁移到新的位置？")
+                .setPositiveButton("是", listener).setNegativeButton("否", null).show();
     }
-    void showPathInvalidateDialog(){
-        new AlertDialog.Builder(this)
-            .setTitle("位置无效")
-            .setMessage("请重新输入！")
-            .setNegativeButton("好",null)
-            .show();
+
+    void showPathInvalidateDialog() {
+        new AlertDialog.Builder(this).setTitle("位置无效").setMessage("请重新输入！")
+                .setNegativeButton("好", null).show();
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         MobclickAgent.onResume(this);
     }
+
     @Override
     protected void onPause() {
         super.onPause();

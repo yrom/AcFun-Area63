@@ -218,6 +218,17 @@ public class AcApp extends Application {
         return lastSize;
         
     }
+    public static long getPreferenceRefreshingInterval(){
+        int mins = Integer.parseInt(sp.getString("mention_interval", "15"));
+        return mins * _1_min;
+    }
+    
+    public static boolean isMentionEnabled(){
+        return sp.getBoolean("mention_enable", true);
+    }
+    public static boolean isMentionWifiOnly(){
+        return sp.getBoolean("mention_enable_wifi_only", true);
+    }
     // ====================================
     // statics
     // ====================================

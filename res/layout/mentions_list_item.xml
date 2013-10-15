@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 YROM.NET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+  
+          http://www.apache.org/licenses/LICENSE-2.0
+  
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License. -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/row_backgroud"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/article_item_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/item_tag_channel"
+        android:padding="4dp"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/item_tag_channel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="8dp"
+        android:background="#ff4444"
+        android:padding="4dp"
+        android:text="综合"
+        android:textColor="#fff"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:id="@+id/comments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/article_item_title"
+        android:orientation="vertical"
+        android:padding="8dp" >
+		<View android:layout_width="match_parent"
+		    android:layout_height="1dp"
+		    android:background="@color/backgroud_main"
+		    />
+        <RelativeLayout
+            android:id="@+id/quote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/comment_floor_bg"
+            android:descendantFocusability="blocksDescendants"
+            android:duplicateParentState="true"
+            android:padding="6dp" >
+
+            <TextView
+                android:id="@+id/quoted_user_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:textColor="#ABABAB" />
+
+            <TextView
+                android:id="@+id/quoted_comments_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/quoted_user_name"
+                android:layout_marginTop="5dip"
+                android:focusable="false"
+                android:padding="4dp"
+                android:textColorLink="@color/main_color" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/quote"
+            android:textColor="#ABABAB" />
+
+        <TextView
+            android:id="@+id/comments_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/user_name"
+            android:layout_marginTop="5dip"
+            android:focusable="false"
+            android:textColorLink="@color/main_color" />
+    </LinearLayout>
+
+</RelativeLayout>

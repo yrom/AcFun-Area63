@@ -10,6 +10,7 @@ import tv.acfun.a63.api.entity.Content;
 import tv.acfun.a63.api.entity.Contents;
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.db.DB;
+import tv.acfun.a63.service.PushService;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.FastJsonRequest;
@@ -132,6 +133,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         initDrawerLayout(savedInstanceState);
         mQueue = AcApp.getGloableQueue();
+        
+        PushService.start(this);
         // umeng
         initUmeng();
     }
@@ -177,8 +180,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
                 GravityCompat.START);
         mDrawerLayout.setScrimColor(Color.argb(100, 0, 0, 0));
-        int[] iconIds = { R.drawable.ic_home, /*TODO R.drawable.ic_bell,*/
-                 R.drawable.ic_hot, R.drawable.ic_heart};
+        int[] iconIds = { R.drawable.ic_home,
+                 R.drawable.ic_hot, R.drawable.ic_heart,  R.drawable.ic_at};
         // set up the drawer's list view with items and click listener
         mDrawerList.setAdapter(new NavigationAdapter(mPlanetTitles, iconIds));
         mDrawerList.setOnItemClickListener(this);
@@ -1098,6 +1101,11 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int position,
             long arg3) {
+        if(position == arg0.getCount() -1){
+            MentionActivity.start(this);
+            mDrawerList.setItemChecked(mCurrentNavPosition, true);
+            return;
+        }
         if (mCurrentNavPosition != position)
             selectItem(position);
     }

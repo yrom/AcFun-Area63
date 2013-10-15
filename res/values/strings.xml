@@ -9,35 +9,6 @@
     <string name="view_mode_mix">图文</string>
     <string name="view_mode_no_image">无图</string>
     <string name="view_mode_comic">漫画</string>
-	<string-array name="planets">
-	    <item>主页</item>
-        <!-- TODO: item>推送</item-->
-        <item>排行榜</item>
-        <item>收藏夹</item>
-	</string-array>
-	<string-array name="titles">
-	    <item>综合</item>
-        <item>工作·情感</item>
-        <item>动漫文化</item>
-        <item>漫画·轻小说</item>
-	</string-array>
-	<string-array name="modes">
-        <item>热门文章</item>
-        <item>最新回复</item>
-	    <item>最近发布</item>
-        <!--item>本区推荐</item-->
-	</string-array>
-	<string-array name="title_sizes">
-	    <item>小号</item>
-        <item>中号</item>
-        <item>大号</item>
-        <item>特大</item>
-	</string-array>
-	<string-array name="value_sizes">
-	    <item>small</item>
-        <item>medium</item>
-        <item>large</item>
-	</string-array>
 	<string name="user_name">用户名</string>
 	<string name="signin">登录</string>
 	<string name="password">密码</string>
@@ -66,4 +37,7 @@
 	<string name="key_donate">donate</string>
 	<string name="comment_hint">不吐嘈不舒服斯基</string>
 	<string name="key_enable_vibrator">enable_vibrator</string>
+	<string name="key_enable_mention">mention_enable</string>
+	<string name="key_enable_mention_wifi_only">mention_enable_wifi_only</string>
+	<string name="key_mention_interval">mention_interval</string>
 </resources>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="tv.acfun.a63"
-    android:versionCode="5"
-    android:versionName="1.0.5" >
+    android:versionCode="6"
+    android:versionName="1.0.6" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -56,6 +56,7 @@
             android:screenOrientation="user"
             android:configChanges="screenSize|orientation" />
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".MentionActivity" />
         <activity
             android:name=".CommentsActivity"
             android:screenOrientation="user"
@@ -69,7 +70,7 @@
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="GooglePlay" />
-
+		<service android:name="tv.acfun.a63.service.PushService"/>
         <service
             android:name="com.umeng.common.net.DownloadingService"
             android:exported="true"
