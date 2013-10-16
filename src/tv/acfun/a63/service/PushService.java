@@ -96,9 +96,9 @@ public class PushService extends Service {
             Intent i = new Intent(ACTION_REFRESH);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, i,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            long triggerAtTime = SystemClock.elapsedRealtime();
             long interval = AcApp.getPreferenceRefreshingInterval();
-            mAManager.setRepeating(AlarmManager.ELAPSED_REALTIME, triggerAtTime+10, interval, pendingIntent);
+            long triggerAtTime = SystemClock.elapsedRealtime()+interval;
+            mAManager.setRepeating(AlarmManager.ELAPSED_REALTIME, triggerAtTime, interval, pendingIntent);
             if(BuildConfig.DEBUG)
                 Log.i("PUSH", "start : id="+startId+", interval="+interval);
         }else{
