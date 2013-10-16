@@ -184,15 +184,13 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         mList = mPtr.getRefreshableView();
         mLoadingBar = (ProgressBar) findViewById(R.id.time_progress);
         mTimeOutText = (TextView) findViewById(R.id.time_out_text);
-//        mTimeOutText.setOnClickListener(this);
-        mList.setVisibility(View.INVISIBLE);
+        mTimeOutText.setOnClickListener(this);
         mList.setDivider(getResources().getDrawable(R.drawable.listview_divider));
         mList.setDividerHeight(2);
         mFootview = LayoutInflater.from(this).inflate(R.layout.list_footerview, mList, false);
-//        mFootview.setOnClickListener(this);
+        mList.setVisibility(View.INVISIBLE);
         mList.addFooterView(mFootview);
         mList.setFooterDividersEnabled(false);
-//        mList.setOnScrollListener(mScrollListener);
         mList.setOnItemClickListener(this);
         mList.setOnTouchListener(new OnTouchListener() {
             private int mMotionY;
@@ -308,7 +306,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     private void requestData(int page, boolean requestNewData) {
         if (requestNewData) {
             mTimeOutText.setVisibility(View.GONE);
-            if(mAdapter == null) 
+            if(mAdapter == null || mAdapter.isEmpty()) 
                 mLoadingBar.setVisibility(View.VISIBLE);
         }
         isloading = true;
@@ -318,29 +316,29 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         AcApp.addRequest(request);
     }
 
-    OnScrollListener mScrollListener = new OnScrollListener() {
-
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-        }
-
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                int totalItemCount) {
-            if (view.getLastVisiblePosition() == (view.getCount() - 1) && !isloading) {
-                if (!hasNextPage || pageIndex + 1 > totalPage) {
-                    mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
-                    TextView textview = (TextView) mFootview.findViewById(R.id.list_footview_text);
-                    textview.setText(R.string.no_more);
-                } else {
-                    pageIndex += 1;
-                    requestData(pageIndex, false);
-                }
-            }
-
-        }
-
-    };
+//    OnScrollListener mScrollListener = new OnScrollListener() {
+//
+//        @Override
+//        public void onScrollStateChanged(AbsListView view, int scrollState) {
+//        }
+//
+//        @Override
+//        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+//                int totalItemCount) {
+//            if (view.getLastVisiblePosition() == (view.getCount() - 1) && !isloading) {
+//                if (!hasNextPage || pageIndex + 1 > totalPage) {
+//                    mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
+//                    TextView textview = (TextView) mFootview.findViewById(R.id.list_footview_text);
+//                    textview.setText(R.string.no_more);
+//                } else {
+//                    pageIndex += 1;
+//                    requestData(pageIndex, false);
+//                }
+//            }
+//
+//        }
+//
+//    };
     AnimationListener mHideListener = new BaseAnimationListener() {
 
         @TargetApi(Build.VERSION_CODES.HONEYCOMB)

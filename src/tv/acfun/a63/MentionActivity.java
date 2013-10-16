@@ -138,9 +138,11 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         mList = mPtr.getRefreshableView();
         mLoadingBar = (ProgressBar) findViewById(R.id.loading);
         mTimeOutText = (TextView) findViewById(R.id.time_out_text);
-        mList.setVisibility(View.INVISIBLE);
+        mTimeOutText.setText(R.string.time_out);
+        mTimeOutText.setOnClickListener(this);
         mFootview = LayoutInflater.from(this).inflate(R.layout.list_footerview, mList, false);
         mFootview.setOnClickListener(this);
+        mList.setVisibility(View.INVISIBLE);
         mList.addFooterView(mFootview);
         mFootview.setClickable(false);
         mList.setFooterDividersEnabled(false);
@@ -156,12 +158,15 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
                 ((TextView)mFootview.findViewById(R.id.list_footview_text)).setText(R.string.loading);
                 requestData(pageIndex, false);
             }
+        }else if(mTimeOutText == v){
+            pageIndex = 1;
+            requestData(pageIndex, true);
         }
     }
     private void requestData(int page, boolean requestNewData) {
         if (requestNewData) {
             mTimeOutText.setVisibility(View.GONE);
-            if(mAdapter == null) 
+            if(mAdapter == null || mAdapter.isEmpty()) 
                 mLoadingBar.setVisibility(View.VISIBLE);
         }
         isloading = true;
@@ -224,7 +229,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
             } else {
                 mLoadingBar.setVisibility(View.GONE);
                 mTimeOutText.setVisibility(View.VISIBLE);
-                mList.setVisibility(View.GONE);
+                mList.setVisibility(View.VISIBLE);
             }
         }
         

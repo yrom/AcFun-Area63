@@ -86,6 +86,8 @@ public class SigninActivity extends BaseActivity {
         protected void onPreExecute() {
             
             dialog = new ProgressDialog(SigninActivity.this);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCancelable(false);
             dialog.setMessage("登录...");
             dialog.show();
         }
