@@ -604,8 +604,9 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
             return;
         }
         showBar(); // show input bar when selected comment
-        Comment c = mAdapter.getItem(position);
-        if(c == null) return;
+        Object o = parent.getItemAtPosition(position);
+        if(o == null || !(o instanceof Comment)) return;
+        Comment c = (Comment)o;
         int quoteCount = getQuoteCount();
         removeQuote(mCommentText.getText());
         if (quoteCount == c.count)

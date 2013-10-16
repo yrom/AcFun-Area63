@@ -19,7 +19,6 @@ package tv.acfun.a63;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.httpclient.Cookie;
 
@@ -280,7 +279,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         try{
-            CommentsActivity.start(this, (int) mAdapter.getItemId(position));
+            CommentsActivity.start(this, (int) parent.getItemIdAtPosition(position));
         }catch(IndexOutOfBoundsException e){
             onClick(mFootview);
         }
