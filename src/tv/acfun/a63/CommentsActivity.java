@@ -484,7 +484,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
         protected void onPreExecute() {
             mBtnSend.setEnabled(false);
-            dialog = ProgressDialog.show(CommentsActivity.this, null, "提交中", true, false);
+            dialog = ProgressDialog.show(CommentsActivity.this, null, getString(R.string.posting_comment), true, false);
         }
 
         String comment;
@@ -519,9 +519,9 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
             if (result) {
                 pageIndex = 1;
                 requestData(pageIndex, true);
-                Toast.makeText(getApplicationContext(), "提交成功!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.comment_success), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getApplicationContext(), "提交失败!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.comment_failed), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -557,7 +557,6 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     @Override
     public void onResponse(Comments response) {
-        Log.i(TAG, "on response");
         isloading = false;
         mPtr.onRefreshComplete();
         if (response.totalCount == 0) {
@@ -618,15 +617,13 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
          *      ://www.kpbird.com/2013/02/android-chips-edittext-token-edittext
          *      .html
          */
-        SpannableStringBuilder sb = SpannableStringBuilder.valueOf(mCommentText.getText());// new
-                                                                                           // SpannableStringBuilder();
+        SpannableStringBuilder sb = SpannableStringBuilder.valueOf(mCommentText.getText());
         TextView tv = TextViewUtils.createBubbleTextView(this, pre);
         BitmapDrawable bd = (BitmapDrawable) TextViewUtils.convertViewToDrawable(tv);
         bd.setBounds(0, 0, bd.getIntrinsicWidth(), bd.getIntrinsicHeight());
         sb.insert(0, pre);
         mQuoteImage = new ImageSpan(bd);
         sb.setSpan(mQuoteImage, 0, pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        // mCommentText.setMovementMethod(LinkMovementMethod.getInstance());
         sb.setSpan(mQuoteSpan, 0, pre.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.append("");
         mCommentText.setText(sb);
@@ -636,18 +633,18 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     boolean validate() {
         mUser = AcApp.getUser();
         if (mUser == null) {
-            Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.sign_in_first), Toast.LENGTH_SHORT).show();
             startActivity(SigninActivity.createIntent(this));
             return false;
         }
         Editable text = mCommentText.getText();
         int len = text.length() - getQuoteSpanLength(text);
         if (len == 0) {
-            Toast.makeText(this, "评论不能为空哦", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.no_comment), Toast.LENGTH_SHORT).show();
             return false;
         }
         if (len <= 5) {
-            Toast.makeText(this, "吐槽得不够啊", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.comment_not_enough), Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -730,7 +727,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
                 final int checked = AcApp.getConfig().getInt("text_size", 0);
                 sizeChooser = new AlertDialog.Builder(this)
                         .setCancelable(true)
-                        .setTitle("评论文字大小")
+                        .setTitle(R.string.comment_font_size)
                         .setSingleChoiceItems(R.array.title_sizes, checked,
                                 new DialogInterface.OnClickListener() {
                                     int lastSelected = checked;
@@ -756,7 +753,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        menu.add(0, android.R.id.button1, 0, "文字大小").setIcon(R.drawable.ic_text_size)
+        menu.add(0, android.R.id.button1, 0, R.string.font_size).setIcon(R.drawable.ic_text_size)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return super.onCreateOptionsMenu(menu);
     }

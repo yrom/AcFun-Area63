@@ -167,6 +167,6 @@ public final class ArticleApi {
      * http://www.acfun.tv/api/member.aspx?name=mentions&pageNo=1&pageSize=10
      */
     public static String getMentionsUrl(int size, int page) {
-        return String.format("http://www.acfun.tv/api/member.aspx?name=mentions&pageNo=%d&pageSize=%d", page, size);
+        return String.format(Constants.URL_MENTIONS, page, size);
     }
 }

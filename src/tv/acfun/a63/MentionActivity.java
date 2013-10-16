@@ -84,7 +84,6 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
     private boolean isloading;
     private boolean shouldReload;
     private Cookie[] mCookies;
-    private int totalPage;
     private boolean hasNextPage;
     private PullToRefreshListView mPtr;
     
@@ -96,6 +95,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         MobclickAgent.onEvent(this, "view_mentions");
         ActionBar ab = getSupportActionBar();
         ActionBarUtil.setXiaomiFilterDisplayOptions(ab, false);
+        ab.setTitle(R.string.mentions);
         initList();
         if(AcApp.getUser()!=null){
             mCookies = JSON.parseObject(AcApp.getUser().cookies, Cookie[].class);
@@ -103,7 +103,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         }else{
             mLoadingBar.setVisibility(View.GONE);
             mTimeOutText.setVisibility(View.VISIBLE);
-            mTimeOutText.setText("尚未登录");
+            mTimeOutText.setText(R.string.sign_in_first);
             mList.setVisibility(View.GONE);
         }
         MobclickAgent.onEvent(this, "view_mentions");
@@ -138,7 +138,6 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         mList = mPtr.getRefreshableView();
         mLoadingBar = (ProgressBar) findViewById(R.id.loading);
         mTimeOutText = (TextView) findViewById(R.id.time_out_text);
-//        mTimeOutText.setOnClickListener(this);
         mList.setVisibility(View.INVISIBLE);
         mFootview = LayoutInflater.from(this).inflate(R.layout.list_footerview, mList, false);
         mFootview.setOnClickListener(this);
@@ -205,7 +204,6 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
             ArrayUtil.putAll(response.commentArr, data);
             commentIdList.addAll(ArrayUtil.asList(response.commentList));
             contentList.addAll(response.contentList);
-            totalPage = response.totalPage;
             hasNextPage = response.nextPage > response.page;
             if (data != null && data.size() > 0) {
                 mAdapter.setData(contentList, data, commentIdList);

@@ -31,7 +31,6 @@ import tv.acfun.a63.util.MemberUtils;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.actionbarsherlock.view.Menu;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Response.ErrorListener;
@@ -72,7 +71,7 @@ public class ProfileActivity extends BaseWebViewActivity {
     
     @Override
     protected void initView(Bundle savedInstanceState) {
-        getSupportActionBar().setTitle("个人信息");
+        getSupportActionBar().setTitle(R.string.pofile);
         mWeb.addJavascriptInterface(new ACJSObject(), "AC");
     }
 
@@ -125,12 +124,12 @@ public class ProfileActivity extends BaseWebViewActivity {
             JSONObject checkIn = MemberUtils.checkIn(cookies);
             if(checkIn != null){
                 if(checkIn.getBooleanValue("success")){
-                    AcApp.showToast("签到成功");
+                    AcApp.showToast(getString(R.string.check_in_success));
                 }else{
-                    AcApp.showToast("签到失败："+checkIn.getString("result"));
+                    AcApp.showToast(getString(R.string.check_in_failed)+checkIn.getString("result"));
                 }
             }else{
-                AcApp.showToast("签到失败：请重试");
+                AcApp.showToast(getString(R.string.check_in_failed)+getString(R.string.retry_pls));
             }
             
                             

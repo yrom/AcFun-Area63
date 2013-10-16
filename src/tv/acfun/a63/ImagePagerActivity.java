@@ -211,7 +211,7 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
                         image.setImageBitmap(bitmap);
                 }else{
                     timeOut.setVisibility(View.VISIBLE);
-                    timeOut.setText("加载失败，可能还没下载到数据，请重试");
+                    timeOut.setText(R.string.no_data_need_retry);
                 }
                 
             }else{
@@ -301,9 +301,9 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
         }
         if(success){
             MobclickAgent.onEvent(this, "save_pic");
-            AcApp.showToast("保存成功");
+            AcApp.showToast(getString(R.string.save_success));
         }else
-            AcApp.showToast("保存失败！请稍后重试"); 
+            AcApp.showToast(getString(R.string.save_failed)); 
     }
     
     @Override

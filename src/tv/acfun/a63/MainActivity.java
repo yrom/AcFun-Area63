@@ -156,7 +156,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 }
                 Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
                 String text = replyList.get(0).getContent();
-                AcApp.showNotification(intent, R.id.comments_content, text, R.drawable.notify_chat, "有新的回复");
+                AcApp.showNotification(intent, R.id.comments_content, text, R.drawable.notify_chat, getString(R.string.new_replay));
             }
         };
         new FeedbackAgent(this).getDefaultConversation().sync(listener);
@@ -617,9 +617,9 @@ public class MainActivity extends SherlockFragmentActivity implements
                     if(!TextUtils.isEmpty(content.description))
                         holder.comments.setText(Html.fromHtml(TextViewUtils.getSource(content.description)));
                     else{
-                        holder.comments.setText("无简介...");
+                        holder.comments.setText(R.string.no_desc);
                     }
-                    String tip = String.format(" 于%s收藏，有%d人同好", AcApp.getPubDate(content.releaseDate),content.stows);
+                    String tip = String.format("于%s收藏，有%d人同好", AcApp.getPubDate(content.releaseDate),content.stows);
                     holder.postTime.setText(tip);
                     holder.channel.setText(ArticleApi.getChannelName(content.channelId));
                     return convertView;
@@ -1006,7 +1006,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             if(!TextUtils.isEmpty(art.description))
                 holder.comments.setText(Html.fromHtml(TextViewUtils.getSource(art.description)));
             else{
-                holder.comments.setText("无简介...");
+                holder.comments.setText(R.string.no_desc);
             }
             
             if (mode < 3) {
