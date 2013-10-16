@@ -104,7 +104,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
             mLoadingBar.setVisibility(View.GONE);
             mTimeOutText.setVisibility(View.VISIBLE);
             mTimeOutText.setText(R.string.sign_in_first);
-            mList.setVisibility(View.GONE);
+            mPtr.setVisibility(View.GONE);
         }
         MobclickAgent.onEvent(this, "view_mentions");
         requestData(1, true);
@@ -141,7 +141,6 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         mTimeOutText.setText(R.string.time_out);
         mTimeOutText.setOnClickListener(this);
         mFootview = LayoutInflater.from(this).inflate(R.layout.list_footerview, mList, false);
-        mFootview.setOnClickListener(this);
         mList.setVisibility(View.INVISIBLE);
         mList.addFooterView(mFootview);
         mFootview.setClickable(false);
@@ -159,8 +158,10 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
                 requestData(pageIndex, false);
             }
         }else if(mTimeOutText == v){
-            pageIndex = 1;
-            requestData(pageIndex, true);
+            if(AcApp.getUser()!=null){
+                pageIndex = 1;
+                requestData(pageIndex, true);
+            }
         }
     }
     private void requestData(int page, boolean requestNewData) {
