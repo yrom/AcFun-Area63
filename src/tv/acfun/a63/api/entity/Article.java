@@ -104,45 +104,39 @@ public class Article {
         if (Boolean.TRUE != articleJson.getBoolean("success")) {
             return null;
         }
-        Article article = null;
-        try {
-            article = new Article();
-            // parse info
-            JSONObject info = articleJson.getJSONObject("info");
-            article.title = info.getString("title");
-            article.postTime = info.getLong("posttime");
-            article.id = info.getIntValue("id");
-            article.description = info.getString("description");
-            article.poster = parseUser(info);
-            // statistics
-            JSONArray statistics = info.getJSONArray("statistics");
-            article.views = statistics.getIntValue(0);
-            article.comments = statistics.getIntValue(1);
-            article.stows = statistics.getIntValue(5);
-            // sub contents and images
-            JSONArray contentArray = articleJson.getJSONArray("content");
-            article.contents = new ArrayList<Article.SubContent>(contentArray.size());
-            article.imgUrls = new ArrayList<String>();
+        Article article = new Article();
+        article.imgUrls = new ArrayList<String>();
+        // parse info
+        JSONObject info = articleJson.getJSONObject("info");
+        article.title = info.getString("title");
+        article.postTime = info.getLong("posttime");
+        article.id = info.getIntValue("id");
+        article.description = info.getString("description");
+        article.poster = parseUser(info);
+        // statistics
+        JSONArray statistics = info.getJSONArray("statistics");
+        article.views = statistics.getIntValue(0);
+        article.comments = statistics.getIntValue(1);
+        article.stows = statistics.getIntValue(5);
+        // sub contents and images
+        JSONArray contentArray = articleJson.getJSONArray("content");
+        article.contents = new ArrayList<Article.SubContent>(contentArray.size());
 
-            for (int i = 0; i < contentArray.size(); i++) {
-                SubContent content = new SubContent();
-                JSONObject sub = contentArray.getJSONObject(i);
-                content.content = sub.getString("content");
-                content.subTitle = sub.getString("subtitle");
-                Matcher matcher = imageReg.matcher(content.content);
-                while (matcher.find()) {
-                    article.imgUrls.add(matcher.group(1));
-                }
-                article.contents.add(content);
+        for (int i = 0; i < contentArray.size(); i++) {
+            SubContent content = new SubContent();
+            JSONObject sub = contentArray.getJSONObject(i);
+            content.content = sub.getString("content");
+            content.subTitle = sub.getString("subtitle");
+            Matcher matcher = imageReg.matcher(content.content);
+            while (matcher.find()) {
+                article.imgUrls.add(matcher.group(1));
             }
-            // channel
-            JSONObject channel = info.getJSONObject("channel");
-            article.channelId = channel.getIntValue("channelID");
-            article.channelName = channel.getString("channelName");
-
-        } catch (Exception e) {
-            Log.e(TAG, "parsing article error", e);
+            article.contents.add(content);
         }
+        // channel
+        JSONObject channel = info.getJSONObject("channel");
+        article.channelId = channel.getIntValue("channelID");
+        article.channelName = channel.getString("channelName");
 
         return article;
     }
