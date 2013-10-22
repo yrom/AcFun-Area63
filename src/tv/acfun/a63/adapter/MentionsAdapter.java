@@ -75,8 +75,10 @@ public class MentionsAdapter extends BaseAdapter {
         TextViewUtils.setCommentContent(holder.comments, c);
         int quoteId = c.quoteId;
         Comment quote = data.get(quoteId);
-        holder.quotedUser.setText("#" + quote.count + " " + quote.userName);
-        TextViewUtils.setCommentContent( holder.quotedComments,quote);
+        if(quote != null){
+            holder.quotedUser.setText("#" + quote.count + " " + quote.userName);
+            TextViewUtils.setCommentContent( holder.quotedComments,quote);
+        }
         return convertView;
     }
 
