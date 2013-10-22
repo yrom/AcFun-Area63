@@ -25,7 +25,6 @@ import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.HttpException;
 
 import tv.acfun.a63.adapter.CommentsAdapter;
-import tv.acfun.a63.adapter.CommentsAdapter.OnQuoteClickListener;
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.Comment;
 import tv.acfun.a63.api.entity.Comments;
@@ -68,8 +67,6 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -108,7 +105,7 @@ import com.umeng.analytics.MobclickAgent;
  * 
  */
 public class CommentsActivity extends BaseActivity implements OnClickListener,
-        OnQuoteClickListener, Listener<Comments>, ErrorListener, OnItemClickListener {
+         Listener<Comments>, ErrorListener, OnItemClickListener {
 
     private static final String TAG = "Comments";
     private int aid;
@@ -217,7 +214,6 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
             }
         });
         mAdapter = new CommentsAdapter(this, data, commentIdList);
-        mAdapter.setOnClickListener(this);
         mList.setAdapter(mAdapter);
     }
 
@@ -532,11 +528,6 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
                 return c.cid;
         }
         return 0;
-    }
-
-    @Override
-    public void onClick(View v, int position) {
-        mList.performItemClick(v, position, mAdapter.getItemId(position));
     }
 
     @Override
