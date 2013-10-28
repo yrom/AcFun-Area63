@@ -1003,8 +1003,19 @@ public class MainActivity extends SherlockFragmentActivity implements
             holder = (ListViewHolder) convertView.getTag();
             Content art = getItem(position);
             holder.title.setText(TextViewUtils.getSource(art.getTitle()));
-            if(!TextUtils.isEmpty(art.description))
-                holder.comments.setText(Html.fromHtml(TextViewUtils.getSource(art.description)));
+            if(!TextUtils.isEmpty(art.description)){
+                CharSequence text = null;
+                try{
+                    text = Html.fromHtml(TextViewUtils.getSource(art.description));
+                    // catch java.io.IOException: Pushback buffer full
+                    //  at android.text.HtmlToSpannedConverter.convert(Html.java:438)
+                    //  at android.text.Html.fromHtml(Html.java:138)
+                    //  at android.text.Html.fromHtml(Html.java:101)
+                }catch(Exception e){
+                    text = TextViewUtils.getSource(art.description);
+                }
+                holder.comments.setText(text);
+            }
             else{
                 holder.comments.setText(R.string.no_desc);
             }
