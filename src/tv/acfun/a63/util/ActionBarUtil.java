@@ -78,7 +78,8 @@ public final class ActionBarUtil {
      */
     public static void setXiaomiFilterDisplayOptions(ActionBar bar, boolean showHome) {
         boolean isXiaomi = "Xiaomi".equalsIgnoreCase(Build.MANUFACTURER);
-        bar.setDisplayOptions(isXiaomi && !showHome ? ActionBar.DISPLAY_SHOW_TITLE
+        boolean isJB = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+        bar.setDisplayOptions(isXiaomi && !showHome && !isJB? ActionBar.DISPLAY_SHOW_TITLE
                 | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_USE_LOGO: ActionBar.DISPLAY_SHOW_TITLE
                 | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_USE_LOGO);
     }

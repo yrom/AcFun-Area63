@@ -13,7 +13,7 @@
 
     <uses-sdk
         android:minSdkVersion="9"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
     <application
         android:name="tv.acfun.a63.AcApp"
@@ -69,7 +69,7 @@
             android:value="523706eb56240b0db70293fe" />
         <meta-data
             android:name="UMENG_CHANNEL"
-            android:value="GooglePlay" />
+            android:value="XiaoMi" />
 		<service android:name="tv.acfun.a63.service.PushService"/>
         <service
             android:name="com.umeng.common.net.DownloadingService"

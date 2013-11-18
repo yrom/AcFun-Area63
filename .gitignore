@@ -16,3 +16,5 @@ gen/
 local.properties
 
 project.properties
+
+.DG_Store
