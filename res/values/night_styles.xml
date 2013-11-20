@@ -1,0 +1,41 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppTheme.Night" parent="@style/Theme.Sherlock">
+        <item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="android:windowAnimationStyle">@style/Animation</item>
+        <item name="actionBarStyle">@style/Widget.Styled.ActionBar.Night</item>
+        <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar.Night</item>
+        
+        <item name="actionBarItemBackground">?attr/selectableItemBackground</item>
+        <item name="android:actionBarItemBackground">?attr/selectableItemBackground</item>
+        
+        <item name="actionButtonStyle">@style/Widget.Styled.ActionButton</item>
+        <item name="android:actionButtonStyle">@style/Widget.Styled.ActionButton</item>
+        <item name="android:windowBackground">@color/primary_text_color</item>
+        <item name="android:listSelector">@drawable/abs__list_selector_holo_dark</item>
+        
+        <item name="spinnerDropDownItemStyle">@style/Widget.Sherlock.Light.DropDownItem.Spinner</item>
+        <item name="android:spinnerDropDownItemStyle">@style/Widget.Sherlock.Light.DropDownItem.Spinner</item>
+        
+        <item name="selectableItemBackground">@drawable/item_background</item>
+        <item name="android:selectableItemBackground">@drawable/item_background</item>
+        
+        <item name="actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
+        <item name="android:actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
+        
+        <item name="dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
+        <item name="android:dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
+        
+        <item name="popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
+        <item name="actionBarWidgetTheme">@style/Widget.Styled</item>
+        <item name="android:actionBarWidgetTheme">@style/Widget.Styled</item>
+		<item name="android:editTextBackground">@drawable/edit_text_holo_light</item> 
+		<item name="SwipeBackLayoutStyle">@style/Widget.Styled.SwipeBackLayout</item>
+    </style>
+    <style name="Widget.Styled.ActionBar.Night" parent="Widget.Sherlock.ActionBar">
+        <item name="background">@color/main_color_dark</item>
+        <item name="android:background">@color/main_color_dark</item>
+    </style>
+</resources>

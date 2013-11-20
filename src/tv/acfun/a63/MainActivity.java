@@ -15,6 +15,7 @@ import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.FastJsonRequest;
 import tv.acfun.a63.util.TextViewUtils;
+import tv.acfun.a63.util.Theme;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -123,6 +124,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Theme.onActivityCreate(this,savedInstanceState);
         super.onCreate(savedInstanceState);
         mUser = AcApp.getUser();
         setContentView(R.layout.activity_main);
