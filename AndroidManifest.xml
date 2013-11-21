@@ -63,7 +63,7 @@
             android:configChanges="screenSize|orientation"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
         <activity android:name=".ConversationActivity" />
-
+		
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="523706eb56240b0db70293fe" />
