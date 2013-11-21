@@ -58,5 +58,5 @@
     <string name="check_in_success">签到成功</string>
     <string name="check_in_failed">签到失败：</string>
     <string name="retry_pls">请重试</string>
-    <string name="key_enable_night">夜间模式</string>
+    <string name="key_enable_night">is_night_mode</string>
 </resources>

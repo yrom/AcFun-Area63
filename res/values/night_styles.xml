@@ -18,8 +18,8 @@
         <item name="spinnerDropDownItemStyle">@style/Widget.Sherlock.Light.DropDownItem.Spinner</item>
         <item name="android:spinnerDropDownItemStyle">@style/Widget.Sherlock.Light.DropDownItem.Spinner</item>
         
-        <item name="selectableItemBackground">@drawable/item_background</item>
-        <item name="android:selectableItemBackground">@drawable/item_background</item>
+        <item name="selectableItemBackground">@drawable/item_background_night</item>
+        <item name="android:selectableItemBackground">@drawable/item_background_night</item>
         
         <item name="actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
         <item name="android:actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
@@ -33,6 +33,9 @@
         <item name="android:actionBarWidgetTheme">@style/Widget.Styled</item>
 		<item name="android:editTextBackground">@drawable/edit_text_holo_light</item> 
 		<item name="SwipeBackLayoutStyle">@style/Widget.Styled.SwipeBackLayout</item>
+		
+		<item name="rowBackground">@drawable/row_backgroud_night</item>
+		<item name="tabStripBackground">@color/row_bg_color_dark</item>
     </style>
     <style name="Widget.Styled.ActionBar.Night" parent="Widget.Sherlock.ActionBar">
         <item name="background">@color/main_color_dark</item>

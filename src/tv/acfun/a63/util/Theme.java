@@ -29,7 +29,7 @@ public class Theme {
     
     public static int getCurrentThemeId(){
         boolean isNightMode = AcApp.getConfig().getBoolean("is_night_mode", false);
-        return isNightMode? R.style.AppTheme : R.style.AppTheme_Night;
+        return isNightMode? R.style.AppTheme_Night : R.style.AppTheme;
     }
 
     public static void onActivityCreate(Activity activity, Bundle savedInstanceState) {

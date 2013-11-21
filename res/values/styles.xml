@@ -33,6 +33,10 @@
         <item name="android:actionBarWidgetTheme">@style/Widget.Styled</item>
 		<item name="android:editTextBackground">@drawable/edit_text_holo_light</item> 
 		<item name="SwipeBackLayoutStyle">@style/Widget.Styled.SwipeBackLayout</item>
+		
+		<item name="rowBackground">@drawable/row_backgroud</item>
+		<item name="tabStripBackground">@drawable/background_tabs</item>
+		
     </style>
     
 	<style name="Widget.Styled" parent="Theme.Sherlock">

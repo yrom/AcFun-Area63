@@ -16,7 +16,7 @@
     <color name="article_info_bg_blue">#990089cc</color>
     <color name="backgroud_main">#ededed</color>
 	<color name="error">#ffee0000</color>
-    
+    <color name="row_bg_color_dark">#ff555555</color>
 	<drawable name="ab_bg_trans">#990099cc</drawable>
 	<color name="umeng_fb_color_btn_pressed">#0099cc</color>
 	<color name="umeng_fb_color_btn_normal">#33B5E5</color>
