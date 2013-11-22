@@ -16,9 +16,16 @@
 
 package tv.acfun.a63.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import tv.acfun.a63.AcApp;
 import tv.acfun.a63.R;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 
 /**
@@ -47,5 +54,21 @@ public class Theme {
     
     public static boolean isThemeChanged(){
         return isThemeChanged;
+    }
+    private static Document sDoc,sDocNight;
+    public static Document getThemedDoc(Context context) throws IOException{
+        if(isNightMode()){
+            if(sDocNight == null){
+                InputStream in = context.getAssets().open("article_night.html");
+                sDocNight = Jsoup.parse(in, "utf-8", "");
+            }
+            return sDocNight;
+        }else{
+            if(sDoc == null){
+                InputStream in = context.getAssets().open("article.html");
+                sDoc = Jsoup.parse(in, "utf-8", "");
+            }
+            return sDoc;
+        }
     }
 }

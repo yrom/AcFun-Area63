@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -98,7 +97,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
 
     private Request<?> request;
-    private static Document _Doc;
+    private Document mDoc;
     private List<String> imgUrls;
     private DownloadImageTask mDownloadTask;
     private String title;
@@ -338,15 +337,11 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         @Override
         protected Boolean doInBackground(Article... params) {
             try {
-                if(_Doc == null || Theme.isThemeChanged()){
-                    String template = Theme.isNightMode()?"article_night.html" : "article.html"; 
-                    InputStream in = getAssets().open(template);
-                    _Doc = Jsoup.parse(in, "utf-8", "");
-                }
+                mDoc = Theme.getThemedDoc(ArticleActivity.this);
                 initCaches();
-                Element title = _Doc.getElementById("title");
+                Element title = mDoc.getElementById("title");
                 title.html(buildTitle(params[0]));
-                Element content = _Doc.getElementById("content");
+                Element content = mDoc.getElementById("content");
 
                 ArrayList<SubContent> contents = params[0].contents;
 
@@ -460,7 +455,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         protected void onPostExecute(Boolean result) {
             setSupportProgressBarIndeterminateVisibility(false);
             if (result) {
-                mWeb.loadDataWithBaseURL("http://www.acfun.tv/", _Doc.html(), "text/html", "UTF-8",
+                mWeb.loadDataWithBaseURL("http://www.acfun.tv/", mDoc.html(), "text/html", "UTF-8",
                         null);
                 if (hasUseMap)
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
