@@ -52,7 +52,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -86,6 +85,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  * 
  */
+@TargetApi(19)
 public class ArticleActivity extends BaseWebViewActivity implements Listener<Article>, ErrorListener {
     private static String ARTICLE_PATH;
 
@@ -104,7 +104,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     private boolean isDownloaded;
     private DB db;
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void initView(Bundle savedInstanceState) {
         ARTICLE_PATH = AcApp.getExternalCacheDir("article").getAbsolutePath();
@@ -126,13 +125,12 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             db = new DB(this);
             isFaved = db.isFav(aid); 
             mWeb.getSettings().setAppCachePath(ARTICLE_PATH);
-            mWeb.getSettings().setBlockNetworkImage(true);
             mWeb.addJavascriptInterface(new ACJSObject(), "AC");
-            mWeb.setWebChromeClient(new WebChromeClient());
             mWeb.setWebViewClient(new WebViewClient() {
-
+                
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    Log.i(TAG, "shouldOverrideUrlLoading::"+url);
                     Pattern regex = Pattern.compile("/a/ac(\\d{5,})");
                     Matcher matcher = regex.matcher(url);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -180,7 +178,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             mWeb.getSettings().setBuiltInZoomControls(true);
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                 mWeb.getSettings().setDisplayZoomControls(false);
-//            mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
         }
     }
 
@@ -262,7 +259,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 .append(article.title)
                 .append("</h1>")
                 .append("<div id=\"info\" class=\"article-info\">")
-                .append("<span class=\"article-publisher\"><img id=\"icon\" src=\"file:///android_asset/wen2.png\" width='18px' height='18px'/> ")
+                .append("<span class=\"article-publisher\">✎")
                 .append("<a href=\"http://www.acfun.tv/member/user.aspx?uid=")
                 .append(article.poster.id).append("\" >")
                 .append(article.poster.name)
@@ -369,6 +366,22 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 content.append("<h2 class=\"article-subtitle\">" + sub.subTitle + "</h2><hr>");
             }
             content.append(sub.content);
+            handleImages(content);
+            handleStyles(content);
+        }
+        private void handleStyles(Element content) {
+            Elements es = content.getAllElements();
+            
+            for (int i = 0; i < es.size(); i++) {
+                Element e = es.get(i);
+                if("span".equals(e.nodeName()))
+                    continue;
+                e.removeAttr("style");
+                
+            }
+        }
+
+        private void handleImages(Element content){
             Elements imgs = content.select("img");
             if (imgs.hasAttr("usemap")) {
                 hasUseMap = true;
@@ -381,8 +394,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 if (!src.startsWith("http")) {
                     src = "http://www.acfun.tv" + src;
                 }
-//                File cache = new File(AcApp.getExternalCacheDir(AcApp.IMAGE + "/" + mArticle.id),
-//                        FileUtil.getHashName(src));
                 File cache = FileUtil.generateImageCacheFile(src);
                 imageCaches.add(cache);
                 imgUrls.add(src);
@@ -403,7 +414,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 img.attr("loc", localUri);
                 // 去掉 style
                 img.removeAttr("style");
-                    // 给 img 标签加上点击事件
+                
+                
+                // 给 img 标签加上点击事件
                 if (!hasUseMap){
                     addClick(img, src);
                     img.removeAttr("width");
@@ -411,7 +424,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 }
             }
         }
-
         private void initCaches() {
             if (imgUrls != null)
                 imgUrls.clear();
@@ -452,6 +464,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
                 else
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.TEXT_AUTOSIZING);
+                }
 
             }
         }
@@ -552,10 +567,17 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 if (url == null)
                     return;
                 Log.i(TAG, url + " cached");
-                mWeb.loadUrl("javascript:(function(){"
-                        + "var images = document.getElementsByTagName(\"img\"); "
-                        + "images["+ values[0] + "].src = images[" + values[0] + "].getAttribute(\"loc\");"
-                        + "})()");
+                StringBuilder jsBuilder = new StringBuilder();
+                jsBuilder.append("javascript:(function(){")
+                         .append("var images = document.getElementsByTagName(\"img\"); ")
+                         .append("var img = images[").append(values[0]).append("];")
+                         .append("img.src = img.getAttribute(\"loc\");");
+                         
+                if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.KITKAT){
+                    jsBuilder.append("img.setAttribute(\"width\",\"94%\");");
+                }
+                jsBuilder.append("})()");
+                evaluateJavascript(jsBuilder.toString(),null);
             }
         }
 
@@ -563,17 +585,20 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         protected void onPostExecute(Void result) {
             // 确保所有图片都顺利的显示出来
             isDownloaded = true;
-            mWeb.loadUrl("javascript:(function(){"
+            evaluateJavascript("javascript:(function(){"
                     + "var images = document.getElementsByTagName(\"img\"); "
                     + "for(var i=0;i<images.length;i++){"
                     +   "var imgSrc = images[i].getAttribute(\"loc\"); "
+                    +   "if(imgSrc != null)"
                     +   "images[i].setAttribute(\"src\",imgSrc);"
                     + "}"
-                    + "})()");
+                    + "})()",
+                    null);
         }
 
     }
-
+    
+    
     class ACJSObject {
         @android.webkit.JavascriptInterface
         public void viewcomment() {

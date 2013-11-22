@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="zh-CN">
 <head>
-<meta name="viewport" content="width=device-width">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 html {
@@ -132,7 +132,7 @@ text-align: center;
     margin-right: auto;
 }
 
-#comment {
+button {
 	background-color:#3bb3e0;
 	padding-left:20px;
 	padding-right:20px;
@@ -156,7 +156,7 @@ text-align: center;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 }
-#comment:active {
+button:active {
 	padding-bottom:9px;
 	padding-left:20px;
 	padding-right:20px;
@@ -171,6 +171,19 @@ text-align: center;
 	color-stop(1, rgb(44,160,202))
 	);
 }
+
+@media screen and (min-width: 500px) {
+  button {
+    width: 60%;
+  } 
+}
+
+@media screen and (min-width: 750px) {
+  button {
+    width: 40%;
+    max-width: 400px;
+  } 
+}
 #footer {
 padding:4%;
 text-align: center;
@@ -182,6 +195,6 @@ text-align: center;
 <section id="content" class="article-body">
 </section>
 <section id="footer">
-<a id="comment" href="javascript:window.AC.viewcomment();">查看评论</a></section>
+<button id="comment" onclick="javascript:window.AC.viewcomment();">查看评论</button></section>
 </body>
 </html>
