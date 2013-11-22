@@ -22,6 +22,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 
 /**
  * use custom ua ({@link Connectivity#UA_MAP}) in http request headers
@@ -58,7 +59,10 @@ public abstract class CustomUARequest<T> extends Request<T> {
     
     @Override
     protected final void deliverResponse(T response) {
-        this.mListener.onResponse(response);
+        if(response == null) 
+            deliverError(new VolleyError("error response !"));
+        else
+            this.mListener.onResponse(response);
     }
     
     @Override
