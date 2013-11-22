@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2013 YROM.NET
+<!--
+     Copyright (C) 2013 YROM.NET
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,47 +14,48 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:duplicateParentState="true"
     android:descendantFocusability="blocksDescendants"
-     >
-    <TextView 
-        android:background="@drawable/requote_bg"
+    android:duplicateParentState="true" >
+
+    <TextView
         android:id="@+id/requote"
-        android:text="@string/hide_requote"
-        android:layout_margin="4dp"
-        android:gravity="center"
-        android:textSize="12sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        />
+        android:layout_margin="4dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:background="?attr/requoteBackground"
+        android:gravity="center"
+        android:text="@string/hide_requote"
+        android:textSize="12sp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/user_name"
-        android:layout_below="@id/requote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/requote"
         android:textColor="#ABABAB" />
-  	<ImageView 
+
+    <ImageView
         android:id="@+id/quote_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/user_name"
         android:layout_alignBottom="@id/user_name"
-        android:src="@drawable/forward"
-        />
-    
+        android:layout_toRightOf="@id/user_name"
+        android:src="@drawable/forward" />
+
     <TextView
         android:id="@+id/comments_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/user_name"
+        android:textColor="?attr/commentItemTextColorSelector"
         android:layout_marginTop="5dip"
-        android:textColorLink="@color/main_color"
-        android:focusable="false"
-        android:textColor="@color/text_color_selector" />
+        android:focusable="false" />
 
 </RelativeLayout>

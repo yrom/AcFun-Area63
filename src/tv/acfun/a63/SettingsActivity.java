@@ -20,11 +20,14 @@ import tv.acfun.a63.service.PushService;
 import tv.acfun.a63.swipe.SwipeSherlockPreferenceActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FileUtil;
+import tv.acfun.a63.util.Theme;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -57,6 +60,7 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Theme.onActivityCreate(this, savedInstanceState);
         super.onCreate(savedInstanceState);
         getListView().setFooterDividersEnabled(false);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
@@ -116,6 +120,7 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
         return false;
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (KEY_IMAGE_CACHE.equals(preference.getKey())) {

@@ -19,6 +19,7 @@ import java.util.List;
 
 import tv.acfun.a63.R;
 import tv.acfun.a63.util.DensityUtil;
+import tv.acfun.a63.util.Theme;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -86,7 +87,7 @@ public class FloorsView extends LinearLayout {
 	    if(!isPressed()){
     		int i = getChildCount();
     		if(this.mBorder == null){
-    			this.mBorder = getContext().getResources().getDrawable(R.drawable.comment_floor_bg);
+    			this.mBorder = getContext().getResources().getDrawable(Theme.isNightMode()?R.drawable.comment_floor_bg_dark: R.drawable.comment_floor_bg);
     		}
     		if ((this.mBorder != null) && (i > 0))
     			for (int j = i - 1; j >=0; j--) {

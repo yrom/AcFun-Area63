@@ -182,8 +182,9 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         mLoadingBar = (ProgressBar) findViewById(R.id.time_progress);
         mTimeOutText = (TextView) findViewById(R.id.time_out_text);
         mTimeOutText.setOnClickListener(this);
-        mList.setDivider(getResources().getDrawable(R.drawable.listview_divider));
-        mList.setDividerHeight(2);
+//        mList.setDivider(getResources().getDrawable(R.drawable.listview_divider));
+//        mList.setDividerHeight(2);
+        mList.setHeaderDividersEnabled(false);
         mFootview = LayoutInflater.from(this).inflate(R.layout.list_footerview, mList, false);
         mList.setVisibility(View.INVISIBLE);
         mList.addFooterView(mFootview);

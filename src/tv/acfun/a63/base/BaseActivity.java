@@ -16,6 +16,8 @@
 
 package tv.acfun.a63.base;
 
+import android.os.Bundle;
+
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.umeng.analytics.MobclickAgent;
@@ -24,13 +26,18 @@ import tv.acfun.a63.AcApp;
 import tv.acfun.a63.R;
 import tv.acfun.a63.SettingsActivity;
 import tv.acfun.a63.swipe.SwipeSherlockActivity;
+import tv.acfun.a63.util.Theme;
 
 /**
  * @author Yrom
  *
  */
 public class BaseActivity extends SwipeSherlockActivity {
-    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        Theme.onActivityCreate(this, savedInstanceState);
+        super.onCreate(savedInstanceState);
+    }
     @Override
     protected void onResume() {
         super.onResume();
