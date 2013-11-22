@@ -39,6 +39,7 @@
 		<item name="tagBackground">@drawable/item_tag_background</item>
 		<item name="commentsBarBackgroud">@drawable/comments_bar_backgroud</item>
 		<item name="commentItemBackground">@android:color/white</item>
+		<item name="commentFloorBackground">@drawable/comment_floor_bg</item>
 		<item name="commentItemTextColorSelector">@color/text_color_selector</item>
 		<item name="requoteBackground">@drawable/requote_bg</item>
 		<item name="android:textColorLink">@color/main_color</item>

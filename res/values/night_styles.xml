@@ -39,6 +39,7 @@
 		<item name="tagBackground">@drawable/item_tag_background_night</item>
 		<item name="commentsBarBackgroud">@drawable/comments_bar_backgroud_dark</item>
 		<item name="commentItemBackground">#333</item>
+		<item name="commentFloorBackground">@drawable/comment_floor_bg_dark</item>
 		<item name="commentItemTextColorSelector">@color/text_color_selector_dark</item>
 		<item name="requoteBackground">@drawable/requote_bg_dark</item>
 		<item name="android:textColorLink">@color/main_color_dark</item>
