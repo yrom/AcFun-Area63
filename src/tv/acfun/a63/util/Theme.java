@@ -33,10 +33,19 @@ public class Theme {
 
     public static void onActivityCreate(Activity activity, Bundle savedInstanceState) {
         activity.setTheme(getCurrentThemeId());
+        
     }
     
     public static boolean isNightMode(){
         return AcApp.getConfig().getBoolean("is_night_mode", false);
     }
+    private static boolean isThemeChanged = false;
     
+    public static void setThemeChanged(){
+        isThemeChanged = true;
+    }
+    
+    public static boolean isThemeChanged(){
+        return isThemeChanged;
+    }
 }

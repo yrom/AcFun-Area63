@@ -46,9 +46,8 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:padding="10dp"
+        android:background="?attr/selectableItemBackground"
         android:text="@string/signin"
-        android:textColor="@color/button_text_color_selector"
-        
         android:textSize="18sp" />
 
     <ImageView

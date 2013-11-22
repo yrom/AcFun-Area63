@@ -42,6 +42,7 @@
 		<item name="commentItemTextColorSelector">@color/text_color_selector_dark</item>
 		<item name="requoteBackground">@drawable/requote_bg_dark</item>
 		<item name="android:textColorLink">@color/main_color_dark</item>
+		<item name="android:textColorPrimary">#dcdcdc</item>
     </style>
     <style name="Widget.Styled.ActionBar.Night" parent="Widget.Sherlock.ActionBar">
         <item name="background">@color/main_color_dark</item>
