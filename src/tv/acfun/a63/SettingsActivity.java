@@ -20,11 +20,14 @@ import tv.acfun.a63.service.PushService;
 import tv.acfun.a63.swipe.SwipeSherlockPreferenceActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FileUtil;
+import tv.acfun.a63.util.Theme;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -53,10 +56,12 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
     private static final String KEY_INTERVAL = "mention_interval";
     private static final String KEY_MENTION_ENABLE = "mention_enable";
     private static final String KEY_MENTION_WIFI_ONLY = "mention_enable_wifi_only";
+    private static final String KEY_NIGHT_MODE = "is_night_mode";
     private String oldPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Theme.onActivityCreate(this, savedInstanceState);
         super.onCreate(savedInstanceState);
         getListView().setFooterDividersEnabled(false);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
@@ -72,6 +77,7 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
         findPreference(KEY_INTERVAL).setOnPreferenceChangeListener(this);
         findPreference(KEY_MENTION_ENABLE).setOnPreferenceChangeListener(this);
         findPreference(KEY_MENTION_WIFI_ONLY).setOnPreferenceChangeListener(this);
+        findPreference(KEY_NIGHT_MODE).setOnPreferenceChangeListener(this);
     }
 
     private void setCache() {
@@ -116,6 +122,7 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
         return false;
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (KEY_IMAGE_CACHE.equals(preference.getKey())) {
@@ -132,6 +139,9 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
                 || KEY_MENTION_WIFI_ONLY.equals(preference.getKey())) {
 
             PushService.start(this); // 重启服务
+            return true;
+        } else if(KEY_NIGHT_MODE.equals(preference.getKey())){
+            Theme.setThemeChanged();
             return true;
         }
         return false;

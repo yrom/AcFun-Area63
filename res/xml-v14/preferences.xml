@@ -23,13 +23,13 @@
         <Preference
             android:key="@string/key_update"
             android:title="检查更新" />
-        <CheckBoxPreference 
+        <SwitchPreference 
             android:key="@string/key_enable_vibrator"
             android:title="震动反馈"
             android:summary="滑动返回时的反馈"
             android:defaultValue="true"
             />
-        <CheckBoxPreference 
+        <SwitchPreference 
             android:key="@string/key_enable_night"
             android:title="夜间模式"
             android:defaultValue="false"
@@ -38,12 +38,12 @@
     <PreferenceCategory 
         android:title="召唤"
         >
-        <CheckBoxPreference 
+        <SwitchPreference 
             android:key="@string/key_enable_mention"
             android:title="启用召唤检查"
             android:defaultValue="true"
             />
-        <CheckBoxPreference 
+        <SwitchPreference 
             android:key="@string/key_enable_mention_wifi_only"
             android:dependency="@string/key_enable_mention"
             android:title="仅在WIFI网络下检查"

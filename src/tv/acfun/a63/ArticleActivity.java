@@ -44,6 +44,7 @@ import tv.acfun.a63.base.BaseWebViewActivity;
 import tv.acfun.a63.db.DB;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
+import tv.acfun.a63.util.Theme;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -337,8 +338,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         @Override
         protected Boolean doInBackground(Article... params) {
             try {
-                if(_Doc == null){
-                    InputStream in = getAssets().open("article.html");
+                if(_Doc == null || Theme.isThemeChanged()){
+                    String template = Theme.isNightMode()?"article_night.html" : "article.html"; 
+                    InputStream in = getAssets().open(template);
                     _Doc = Jsoup.parse(in, "utf-8", "");
                 }
                 initCaches();

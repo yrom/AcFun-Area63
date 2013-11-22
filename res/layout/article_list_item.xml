@@ -3,17 +3,17 @@
 	<RelativeLayout 
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:background="@drawable/row_backgroud"
+	    android:background="?attr/rowBackground"
 	    android:orientation="vertical"
 	    xmlns:android="http://schemas.android.com/apk/res/android">
 	
 	    <TextView
 	        android:padding="8dp"
+	        style="@android:style/TextAppearance.Medium"
 	        android:id="@+id/article_item_title"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_toLeftOf="@+id/item_tag"
-	        android:textColor="@color/text_color_default"
 	        android:textSize="18sp" />
 		<ImageView
 		    android:id="@+id/item_tag"

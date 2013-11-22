@@ -14,7 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License. -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@drawable/row_backgroud"
+    android:background="?attr/rowBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
@@ -50,14 +50,14 @@
         android:padding="8dp" >
 		<View android:layout_width="match_parent"
 		    android:layout_height="1dp"
-		    android:background="@color/backgroud_main"
+		    android:background="?android:attr/listDivider"
 		    />
         <RelativeLayout
             android:id="@+id/quote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:background="@drawable/comment_floor_bg"
+            android:background="?attr/commentFloorBackground"
             android:descendantFocusability="blocksDescendants"
             android:duplicateParentState="true"
             android:padding="6dp" >
@@ -78,8 +78,7 @@
                 android:layout_marginTop="5dip"
                 android:focusable="false"
                 android:padding="4dp"
-                android:textColor="#666"
-                android:textColorLink="@color/main_color" />
+               	/>
         </RelativeLayout>
 
         <TextView
@@ -96,8 +95,7 @@
             android:layout_below="@id/user_name"
             android:layout_marginTop="5dip"
             android:focusable="false"
-            android:textColor="#333"
-            android:textColorLink="@color/main_color" />
+            />
     </LinearLayout>
 
 </RelativeLayout>

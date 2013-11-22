@@ -15,6 +15,7 @@ import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.FastJsonRequest;
 import tv.acfun.a63.util.TextViewUtils;
+import tv.acfun.a63.util.Theme;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -123,6 +124,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Theme.onActivityCreate(this,savedInstanceState);
         super.onCreate(savedInstanceState);
         mUser = AcApp.getUser();
         setContentView(R.layout.activity_main);
@@ -1024,10 +1026,10 @@ public class MainActivity extends SherlockFragmentActivity implements
                 View tagHot = convertView.findViewById(R.id.item_tag);
                 if (ArticleApi.isRecommendedArticle(art)) {
                     tagHot.setVisibility(View.VISIBLE);
-                    ((ImageView) tagHot).setImageResource(R.drawable.ic_recommended);
+                    ((ImageView) tagHot).setImageResource(Theme.isNightMode() ? R.drawable.ic_recommended_dark : R.drawable.ic_recommended);
                 } else if (ArticleApi.isHotArticle(art)) {
                     tagHot.setVisibility(View.VISIBLE);
-                    ((ImageView) tagHot).setImageResource(R.drawable.ic_whats_hot);
+                    ((ImageView) tagHot).setImageResource(Theme.isNightMode() ? R.drawable.ic_whats_hot_dark : R.drawable.ic_whats_hot);
                 }
 
                 else

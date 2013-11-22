@@ -33,7 +33,6 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:textSize="12sp"
-	    android:textColor="#666"
 	    android:layout_alignRight="@id/user_name"
 	    />
     <TextView
@@ -43,8 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/user_name"
         android:layout_marginTop="5dip"
-        android:textColorLink="@color/main_color"
         android:focusable="false"
-        android:textColor="@color/text_color_selector" />
+        android:textColor="?attr/commentItemTextColorSelector" />
 
 </RelativeLayout>

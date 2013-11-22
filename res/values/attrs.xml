@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
+    <attr name="rowBackground" format="reference|color"/>
+    <attr name="tabStripBackground" format="reference|color"/>
+    <attr name="tagBackground" format="reference|color"/>
+    <attr name="commentsBarBackgroud" format="reference|color"/>
+    <attr name="commentItemBackground" format="reference|color"/>
+    <attr name="commentItemTextColorSelector" format="reference|color"/>
+    <attr name="requoteBackground" format="reference|color"/>
+    <attr name="commentFloorBackground" format="reference|color"/>
+
 </resources>

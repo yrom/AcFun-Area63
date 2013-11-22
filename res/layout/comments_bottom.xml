@@ -10,7 +10,7 @@
         android:id="@+id/send_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/comments_bar_backgroud"
+        android:background="?attr/commentsBarBackgroud"
         android:gravity="center_vertical"
         android:minHeight="48dp"
         android:orientation="horizontal" >
