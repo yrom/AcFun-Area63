@@ -36,7 +36,7 @@
 		
 		<item name="rowBackground">@drawable/row_backgroud</item>
 		<item name="tabStripBackground">@drawable/background_tabs</item>
-		
+		<item name="tagBackground">@drawable/item_tag_background</item>
     </style>
     
 	<style name="Widget.Styled" parent="Theme.Sherlock">
@@ -80,4 +80,5 @@
         <item name="android:windowEnterAnimation">@anim/activity_open_enter</item>
         <item name="android:windowExitAnimation">@anim/activity_close_exit</item>
     </style>
+    
 </resources>

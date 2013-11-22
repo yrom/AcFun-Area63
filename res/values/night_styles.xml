@@ -36,6 +36,7 @@
 		
 		<item name="rowBackground">@drawable/row_backgroud_night</item>
 		<item name="tabStripBackground">@color/row_bg_color_dark</item>
+		<item name="tagBackground">@drawable/item_tag_background_night</item>
     </style>
     <style name="Widget.Styled.ActionBar.Night" parent="Widget.Sherlock.ActionBar">
         <item name="background">@color/main_color_dark</item>

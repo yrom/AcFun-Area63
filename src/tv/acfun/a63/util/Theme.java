@@ -28,11 +28,15 @@ import android.os.Bundle;
 public class Theme {
     
     public static int getCurrentThemeId(){
-        boolean isNightMode = AcApp.getConfig().getBoolean("is_night_mode", false);
-        return isNightMode? R.style.AppTheme_Night : R.style.AppTheme;
+        return isNightMode()? R.style.AppTheme_Night : R.style.AppTheme;
     }
 
     public static void onActivityCreate(Activity activity, Bundle savedInstanceState) {
         activity.setTheme(getCurrentThemeId());
     }
+    
+    public static boolean isNightMode(){
+        return AcApp.getConfig().getBoolean("is_night_mode", false);
+    }
+    
 }

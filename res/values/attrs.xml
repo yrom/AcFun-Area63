@@ -3,4 +3,6 @@
     
     <attr name="rowBackground" format="reference|color"/>
     <attr name="tabStripBackground" format="reference|color"/>
+    <attr name="tagBackground" format="reference|color"/>
+
 </resources>
