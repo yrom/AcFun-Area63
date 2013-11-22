@@ -421,9 +421,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     addClick(img, src);
                     img.removeAttr("width");
                     img.removeAttr("height");
-                    if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.KITKAT){
-                        img.attr("width", "94%");
-                    }
                 }
             }
         }
@@ -570,11 +567,17 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 if (url == null)
                     return;
                 Log.i(TAG, url + " cached");
-                evaluateJavascript("javascript:(function(){"
-                        + "var images = document.getElementsByTagName(\"img\"); "
-                        + "images["+ values[0] + "].src = images[" + values[0] + "].getAttribute(\"loc\");"
-                        + "})()"
-                        ,null);
+                StringBuilder jsBuilder = new StringBuilder();
+                jsBuilder.append("javascript:(function(){")
+                         .append("var images = document.getElementsByTagName(\"img\"); ")
+                         .append("var img = images[").append(values[0]).append("];")
+                         .append("img.src = img.getAttribute(\"loc\");");
+                         
+                if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.KITKAT){
+                    jsBuilder.append("img.setAttribute(\"width\",\"94%\");");
+                }
+                jsBuilder.append("})()");
+                evaluateJavascript(jsBuilder.toString(),null);
             }
         }
 
