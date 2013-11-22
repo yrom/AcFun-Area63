@@ -396,10 +396,10 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 imgUrls.add(src);
                 img.attr("org", src);
                 String localUri = FileUtil.getLocalFileUri(cache).toString();
-                if (cache.exists() && cache.canRead() && cache.length() > FileUtil._1KB)
+                if (cache.exists() && cache.canRead() && cache.length() > FileUtil._1KB){
                     // set cache
                     img.attr("src", localUri);
-                else if (AcApp.getViewMode() != Constants.MODE_NO_PIC)
+                }else if (AcApp.getViewMode() != Constants.MODE_NO_PIC)
                     img.attr("src", "file:///android_asset/loading.gif");
                 else {
                     // 无图模式
@@ -571,7 +571,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                          .append("img.src = img.getAttribute(\"loc\");");
                          
                 if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.KITKAT){
-                    jsBuilder.append("img.setAttribute(\"width\",\"94%\");");
+                    jsBuilder.append("if(img.src.indexOf(\".gif\")<0)")
+                             .append("img.setAttribute(\"width\",\"94%\");");
                 }
                 jsBuilder.append("})()");
                 evaluateJavascript(jsBuilder.toString(),null);
