@@ -568,13 +568,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 jsBuilder.append("javascript:(function(){")
                          .append("var images = document.getElementsByTagName(\"img\"); ")
                          .append("var img = images[").append(values[0]).append("];")
-                         .append("img.src = img.getAttribute(\"loc\");");
-                         
-                if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.KITKAT){
-                    jsBuilder.append("if(img.src.indexOf(\".gif\")<0)")
-                             .append("img.setAttribute(\"width\",\"94%\");");
-                }
-                jsBuilder.append("})()");
+                         .append("img.src = img.getAttribute(\"loc\");")
+                         .append("})()");
                 evaluateJavascript(jsBuilder.toString(),null);
             }
         }
