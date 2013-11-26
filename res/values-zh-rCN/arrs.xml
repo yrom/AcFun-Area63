@@ -2,10 +2,10 @@
 <resources>
 
     <string-array name="planets">
-        <item>Home</item>
-        <item>Rank</item>
-        <item>Favorites</item>
-        <item>Mentions</item>
+        <item>主页</item>
+        <item>排行榜</item>
+        <item>收藏夹</item>
+        <item>召唤</item>
     </string-array>
     <string-array name="titles">
         <item>综合</item>
@@ -14,16 +14,16 @@
         <item>漫画·轻小说</item>
     </string-array>
     <string-array name="modes">
-        <item>What\'s Hot</item>
-        <item>Latest Commented</item>
-        <item>Recently Published</item>
+        <item>热门文章</item>
+        <item>最新回复</item>
+        <item>最近发布</item>
         <!-- item>本区推荐</item -->
     </string-array>
     <string-array name="title_sizes">
-        <item>Small</item>
-        <item>Normal</item>
-        <item>Large</item>
-        <item>Huge</item>
+        <item>小号</item>
+        <item>中号</item>
+        <item>大号</item>
+        <item>特大</item>
     </string-array>
     <string-array name="value_sizes">
         <item>small</item>
@@ -31,11 +31,11 @@
         <item>large</item>
     </string-array>
     <string-array name="title_interval">
-        <item>15 m</item>
-        <item>30 m</item>
-        <item>60 m</item>
-        <item>2 h</item>
-        <item>6 h</item>
+        <item>15分钟</item>
+        <item>30分钟</item>
+        <item>60分钟</item>
+        <item>2个小时</item>
+        <item>6个小时</item>
     </string-array>
 
     <string-array name="value_interval">

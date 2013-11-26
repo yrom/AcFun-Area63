@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="设置" >
+    android:title="@string/action_settings" >
 
-    <PreferenceCategory android:title="设置" >
+    <PreferenceCategory android:title="@string/action_settings" >
         <Preference
             android:key="@string/key_clear_cache"
-            android:title="清空缓存" />
+            android:title="@string/clear_cache" />
 
         <EditTextPreference
             android:key="@string/key_image_cache"
-            android:title="图片保存路径" />
+            android:title="@string/pic_path" />
 
         <tv.acfun.a63.view.SeekBarPreference
             android:key="@string/key_num_of_floor"
@@ -22,64 +22,65 @@
         
         <Preference
             android:key="@string/key_update"
-            android:title="检查更新" />
+            android:title="@string/update" />
         <SwitchPreference 
             android:key="@string/key_enable_vibrator"
-            android:title="震动反馈"
-            android:summary="滑动返回时的反馈"
+            android:title="@string/vibrator_enable"
+            android:summary="@string/vibrator_back"
             android:defaultValue="true"
             />
         <SwitchPreference 
             android:key="@string/key_enable_night"
-            android:title="夜间模式"
+            android:title="@string/night_mode"
+            android:summary="@string/need_relaunch"
             android:defaultValue="false"
             />
     </PreferenceCategory>
     <PreferenceCategory 
-        android:title="召唤"
+        android:title="@string/mentions"
         >
         <SwitchPreference 
             android:key="@string/key_enable_mention"
-            android:title="启用召唤检查"
+            android:title="@string/mention_enable"
             android:defaultValue="true"
             />
         <SwitchPreference 
             android:key="@string/key_enable_mention_wifi_only"
             android:dependency="@string/key_enable_mention"
-            android:title="仅在WIFI网络下检查"
+            android:title="@string/wifi_only"
             android:defaultValue="true"
             />
         <ListPreference
             android:dependency="@string/key_enable_mention"
             android:key="@string/key_mention_interval"
-            android:title="检查间隔"
+            android:title="@string/mention_interval"
             android:entryValues="@array/value_interval"
             android:entries="@array/title_interval"
             android:defaultValue="15"
             />        
     </PreferenceCategory>
-    <PreferenceCategory android:title="其他" >
+    <PreferenceCategory android:title="@string/others" >
         <Preference
             android:key="@string/key_about"
-            android:title="关于" >
+            android:title="@string/about" >
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/about_url" />
         </Preference>
         <Preference
             android:key="@string/key_rating"
-            android:title="评分！" >
+            android:title="@string/rating" >
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="market://details?id=tv.acfun.a63" />
         </Preference>
         <Preference
             android:key="@string/key_feedback"
-            android:title="反馈" />
+            android:title="@string/feed_back" />
         <Preference
             android:key="@string/key_donate"
-            android:summary="帮我买杯咖啡吧- -"
-            android:title="捐助开发者" >
+            android:summary="@string/buy_me_coffee"
+            android:title="@string/donate" >
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/donate_url" />
