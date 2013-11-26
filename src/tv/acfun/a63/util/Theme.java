@@ -46,15 +46,7 @@ public class Theme {
     public static boolean isNightMode(){
         return AcApp.getConfig().getBoolean("is_night_mode", false);
     }
-    private static boolean isThemeChanged = false;
-    
-    public static void setThemeChanged(){
-        isThemeChanged = true;
-    }
-    
-    public static boolean isThemeChanged(){
-        return isThemeChanged;
-    }
+
     private static Document sDoc,sDocNight;
     public static Document getThemedDoc(Context context) throws IOException{
         if(isNightMode()){

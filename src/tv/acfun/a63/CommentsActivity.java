@@ -299,41 +299,19 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     };
 
     private void requestData(int page, boolean requestNewData) {
-        if (requestNewData) {
-            mTimeOutText.setVisibility(View.GONE);
-            if(mAdapter == null || mAdapter.isEmpty()) 
-                mLoadingBar.setVisibility(View.VISIBLE);
-        }
         isloading = true;
         Request<?> request = new CommentsRequest(aid, page, this, this);
         request.setTag(TAG);
         request.setShouldCache(true);
+        if (requestNewData) {
+            mTimeOutText.setVisibility(View.GONE);
+            if(mAdapter == null || mAdapter.isEmpty()) 
+                mLoadingBar.setVisibility(View.VISIBLE);
+            AcApp.getGloableQueue().getCache().invalidate(request.getCacheKey(), true);
+        }
         AcApp.addRequest(request);
     }
 
-//    OnScrollListener mScrollListener = new OnScrollListener() {
-//
-//        @Override
-//        public void onScrollStateChanged(AbsListView view, int scrollState) {
-//        }
-//
-//        @Override
-//        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-//                int totalItemCount) {
-//            if (view.getLastVisiblePosition() == (view.getCount() - 1) && !isloading) {
-//                if (!hasNextPage || pageIndex + 1 > totalPage) {
-//                    mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
-//                    TextView textview = (TextView) mFootview.findViewById(R.id.list_footview_text);
-//                    textview.setText(R.string.no_more);
-//                } else {
-//                    pageIndex += 1;
-//                    requestData(pageIndex, false);
-//                }
-//            }
-//
-//        }
-//
-//    };
     AnimationListener mHideListener = new BaseAnimationListener() {
 
         @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -466,6 +444,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         if (!validate()) {
             return;
         }
+        mEmotionGrid.setVisibility(View.GONE);
         MobclickAgent.onEvent(this, "post_comment");
         int count = getQuoteCount();
         String comment = getComment();
@@ -510,9 +489,9 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
             mBtnSend.setEnabled(true);
             mCommentText.setText("");
             if (result) {
+                Toast.makeText(getApplicationContext(), getString(R.string.comment_success), Toast.LENGTH_SHORT).show();
                 pageIndex = 1;
                 requestData(pageIndex, true);
-                Toast.makeText(getApplicationContext(), getString(R.string.comment_success), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getApplicationContext(), getString(R.string.comment_failed), Toast.LENGTH_SHORT).show();
             }

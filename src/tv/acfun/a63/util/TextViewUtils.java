@@ -186,6 +186,7 @@ public class TextViewUtils {
      *     &nbsp;
      */
     public static String getSource(String escapedHtml) {
+        if(escapedHtml == null) return "";
         return escapedHtml.replaceAll("&quot;", "\"").replaceAll("&amp;", "&").replaceAll("&lt;", "<")
                 .replaceAll("&gt;", ">").replaceAll("&nbsp;", " ");
     }

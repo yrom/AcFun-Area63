@@ -77,7 +77,7 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
         findPreference(KEY_INTERVAL).setOnPreferenceChangeListener(this);
         findPreference(KEY_MENTION_ENABLE).setOnPreferenceChangeListener(this);
         findPreference(KEY_MENTION_WIFI_ONLY).setOnPreferenceChangeListener(this);
-        findPreference(KEY_NIGHT_MODE).setOnPreferenceChangeListener(this);
+//        findPreference(KEY_NIGHT_MODE).setOnPreferenceChangeListener(this);
     }
 
     private void setCache() {
@@ -139,9 +139,6 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
                 || KEY_MENTION_WIFI_ONLY.equals(preference.getKey())) {
 
             PushService.start(this); // 重启服务
-            return true;
-        } else if(KEY_NIGHT_MODE.equals(preference.getKey())){
-            Theme.setThemeChanged();
             return true;
         }
         return false;

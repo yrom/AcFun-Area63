@@ -130,7 +130,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    Log.i(TAG, "shouldOverrideUrlLoading::"+url);
                     Pattern regex = Pattern.compile("/a/ac(\\d{5,})");
                     Matcher matcher = regex.matcher(url);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -319,6 +318,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
     @Override
     public void onErrorResponse(VolleyError error) {
+        MobclickAgent.onError(this,error.toString());
         setSupportProgressBarIndeterminateVisibility(false);
         showErrorDialog();
     }
@@ -351,7 +351,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 }
 
             } catch (IOException e) {
-                e.printStackTrace();
                 return false;
             }
             return true;
