@@ -321,7 +321,7 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
         String path = mList.get(mCurrentImage);
         Uri uri = Uri.parse(path);
         shareIntent.setType("image/*");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("分享图片，%s - http://www.acfun.tv/a/ac%d",title,aid));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("#Acfun文章区# 分享图片，%s - http://www.acfun.tv/a/ac%d",title,aid));
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         return shareIntent;
     }

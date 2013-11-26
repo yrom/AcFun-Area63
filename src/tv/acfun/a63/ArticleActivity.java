@@ -198,8 +198,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
 
     private Intent createShareIntent() {
-        String shareurl = title + "http://www.acfun.tv/a/ac" + aid;
+        String shareurl = title + " http://www.acfun.tv/a/ac" + aid;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareurl += " ——#Acfun文章区#客户端 http://t.cn/8kLMite";
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "分享");
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareurl);
