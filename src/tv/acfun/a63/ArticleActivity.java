@@ -396,10 +396,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 imgUrls.add(src);
                 img.attr("org", src);
                 String localUri = FileUtil.getLocalFileUri(cache).toString();
-                if (cache.exists() && cache.canRead() && cache.length() > FileUtil._1KB){
-                    // set cache
-                    img.attr("src", localUri);
-                }else if (AcApp.getViewMode() != Constants.MODE_NO_PIC)
+
+                if (AcApp.getViewMode() != Constants.MODE_NO_PIC)
                     img.attr("src", "file:///android_asset/loading.gif");
                 else {
                     // 无图模式
