@@ -64,6 +64,7 @@ public class MentionsAdapter extends BaseAdapter {
             holder.channel = (TextView) convertView.findViewById(R.id.item_tag_channel);
             holder.quotedUser = (TextView) convertView.findViewById(R.id.quoted_user_name);
             holder.comments = (TextView) convertView.findViewById(R.id.comments_content);
+            holder.quoteLayout = (ViewGroup) convertView.findViewById(R.id.quote);
             holder.quotedComments = (TextView) convertView.findViewById(R.id.quoted_comments_content);
             convertView.setTag(holder);
         } else {
@@ -76,14 +77,18 @@ public class MentionsAdapter extends BaseAdapter {
         int quoteId = c.quoteId;
         Comment quote = data.get(quoteId);
         if(quote != null){
+            holder.quoteLayout.setVisibility(View.VISIBLE);
             holder.quotedUser.setText("#" + quote.count + " " + quote.userName);
             TextViewUtils.setCommentContent( holder.quotedComments,quote);
+        }else{
+            holder.quoteLayout.setVisibility(View.GONE);
         }
         return convertView;
     }
 
     static class MentionsHolder {
         TextView contentTitle, channel, user, quotedUser, comments, quotedComments;
+        ViewGroup quoteLayout;
     }
     private Comment getCommentItem(int position){
         try {
