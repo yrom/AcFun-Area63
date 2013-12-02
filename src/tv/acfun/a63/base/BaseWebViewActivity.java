@@ -25,9 +25,11 @@ import tv.acfun.a63.util.Connectivity;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
@@ -40,6 +42,7 @@ import com.actionbarsherlock.view.Window;
 @TargetApi(19)
 public class BaseWebViewActivity extends BaseActivity {
     protected WebView mWeb;
+    private View mProgress;
 
     @Override
     protected final void onCreate(Bundle savedInstanceState) {
@@ -47,17 +50,23 @@ public class BaseWebViewActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
         setContentView(R.layout.activity_article);
+        mProgress = findViewById(R.id.loading);
         mWeb = (WebView) findViewById(R.id.webview);
         mWeb.getSettings().setAllowFileAccess(true);
         mWeb.getSettings().setJavaScriptEnabled(true);
         mWeb.getSettings().setUserAgentString(Connectivity.UA);
         mWeb.getSettings().setUseWideViewPort(true);
         mWeb.getSettings().setLoadWithOverviewMode(true);
+        /*
+         * fixed issues #12
+         * http://stackoverflow.com/questions/9476151/webview-flashing-with-white-background-if-hardware-acceleration-is-enabled-an
+         */
+        if(Build.VERSION.SDK_INT >= 11)
+            mWeb.setBackgroundColor(Color.argb(1, 0, 0, 0));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
         }
         initView(savedInstanceState);
-        mWeb.loadUrl("file:///android_asset/loading.html");
         initData();
     }
 
@@ -89,7 +98,12 @@ public class BaseWebViewActivity extends BaseActivity {
     protected void initData() {
         setSupportProgressBarIndeterminateVisibility(true);
     }
-
+    @Override
+    public void setSupportProgressBarIndeterminateVisibility(boolean visible) {
+        super.setSupportProgressBarIndeterminateVisibility(visible);
+        mProgress.setVisibility(visible?View.VISIBLE:View.GONE);
+        mWeb.setVisibility(visible?View.GONE:View.VISIBLE);
+    }
     /**
      * 
      * @param script
