@@ -23,6 +23,7 @@ public class FileUtil {
         return Uri.fromFile(file);
     }
     public static long getFolderSize(File folder) {
+        if(folder == null) return 0;
         long size = 0;
         File[] files = folder.listFiles();
         for (int i = 0; i < files.length; i++) {
