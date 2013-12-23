@@ -43,6 +43,7 @@
 		<item name="commentItemTextColorSelector">@color/text_color_selector</item>
 		<item name="requoteBackground">@drawable/requote_bg</item>
 		<item name="android:textColorLink">@color/main_color</item>
+		<item name="searchPlateBackground">@drawable/search_bg</item>
     </style>
     
 	<style name="Widget.Styled" parent="Theme.Sherlock">

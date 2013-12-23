@@ -9,5 +9,6 @@
     <attr name="commentItemTextColorSelector" format="reference|color"/>
     <attr name="requoteBackground" format="reference|color"/>
     <attr name="commentFloorBackground" format="reference|color"/>
+    <attr name="searchPlateBackground" format="reference|color"/>
 
 </resources>

@@ -44,6 +44,7 @@
 		<item name="requoteBackground">@drawable/requote_bg_dark</item>
 		<item name="android:textColorLink">@color/main_color_dark</item>
 		<item name="android:textColorPrimary">#dcdcdc</item>
+		<item name="searchPlateBackground">@drawable/comments_bar_backgroud_dark</item>
     </style>
     <style name="Widget.Styled.ActionBar.Night" parent="Widget.Sherlock.ActionBar">
         <item name="background">@color/main_color_dark</item>
