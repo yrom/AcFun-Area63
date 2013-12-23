@@ -489,7 +489,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     break;
                 }
                 File cache = imageCaches.get(imgUrls.indexOf(url));
-                Log.i(TAG, "cache file = "+cache.getAbsolutePath());
+                Log.d(TAG, "cache file = "+cache.getAbsolutePath());
                 if (cache.exists() && cache.canRead()) {
                     publishProgress(index);
                     continue;
@@ -561,7 +561,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 String url = imgUrls.get(values[0]);
                 if (url == null)
                     return;
-                Log.i(TAG, url + " cached");
+                Log.d(TAG, url + " cached");
                 StringBuilder jsBuilder = new StringBuilder();
                 jsBuilder.append("javascript:(function(){")
                          .append("var images = document.getElementsByTagName(\"img\"); ")
