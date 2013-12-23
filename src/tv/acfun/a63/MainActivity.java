@@ -698,7 +698,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-            if(actionId == EditorInfo.IME_ACTION_SEARCH){
+            if(actionId == EditorInfo.IME_ACTION_SEARCH 
+                    || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
                 startSearch(v.getText().toString(),1);
             }
             return false;
