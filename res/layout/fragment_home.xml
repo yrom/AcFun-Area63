@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical" xmlns:app="http://schemas.android.com/apk/res/tv.acfun.a63">
 
-    <com.astuetz.viewpager.extensions.PagerSlidingTabStrip
+    <com.astuetz.PagerSlidingTabStrip
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="48dip"
         android:textSize="14sp"
-        app:indicatorColor="@color/main_color"
+        app:pstsIndicatorColor="@color/main_color"
         android:textColor="?android:attr/textColorPrimary"
         android:background="?attr/tabStripBackground" />
 
