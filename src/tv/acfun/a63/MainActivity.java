@@ -183,7 +183,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 GravityCompat.START);
         mDrawerLayout.setScrimColor(Color.argb(100, 0, 0, 0));
         int[] iconIds = { R.drawable.ic_home,
-                 R.drawable.ic_hot, R.drawable.ic_heart,  R.drawable.ic_at};
+                 R.drawable.ic_hot, R.drawable.ic_heart,  R.drawable.ic_at, R.drawable.ic_action_search};
         // set up the drawer's list view with items and click listener
         mDrawerList.setAdapter(new NavigationAdapter(mPlanetTitles, iconIds));
         mDrawerList.setOnItemClickListener(this);
@@ -296,7 +296,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         }else if(position == 2){
             MobclickAgent.onEvent(this, "fav");
             f = new FavListFragment();
-        }
+        }// TODO: search fragment
         f.setArguments(args);
         mFragments.set(position,f);
         return f;
@@ -1114,7 +1114,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int position,
             long arg3) {
-        if(position == arg0.getCount() -1){
+        if(position == arg0.getCount() -2){
             MentionActivity.start(this);
             mDrawerList.setItemChecked(mCurrentNavPosition, true);
             return;

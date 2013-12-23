@@ -6,6 +6,7 @@
         <item>Rank</item>
         <item>Favorites</item>
         <item>Mentions</item>
+        <item>Search</item>
     </string-array>
     <string-array name="titles">
         <item>综合</item>

@@ -6,6 +6,7 @@
         <item>排行榜</item>
         <item>收藏夹</item>
         <item>召唤</item>
+        <item>搜索</item>
     </string-array>
     <string-array name="titles">
         <item>综合</item>
