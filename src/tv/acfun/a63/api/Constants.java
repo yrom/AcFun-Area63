@@ -18,6 +18,7 @@ public interface Constants {
      */
     String URL_FOLLOWER = URL_HOME + "api/friend.aspx?name=getFollowedList&pageNo=%d&pageSize=20";
     String URL_MENTIONS = URL_HOME +"api/member.aspx?name=mentions&pageNo=%d&pageSize=%d";
+    String URL_SEARCH = URL_HOME + "api/search.aspx?query=%s&exact=1&channelIds=63&orderId=%d&orderBy=%d&pageNo=%d&pageSize=%d";
     int CAT_ARTICLE = 63;
     int CAT_COLLECTION = 110;
     int CAT_WORK_EMOTION = 73;

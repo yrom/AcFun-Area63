@@ -1,6 +1,9 @@
 
 package tv.acfun.a63.api;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import tv.acfun.a63.AcApp;
@@ -158,15 +161,37 @@ public final class ArticleApi {
         channels.put(Constants.id.ARTICLE.COLLECTION, "综合");
         channels.put(Constants.id.ARTICLE.WORK_EMOTION, "工作·情感");
         channels.put(Constants.id.ARTICLE.AN_CULTURE, "动漫文化");
-        channels.put(Constants.id.ARTICLE.COMIC_LIGHT_NOVEL, "漫画·轻小说");
+        channels.put(Constants.id.ARTICLE.COMIC_LIGHT_NOVEL, "漫画·小说");
     }
     public static String getChannelName(int channelId){
         return channels.get(channelId);
     }
+    
     /**
      * http://www.acfun.tv/api/member.aspx?name=mentions&pageNo=1&pageSize=10
      */
     public static String getMentionsUrl(int size, int page) {
         return String.format(Constants.URL_MENTIONS, page, size);
     }
+    
+    /**
+     * @param query key word
+     * @param orderId 相关、日期、点击、评论、收藏，0~4
+     * @param orderBy 按标题标签、用户、内容简介查找，1~3
+     * @param pageNo 
+     * @param pageSize http://www.acfun.tv/api/search.aspx?query={query}&exact=1&channelIds=63&orderId=2&orderBy=1&pageNo=1&pageSize=10&_=1387786184949
+     * @return
+     */
+    public static String getSearchUrl(String query, int orderId, int orderBy, int pageNo, int pageSize){
+        String url = null;
+        try {
+            String key = URLEncoder.encode(query, "UTF-8");
+            String format = Constants.URL_SEARCH; 
+            url = String.format(format, key,orderId,orderBy,pageNo,pageSize);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+    
 }
