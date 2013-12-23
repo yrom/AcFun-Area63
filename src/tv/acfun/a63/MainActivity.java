@@ -30,18 +30,25 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -49,6 +56,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
@@ -89,37 +97,21 @@ import com.umeng.update.UmengUpdateAgent;
 public class MainActivity extends SherlockFragmentActivity implements
         OnItemClickListener, OnNavigationListener, OnClickListener {
     private static final String TAG = "MainActivity";
-
     private static String[] mPlanetTitles;
-
     private DrawerLayout mDrawerLayout;
-
     private ListView mDrawerList;
-
     private ActionBarDrawerToggle mDrawerToggle;
-
     private CharSequence mTitle;
-
     private String[] mTitles;
-
     private ActionBar mBar;
-
     private View mDrawer;
-
     private View mAvatarFrame;
-
     private int mCurrentNavPosition;
-
     private static RequestQueue mQueue;
-
     private ImageView avatar;
-
     private TextView nameText;
-
     private TextView signatureText;
-
     private User mUser;
-
     private Fragment mContentFragment;
 
     @Override
@@ -282,21 +274,31 @@ public class MainActivity extends SherlockFragmentActivity implements
             mFragments.add(null);
         }
         Bundle args = new Bundle();
-        if(position == 0){
-            MobclickAgent.onEvent(this, "main");
-            f = new HomeFragment();
-            args.putInt(HomeFragment.ARG_PLANET_NUMBER, position);
-            args.putStringArray(HomeFragment.ARG_TITLES, mTitles);
-        }else if( position == 1){
+        switch (position) {
+        case 1:
             MobclickAgent.onEvent(this, "rank");
             f = new RankListFragment();
             args.putInt(RankListFragment.ARG_LIST_MODE, 3);
             args.putInt(RankListFragment.ARG_SECTION_NUMBER, 4);
             f.setHasOptionsMenu(false);
-        }else if(position == 2){
+            break;
+        case 2:
             MobclickAgent.onEvent(this, "fav");
             f = new FavListFragment();
-        }// TODO: search fragment
+            break;
+        case 4:
+            MobclickAgent.onEvent(this, "search");
+            f = new SearchFragment();
+            break;
+        case 0:
+        default:
+            MobclickAgent.onEvent(this, "main");
+            f = new HomeFragment();
+            args.putInt(HomeFragment.ARG_PLANET_NUMBER, position);
+            args.putStringArray(HomeFragment.ARG_TITLES, mTitles);
+            break;
+        }
+
         f.setArguments(args);
         mFragments.set(position,f);
         return f;
@@ -638,6 +640,116 @@ public class MainActivity extends SherlockFragmentActivity implements
             
         }
     }
+    /**
+     * 搜索
+     */
+    public static class SearchFragment extends Fragment implements OnClickListener, OnEditorActionListener, 
+            OnScrollListener,OnItemClickListener {
+        private View mBtnClear;
+        private EditText mSearchText;
+        private View mProgress;
+        private ListView mResultList;
+        private LayoutInflater mInflater;
+        private ArticleListAdapter mAdapter;
+        
+        private TextWatcher watcher = new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+                    mBtnClear.setVisibility(View.VISIBLE);
+                } else {
+                    mBtnClear.setVisibility(View.GONE);
+                    mProgress.setVisibility(View.GONE);
+                }
+                mResultList.setVisibility(View.GONE);
+                if(mAdapter != null && mAdapter.contents != null)
+                    mAdapter.contents.clear();
+            }
+        };
+        protected int mPage;
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            this.mInflater = inflater;
+            return inflater.inflate(R.layout.fragment_search, container,false);
+        }
+        @Override
+        public void onViewCreated(View view, Bundle savedInstanceState) {
+            mBtnClear = view.findViewById(R.id.btn_search_clear);
+            mBtnClear.setOnClickListener(this);
+            mSearchText = (EditText) view.findViewById(R.id.search_text);
+            mSearchText.addTextChangedListener(watcher);
+            mSearchText.setOnEditorActionListener(this);
+            mProgress = view.findViewById(R.id.search_plate_progress);
+            mResultList = (ListView) view.findViewById(android.R.id.list);
+            mResultList.setOnScrollListener(this);
+            mResultList.setOnItemClickListener(this);
+        }
+        @Override
+        public void onClick(View v) {
+            if(v == mBtnClear){
+                mSearchText.setText("");
+            }
+        }
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            if(actionId == EditorInfo.IME_ACTION_SEARCH){
+                startSearch(v.getText().toString(),1);
+            }
+            return false;
+        }
+        private int mTotalCount;
+        Listener<Contents> listener = new Listener<Contents>() {
+            @Override
+            public void onResponse(Contents response) {
+                mResultList.setVisibility(View.VISIBLE);
+                if(mAdapter == null){
+                    mAdapter = new ArticleListAdapter(mInflater,response.getContents(),0);
+                }
+                if(mPage <= 1){
+                    mAdapter.contents = response.getContents();
+                    mResultList.setAdapter(mAdapter);
+                }else{
+                    mAdapter.addData(response.getContents());
+                }
+                mProgress.setVisibility(View.GONE);
+                mAdapter.notifyDataSetChanged();
+                mTotalCount = response.totalcount;
+                
+            }};
+        ErrorListener errorListner;
+        private boolean mLastItemVisible;
+        private void startSearch(String query, int page) {
+            mProgress.setVisibility(View.VISIBLE);
+            mPage = page;
+            String url = ArticleApi.getSearchUrl(query, 2, 1, mPage, 20);
+            if (BuildConfig.DEBUG) Log.d(TAG, "query url=" + url);
+            Request<?> request = new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
+            AcApp.addRequest(request);
+        }
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && mLastItemVisible) {
+                startSearch(mSearchText.getText().toString(),mPage+1);
+            }
+        }
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            mLastItemVisible = (totalItemCount > 0)
+                    && (firstVisibleItem + visibleItemCount >= totalItemCount - 1)
+                    && totalItemCount < mTotalCount;
+        }
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            startViewArticle(parent, position);
+            
+        }
+    }
     
     /**
      * 排行榜
@@ -954,11 +1066,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Object obj = parent.getItemAtPosition(position);
-            if(obj != null && obj instanceof Content){
-                Content c = (Content)obj;
-                ArticleActivity.start(getActivity(), c.aid,c.title);
-            }
+            startViewArticle(parent, position);
+        }
+
+    }
+    private static void startViewArticle(AdapterView<?> list, int position) {
+        Object obj = list.getItemAtPosition(position);
+        if(obj != null && obj instanceof Content){
+            Content c = (Content)obj;
+            ArticleActivity.start(list.getContext(), c.aid,c.title);
         }
     }
     static class ArticleListAdapter extends BaseAdapter {
@@ -1138,11 +1254,6 @@ public class MainActivity extends SherlockFragmentActivity implements
                     SigninActivity.createIntent(getApplicationContext()),
                     SigninActivity.REQUEST_SIGN_IN);
         }
-//        else if(v.getId() == R.id.signout || v.getId() == R.id.avatar && mUser != null){
-//            AcApp.logout();
-//            invalidateAvatarFrame();
-//            AcApp.showToast("注销");
-//        }
 
     }
 

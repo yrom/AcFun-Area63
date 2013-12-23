@@ -121,7 +121,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             throw new IllegalArgumentException("没有 id");
         } else {
             getSupportActionBar().setTitle("ac" + aid);
-            MobclickAgent.onEvent(this, "view_article","ac"+aid);
+            MobclickAgent.onEvent(this, "view_article");
             db = new DB(this);
             isFaved = db.isFav(aid); 
             mWeb.getSettings().setAppCachePath(ARTICLE_PATH);

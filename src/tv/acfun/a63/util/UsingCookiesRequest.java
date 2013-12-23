@@ -45,6 +45,7 @@ public abstract class UsingCookiesRequest<T> extends CustomUARequest<T> {
     @Override
     public Map<String, String> getHeaders() {
         Map<String, String> headers = super.getHeaders();
+        if(mCookies ==null) return headers;
         
         StringBuilder builder = new StringBuilder();
         for(int i=0;i<mCookies.length;i++){

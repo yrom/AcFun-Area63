@@ -24,6 +24,10 @@ import java.util.List;
  *
  */
 public class Contents {
+    public int totalpage;
+    
+    public int totalcount;
+    
     private List<Content> contents;
 
     public List<Content> getContents() {

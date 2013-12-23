@@ -75,4 +75,5 @@
     <string name="mention_interval">Interval</string>
     <string name="vibrator_enable">Vibration feedback</string>
     <string name="vibrator_back">Vibration on Swiping Back</string>
+    <string name="search_hint">Keywords</string>
 </resources>
