@@ -273,7 +273,10 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         }
         
         private Cache.Entry cache(NetworkResponse response){
+            if(shouldCache())
+                return Connectivity.newCache(response,15*60);
             return Connectivity.newCache(response,120);
+            
         }
     }
     public static void start(Context context) {

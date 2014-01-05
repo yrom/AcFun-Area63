@@ -117,25 +117,22 @@ public class PushService extends Service {
                 canRefresh = Connectivity.isWifiConnected(context);
             else
                 canRefresh = Connectivity.isNetworkAvailable(context);
-            if(canRefresh)
+            
+            if(canRefresh && ACTION_REFRESH.equals(intent.getAction()))
                 try {
-                    if (ACTION_REFRESH.equals(intent.getAction())) {
-                        if(BuildConfig.DEBUG)
-                            Log.i("RefreshReceiver", "request refresh");
-                        Cookie[] cookies = JSON.parseObject(AcApp.getUser().cookies, Cookie[].class);
-                        MentionsRequest mentionsRequest = new MentionActivity.MentionsRequest(1,
-                                cookies, mListener, mError);
-                        // 缓存，使从消息栏打开 Activity 后可以直接读取
-                        mentionsRequest.setShouldCache(true);
-                        byte[] data = AcApp.getDataInDiskCache(mentionsRequest.getCacheKey());
-                        if (data != null) {
-                            String json = new String(data, Charset.defaultCharset());
-                            JSONObject parseObject = JSON.parseObject(json);
-                            Mentions comments = JSON.toJavaObject(parseObject, Mentions.class);
-                            lastTotalCount = comments.totalCount;
-                        }
-                        AcApp.addRequest(mentionsRequest);
+                    if (BuildConfig.DEBUG) Log.i("RefreshReceiver", "request refresh");
+                    Cookie[] cookies = JSON.parseObject(AcApp.getUser().cookies, Cookie[].class);
+                    MentionsRequest mentionsRequest = new MentionActivity.MentionsRequest(1, cookies, mListener, mError);
+                    // 缓存，使从消息栏打开 Activity 后可以直接读取
+                    mentionsRequest.setShouldCache(true);
+                    byte[] data = AcApp.getDataInDiskCache(mentionsRequest.getCacheKey());
+                    if (data != null) {
+                        String json = new String(data, Charset.defaultCharset());
+                        JSONObject parseObject = JSON.parseObject(json);
+                        Mentions comments = JSON.toJavaObject(parseObject, Mentions.class);
+                        lastTotalCount = comments.totalCount;
                     }
+                    AcApp.addRequest(mentionsRequest);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -150,7 +147,9 @@ public class PushService extends Service {
 
         @Override
         public void onResponse(Mentions response) {
-            boolean needNotify = response.totalCount >0 && lastTotalCount < response.totalCount ;
+            boolean needNotify = response.totalCount >0 
+                    && lastTotalCount > 0   // 可能被回收了，所以被重置为0，因避免
+                    && lastTotalCount < response.totalCount ;
             if(BuildConfig.DEBUG)
                 needNotify = true;
             if (needNotify) {
