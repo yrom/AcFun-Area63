@@ -15,6 +15,7 @@
  */
 package tv.acfun.a63.api.entity;
 
+import tv.acfun.a63.AcApp;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -23,6 +24,10 @@ public class User implements Parcelable{
     public String name;
     public String avatar;
     public String signature;
+    public long savedTime;
+    public boolean isExpired(){
+        return System.currentTimeMillis() - savedTime >= 14 * AcApp._24_hour;
+    }
     public User(){}
     public User(int id, String name, String avatar, String signature) {
         this.id = id;
@@ -36,6 +41,7 @@ public class User implements Parcelable{
         avatar = in.readString();
         signature = in.readString();
         cookies = in.readString();
+        savedTime = in.readLong();
     }
     @Override
     public int describeContents() {
@@ -48,6 +54,7 @@ public class User implements Parcelable{
         dest.writeString(avatar);
         dest.writeString(signature);
         dest.writeString(cookies);
+        dest.writeLong(savedTime);
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {

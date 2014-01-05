@@ -16,6 +16,8 @@ import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.FastJsonRequest;
 import tv.acfun.a63.util.TextViewUtils;
 import tv.acfun.a63.util.Theme;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -227,6 +229,17 @@ public class MainActivity extends SherlockFragmentActivity implements
                 nameText.setLayoutParams(params);
                 signatureText.setText(mUser.signature);
                 signatureText.setVisibility(View.VISIBLE);
+            }
+            if(mUser.isExpired()){
+                new AlertDialog.Builder(this)
+                .setTitle("您的账户已过期！")
+                .setMessage("过期后会出现无法评论、签到等问题，请注销后重新登录！")
+                .setPositiveButton("好", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
             }
         }
     }
@@ -1267,6 +1280,9 @@ public class MainActivity extends SherlockFragmentActivity implements
         mAvatarFrame = getLayoutInflater().inflate(R.layout.avatar_frame, (LinearLayout)mDrawer,false);
         mAvatarFrame.setOnClickListener(this);
         ((LinearLayout)mDrawer).addView(mAvatarFrame, 0);
+        avatar = (ImageView) mAvatarFrame.findViewById(R.id.avatar);
+        nameText = (TextView) mAvatarFrame.findViewById(R.id.user_name);
+        signatureText = (TextView) mAvatarFrame.findViewById(R.id.signature);
     }
 
     @Override

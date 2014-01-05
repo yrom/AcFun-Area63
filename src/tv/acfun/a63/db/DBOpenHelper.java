@@ -19,6 +19,7 @@ package tv.acfun.a63.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * @author Yrom
@@ -26,7 +27,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "ac.db";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
     public static final String TABLE_USER = "user";
     public static final String TABLE_FAV = "fav";
     public DBOpenHelper(Context context) {
@@ -38,7 +39,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE "+TABLE_USER+" (_id INTEGER PRIMARY KEY AUTOINCREMENT,uid INTEGER,name VARCHAR(25),avatar TEXT,signature TEXT,cookies TEXT)");
+        db.execSQL("CREATE TABLE "+TABLE_USER+" (_id INTEGER PRIMARY KEY AUTOINCREMENT,uid INTEGER,name VARCHAR(25),avatar TEXT,signature TEXT,cookies TEXT,time INTEGER)");
         db.execSQL("CREATE TABLE "+TABLE_FAV+" (_id INTEGER PRIMARY KEY AUTOINCREMENT,aid INTEGER,title VARCHAR(200),description TEXT, channelId INTEGER, stows INTEGER, time INTEGER)");
     }
 
@@ -47,8 +48,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO Auto-generated method stub
-
+        Log.d("DB", "onUpgrade::oldVersion="+oldVersion+",newVersion="+newVersion);
+        db.execSQL("ALTER TABLE "+ TABLE_USER +" ADD time INTEGER");
     }
 
 }

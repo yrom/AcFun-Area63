@@ -43,8 +43,8 @@ public final class DB {
     }
     public void saveUser(User user){
         SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL("INSERT INTO "+DBOpenHelper.TABLE_USER + " (uid, name, avatar, signature, cookies) VALUES(?,?,?,?,?)",
-                new Object[] { user.id, user.name, user.avatar,user.signature, user.cookies});
+        db.execSQL("INSERT INTO "+DBOpenHelper.TABLE_USER + " (uid, name, avatar, signature, cookies, time) VALUES(?,?,?,?,?,?)",
+                new Object[] { user.id, user.name, user.avatar,user.signature, user.cookies, user.savedTime});
         db.close();
     }
     
@@ -59,6 +59,7 @@ public final class DB {
             user.avatar = query.getString(query.getColumnIndex("avatar"));
             user.signature = query.getString(query.getColumnIndex("signature"));
             user.cookies = query.getString(query.getColumnIndex("cookies"));
+            user.savedTime = query.getLong(query.getColumnIndex("time"));
         }
         query.close();
         db.close();

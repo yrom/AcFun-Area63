@@ -99,7 +99,9 @@ public class SigninActivity extends BaseActivity {
                 HashMap<String, Object> map = MemberUtils.login(mNameView.getText().toString(), mPwdView.getText().toString());
                 if((Boolean)map.get("success")){
                     user = (User) map.get("user");
+                    user.savedTime = System.currentTimeMillis();
                     new DB(getApplicationContext()).saveUser(user);
+                    
                     return true;
                 }else{
                     response ="错误: "+map.get("result").toString();

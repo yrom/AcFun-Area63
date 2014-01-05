@@ -60,6 +60,7 @@
         <activity
             android:name=".CommentsActivity"
             android:screenOrientation="user"
+            android:exported="true"
             android:configChanges="screenSize|orientation"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
         <activity android:name=".ConversationActivity" />
@@ -69,7 +70,7 @@
             android:value="523706eb56240b0db70293fe" />
         <meta-data
             android:name="UMENG_CHANNEL"
-            android:value="GooglePlay" />
+            android:value="XiaoMi" />
 		<service android:name="tv.acfun.a63.service.PushService"/>
         <service
             android:name="com.umeng.common.net.DownloadingService"
