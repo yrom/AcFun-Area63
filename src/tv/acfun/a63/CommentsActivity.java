@@ -41,6 +41,8 @@ import tv.acfun.a63.view.EmotionView;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -69,6 +71,7 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -105,7 +108,7 @@ import com.umeng.analytics.MobclickAgent;
  * 
  */
 public class CommentsActivity extends BaseActivity implements OnClickListener,
-         Listener<Comments>, ErrorListener, OnItemClickListener {
+         Listener<Comments>, ErrorListener, OnItemClickListener, OnItemLongClickListener {
 
     private static final String TAG = "Comments";
     private int aid;
@@ -188,6 +191,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         mList.addFooterView(mFootview);
         mList.setFooterDividersEnabled(false);
         mList.setOnItemClickListener(this);
+        mList.setOnItemLongClickListener(this);
         mList.setOnTouchListener(new OnTouchListener() {
             private int mMotionY;
 
@@ -746,5 +750,18 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     protected void onPause() {
         super.onPause();
         MobclickAgent.onPause(this);
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        // TODO Auto-generated method stub
+        Object o = parent.getItemAtPosition(position);
+        if(o == null || !(o instanceof Comment)) return false;
+        Comment c = (Comment)o;
+        ClipboardManager ma = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData text = ClipData.newHtmlText(c.userName, c.content, c.content);
+        ma.setPrimaryClip(text);
+        Toast.makeText(this, "#"+c.count+"的内容已复制", 0).show();
+        return true;
     }
 }
