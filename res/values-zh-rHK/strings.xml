@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Ac文章區</string>
+    <string name="app_name_open">AcFun - 文章區</string>
+    <string name="action_settings">設置</string>
+    <string name="action_view_mode">閱讀模式</string>
+    <string name="action_search">搜索</string>
+    <string name="view_mode_mix">圖文</string>
+    <string name="view_mode_no_image">無圖</string>
+    <string name="view_mode_comic">漫畫</string>
+    <string name="user_name">用戶名</string>
+    <string name="signin">登錄</string>
+    <string name="password">密碼</string>
+    <string name="time_out">獲取超時，點擊重試！ </string>
+    <string name="loading">加載下一頁…</string>
+    <string name="hide_requote">重複引用已隱藏</string>
+    <string name="no_more">(=ﾟωﾟ)= 已經沒有啦</string>
+    <string name="reloading">點我重新加載…</string>
+    <string name="no_comment_yet">沙發也許還在…</string>
+    <string name="post_comment">快速回复</string>
+    <string name="action_bar_share">分享</string>
+    <string name="action_bar_fov">收藏</string>
+    <string name="action_bar_comment">評論</string>
+    <string name="action_bar_save">保存到圖片文件夾</string>
+    <string name="pull_to_retry">加載失敗，下拉重試</string>
+    <string name="comment_hint">不吐嘈不舒服斯基</string>
+    <string name="sign_in_first">請先登錄</string>
+    <string name="no_comment">評論不能為空哦</string>
+    <string name="comment_not_enough">吐槽得不夠啊</string>
+    <string name="comment_font_size">評論文字大小</string>
+    <string name="font_size">文字大小</string>
+    <string name="comment_success">提交成功!</string>
+    <string name="comment_failed">提交失敗!</string>
+    <string name="posting_comment">提交中…</string>
+    <string name="no_desc">無簡介…</string>
+    <string name="new_replay">有新的回复</string>
+    <string name="mentions">提到我的</string>
+    <string name="no_data_need_retry">加載失敗，可能還沒下載到數據，請重試</string>
+    <string name="save_success">保存成功</string>
+    <string name="save_failed">保存失敗！請稍後重試</string>
+    <string name="pofile">個人信息</string>
+    <string name="check_in_success">簽到成功</string>
+    <string name="check_in_failed">簽到失敗：</string>
+    <string name="retry_pls">請重試</string>
+    <string name="need_relaunch">需重啟應用才有效（￣艸￣)</string>
+    <string name="clear_cache">清空緩存</string>
+    <string name="night_mode">夜間模式</string>
+    <string name="buy_me_coffee">幫我買杯咖啡吧- -</string>
+    <string name="donate">捐助開發者</string>
+    <string name="others">其他</string>
+    <string name="about">關於</string>
+    <string name="wifi_only">僅在WIFI網絡下檢查</string>
+    <string name="rating">評分！ </string>
+    <string name="feed_back">反饋</string>
+    <string name="pic_path">圖片保存路徑</string>
+    <string name="update">檢查更新</string>
+    <string name="mention_enable">啟用召喚檢查</string>
+    <string name="mention_interval">檢查間隔</string>
+    <string name="vibrator_enable">震動反饋</string>
+    <string name="vibrator_back">滑動返回時的反饋</string>
+    <string name="search_hint">輸入關鍵詞</string>
+
+</resources>

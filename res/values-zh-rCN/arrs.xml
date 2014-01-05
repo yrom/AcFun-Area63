@@ -12,7 +12,7 @@
         <item>综合</item>
         <item>工作·情感</item>
         <item>动漫文化</item>
-        <item>漫画·轻小说</item>
+        <item>漫画·小说</item>
     </string-array>
     <string-array name="modes">
         <item>热门文章</item>
@@ -26,25 +26,12 @@
         <item>大号</item>
         <item>特大</item>
     </string-array>
-    <string-array name="value_sizes">
-        <item>small</item>
-        <item>medium</item>
-        <item>large</item>
-    </string-array>
     <string-array name="title_interval">
         <item>15分钟</item>
         <item>30分钟</item>
         <item>60分钟</item>
         <item>2个小时</item>
         <item>6个小时</item>
-    </string-array>
-
-    <string-array name="value_interval">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>120</item>
-        <item>360</item>
     </string-array>
 
 </resources>

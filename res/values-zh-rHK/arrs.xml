@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="planets">
+        <item>主頁</item>
+        <item>排行榜</item>
+        <item>收藏夾</item>
+        <item>召喚</item>
+        <item>搜索</item>
+    </string-array>
+    <string-array name="titles">
+        <item>綜合</item>
+        <item>工作·情感</item>
+        <item>動漫文化</item>
+        <item>漫畫·小說</item>
+    </string-array>
+    <string-array name="modes">
+        <item>熱門文章</item>
+        <item>最新回复</item>
+        <item>最近發布</item>
+        <!-- item>本區推薦</item -->
+    </string-array>
+    <string-array name="title_sizes">
+        <item>小號</item>
+        <item>中號</item>
+        <item>大號</item>
+        <item>特大</item>
+    </string-array>
+    <string-array name="title_interval">
+        <item>15分鐘</item>
+        <item>30分鐘</item>
+        <item>60分鐘</item>
+        <item>2個小時</item>
+        <item>6個小時</item>
+    </string-array>
+
+</resources>
