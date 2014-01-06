@@ -205,6 +205,7 @@ public class FileUtil {
     }
     
     public static boolean deleteFiles(File file){
+        if(file == null) return false;
         if(file.isFile()) return file.delete();
         else{
             String[] progArray = new String[]{"rm","-r",file.getAbsolutePath()};
