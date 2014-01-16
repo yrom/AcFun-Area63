@@ -42,7 +42,7 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
-import android.content.ClipboardManager;
+import android.text.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -762,7 +762,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         ClipboardManager ma = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
             ClipData text = ClipData.newHtmlText(c.userName, c.content, c.content);
-            ma.setPrimaryClip(text);
+            ((android.content.ClipboardManager) ma).setPrimaryClip(text);
         }else{
             ma.setText(c.content);
         }
