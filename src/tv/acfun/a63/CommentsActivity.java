@@ -752,15 +752,20 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         MobclickAgent.onPause(this);
     }
 
+    @SuppressWarnings("deprecation")
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        // TODO Auto-generated method stub
         Object o = parent.getItemAtPosition(position);
         if(o == null || !(o instanceof Comment)) return false;
         Comment c = (Comment)o;
         ClipboardManager ma = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        ClipData text = ClipData.newHtmlText(c.userName, c.content, c.content);
-        ma.setPrimaryClip(text);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            ClipData text = ClipData.newHtmlText(c.userName, c.content, c.content);
+            ma.setPrimaryClip(text);
+        }else{
+            ma.setText(c.content);
+        }
         Toast.makeText(this, "#"+c.count+"的内容已复制", 0).show();
         return true;
     }
