@@ -98,6 +98,7 @@ import com.umeng.update.UmengUpdateAgent;
 
 public class MainActivity extends SherlockFragmentActivity implements
         OnItemClickListener, OnNavigationListener, OnClickListener {
+    private static final String KEY_CURRENT_ITEM = "current_item";
     private static final String TAG = "MainActivity";
     private static String[] mPlanetTitles;
     private DrawerLayout mDrawerLayout;
@@ -168,7 +169,6 @@ public class MainActivity extends SherlockFragmentActivity implements
         signatureText = (TextView) mAvatarFrame.findViewById(R.id.signature);
         setUserInfo();
         
-        
         mDrawerList = (ListView) findViewById(R.id.list);
 
         // set a custom shadow that overlays the main content when the drawer
@@ -209,15 +209,24 @@ public class MainActivity extends SherlockFragmentActivity implements
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mTitles = getResources().getStringArray(R.array.titles);
         mFragments = new ArrayList<Fragment>(mTitles.length);
+        int position = 0;
         if (savedInstanceState == null) {
-            selectItem(0);
+            selectItem(position);
+        }else{
+            position = savedInstanceState.getInt(KEY_CURRENT_ITEM, 0);
         }
+        if(position == 0)
+            setActionbarNavigation();
         if (AcApp.getConfig().getBoolean("is_first_open", true)) {
             mDrawerLayout.openDrawer(mDrawer);
             AcApp.putBoolean("is_first_open", false);
         }
     }
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_CURRENT_ITEM, mCurrentNavPosition);
+    }
     private void setUserInfo() {
         if(mUser != null){
             AcApp.getGloableLoader().get(mUser.avatar, ImageLoader.getImageListener(avatar, R.drawable.account_avatar, R.drawable.account_avatar));
@@ -317,32 +326,6 @@ public class MainActivity extends SherlockFragmentActivity implements
         return f;
     }
     private void selectItem(int position) {
-        if (position == 0) {
-            mBar.setDisplayShowTitleEnabled(false);
-            mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-            if(mNavAdapter == null){
-                mNavAdapter = new ArrayAdapter<String>(
-                        mBar.getThemedContext(), R.layout.list_item_2,
-                        android.R.id.text2, getResources().getStringArray(
-                                R.array.modes)) {
-    
-                    @Override
-                    public View getView(int position, View convertView,
-                            ViewGroup parent) {
-                        View view = super.getView(position, convertView, parent);
-                        TextView text = (TextView) view
-                                .findViewById(android.R.id.text1);
-                        text.setText(mPlanetTitles[0]);
-                        return view;
-                    }
-    
-                };
-                mNavAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-            }
-            mBar.setListNavigationCallbacks(mNavAdapter, this);
-            mBar.setSelectedNavigationItem(AcApp.getConfig().getInt("nav_item", 0));
-        }
-        
         Fragment f = getFragment(position);
         switchContent(mContentFragment, f);
         // update selected item and title, then close the drawer
@@ -350,6 +333,32 @@ public class MainActivity extends SherlockFragmentActivity implements
         setTitle(mPlanetTitles[position]);
         mDrawerLayout.closeDrawer(mDrawer);
         mCurrentNavPosition = position;
+    }
+
+    private void setActionbarNavigation() {
+        mBar.setDisplayShowTitleEnabled(false);
+        mBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        if(mNavAdapter == null){
+            mNavAdapter = new ArrayAdapter<String>(
+                    mBar.getThemedContext(), R.layout.list_item_2,
+                    android.R.id.text2, getResources().getStringArray(
+                            R.array.modes)) {
+   
+                @Override
+                public View getView(int position, View convertView,
+                        ViewGroup parent) {
+                    View view = super.getView(position, convertView, parent);
+                    TextView text = (TextView) view
+                            .findViewById(android.R.id.text1);
+                    text.setText(mPlanetTitles[0]);
+                    return view;
+                }
+   
+            };
+            mNavAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        }
+        mBar.setListNavigationCallbacks(mNavAdapter, this);
+        mBar.setSelectedNavigationItem(AcApp.getConfig().getInt("nav_item", 0));
     }
 
     /* Called whenever we call invalidateOptionsMenu() */
@@ -476,6 +485,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         private SectionsPagerAdapter mSectionsPagerAdapter;
 
+        private ViewPager mViewPager;
+
         public HomeFragment() {
             VIEW_MODE_CODE = AcApp.getViewMode();
         }
@@ -515,7 +526,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 break;
             }
         }
-
+        
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
             inflater.inflate(R.menu.view_mode, menu);
@@ -548,10 +559,10 @@ public class MainActivity extends SherlockFragmentActivity implements
             mSectionsPagerAdapter = new SectionsPagerAdapter(
                     getChildFragmentManager(), getArguments().getStringArray(ARG_TITLES));
             PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) rootView.findViewById(R.id.tabs);
-            ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.pager);
-            viewPager.setOffscreenPageLimit(3);
-            viewPager.setAdapter(mSectionsPagerAdapter);
-            tabs.setViewPager(viewPager);
+            mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
+            mViewPager.setOffscreenPageLimit(2);
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            tabs.setViewPager(mViewPager);
             return rootView;
         }
         
