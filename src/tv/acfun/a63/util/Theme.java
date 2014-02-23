@@ -19,6 +19,8 @@ package tv.acfun.a63.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import me.imid.swipebacklayout.lib.app.SwipeBackActivityBase;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -37,6 +39,14 @@ public class Theme {
     public static int getCurrentThemeId(){
         return isNightMode()? R.style.AppTheme_Night : R.style.AppTheme;
     }
+    
+    public static int getCurrentThemeId(Activity activity){
+        if(activity instanceof SwipeBackActivityBase){
+            return isNightMode()? R.style.AppTheme_Night_Translucent : R.style.AppTheme_Translucent;
+        }
+        return isNightMode()? R.style.AppTheme_Night : R.style.AppTheme;
+    }
+
 
     public static void onActivityCreate(Activity activity, Bundle savedInstanceState) {
         activity.setTheme(getCurrentThemeId());

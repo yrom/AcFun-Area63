@@ -1,9 +1,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="AppTheme.Night" parent="@style/Theme.Sherlock">
-        <item name="android:windowIsTranslucent">true</item>
-		<item name="android:windowContentOverlay">@null</item>
-		<item name="android:windowAnimationStyle">@style/Animation</item>
+       
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar.Night</item>
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar.Night</item>
         
@@ -45,6 +43,11 @@
 		<item name="android:textColorLink">@color/main_color_dark</item>
 		<item name="android:textColorPrimary">#dcdcdc</item>
 		<item name="searchPlateBackground">@drawable/comments_bar_backgroud_dark</item>
+    </style>
+    <style name="AppTheme.Night.Translucent">
+         <item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="android:windowAnimationStyle">@style/Animation</item>
     </style>
     <style name="Widget.Styled.ActionBar.Night" parent="Widget.Sherlock.ActionBar">
         <item name="background">@color/main_color_dark</item>
