@@ -34,9 +34,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SigninActivity" />
+        <activity android:name=".SigninActivity" android:theme="@style/AppTheme.Translucent"/>
         <activity
             android:name=".ArticleActivity"
+            android:theme="@style/AppTheme.Translucent"
             android:configChanges="screenSize|orientation"
             android:screenOrientation="user"
             android:label="@string/app_name_open" >
@@ -50,15 +51,18 @@
         </activity>
         <activity
             android:name=".ProfileActivity"
+            android:theme="@style/AppTheme.Translucent"
             android:configChanges="screenSize|orientation" />
         <activity
             android:name=".ImagePagerActivity"
+            android:theme="@style/AppTheme.Translucent"
             android:screenOrientation="user"
             android:configChanges="screenSize|orientation" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".MentionActivity" />
+        <activity android:name=".SettingsActivity" android:theme="@style/AppTheme.Translucent" />
+        <activity android:name=".MentionActivity" android:theme="@style/AppTheme.Translucent" />
         <activity
             android:name=".CommentsActivity"
+            android:theme="@style/AppTheme.Translucent"
             android:screenOrientation="user"
             android:exported="true"
             android:configChanges="screenSize|orientation"
