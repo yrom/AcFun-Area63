@@ -61,4 +61,5 @@
 	<string name="vibrator_enable">震动反馈</string>
 	<string name="vibrator_back">滑动返回时的反馈</string>
 	<string name="search_hint">输入关键词</string>
+	<string name="btn_ok">好</string>
 </resources>

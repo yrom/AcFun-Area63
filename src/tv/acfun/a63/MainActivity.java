@@ -241,12 +241,13 @@ public class MainActivity extends SherlockFragmentActivity implements
             }
             if(mUser.isExpired()){
                 new AlertDialog.Builder(this)
-                .setTitle("您的账户已过期！")
-                .setMessage("过期后会出现无法评论、签到等问题，请注销后重新登录！")
-                .setPositiveButton("好", new DialogInterface.OnClickListener() {
+                .setTitle(R.string.account_expired)
+                .setMessage(R.string.msg_account_expired)
+                .setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+                        startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                     }
                 }).show();
             }

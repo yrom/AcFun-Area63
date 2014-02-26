@@ -79,13 +79,17 @@ public class ProfileActivity extends BaseWebViewActivity {
     protected void initData() {
         super.initData();
         mUser = AcApp.getUser();
+        if(mUser == null) {
+            finish(); 
+            return;
+        }
         cookies = JSON.parseObject(mUser.cookies, Cookie[].class);
         SplashDocumentRequest request = new SplashDocumentRequest(cookies, mSplashListener, mErrorListner);
         request.setTag(TAG);
         AcApp.addRequest(request);
     }
     
-    private class SplashDocumentRequest extends DocumentRequest{
+    private class SplashDocumentRequest extends DocumentRequest{ 
 
         public SplashDocumentRequest(Cookie[] cookies, Listener<Document> listener,
                 ErrorListener errorListner) {
