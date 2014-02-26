@@ -69,8 +69,8 @@ public class SwipeBackHelper extends SwipeBackActivityHelper {
     @Override
     public void onPostCreate() {
         super.onPostCreate();
-        getSwipeBackLayout().setSwipeListener(mOnSwipe);
-        getSwipeBackLayout().setScrollThresHold(0.5f);
+        getSwipeBackLayout().addSwipeListener(mOnSwipe);
+        getSwipeBackLayout().setScrollThresHold(0.4f);
     }
     public void setVibratorEnabled(boolean enabledVibrator){
         mEnabledVibrator = enabledVibrator;

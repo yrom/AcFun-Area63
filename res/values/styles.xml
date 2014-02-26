@@ -43,9 +43,8 @@
 		<item name="searchPlateBackground">@drawable/search_bg</item>
     </style>
     <style name="AppTheme.Translucent">
+        <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowAnimationStyle">@style/Animation</item>
-        <item name="android:windowContentOverlay">@null</item>
     </style>
 	<style name="Widget.Styled" parent="Theme.Sherlock">
         <item name="popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
