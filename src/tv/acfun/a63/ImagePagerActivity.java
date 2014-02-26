@@ -232,21 +232,17 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
         }
         private void get(final PhotoView image) {
             progress.setVisibility(View.VISIBLE);
+            if(mUri.getHost() == null) {
+                onError(image);
+                return;
+            }
             imageContainer = AcApp.getGloableLoader().get(mUri.toString(), new ImageListener() {
                 
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    progress.setVisibility(View.GONE);
-                    timeOut.setOnClickListener(new OnClickListener() {
-                        
-                        @Override
-                        public void onClick(View v) {
-                            v.setVisibility(View.GONE);
-                            get(image);
-                        }
-                    });
-                    timeOut.setVisibility(View.VISIBLE);
+                    onError(image);
                 }
+
                 
                 @Override
                 public void onResponse(ImageContainer response, boolean isImmediate) {
@@ -258,6 +254,20 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
                 }
             });
         }
+        private void onError(final PhotoView image) {
+            MobclickAgent.onError(mContext, "error occurred during load image: \n url=" + mUri.toString());
+            progress.setVisibility(View.GONE);
+            timeOut.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View v) {
+                    v.setVisibility(View.GONE);
+                    get(image);
+                }
+            });
+            timeOut.setVisibility(View.VISIBLE);
+        }
+        
         @Override
         public void onDestroyView() {
             super.onDestroyView();
