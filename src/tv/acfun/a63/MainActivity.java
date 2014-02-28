@@ -1266,7 +1266,15 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        ((HomeFragment)mContentFragment).changeContentListMode(itemPosition);
+        if(mContentFragment == null){
+            mContentFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        }
+        if(mContentFragment!= null && mContentFragment instanceof HomeFragment)
+            ((HomeFragment)mContentFragment).changeContentListMode(itemPosition);
+        else
+            MobclickAgent.reportError(this.getApplicationContext(), 
+                    String.format("onNavigationItemSelected: %d, but mContentFragment isn't HomeFragment: %s",
+                            itemPosition, String.valueOf(mContentFragment)));
         return true;
     }
 

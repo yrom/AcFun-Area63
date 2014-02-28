@@ -255,7 +255,7 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
             });
         }
         private void onError(final PhotoView image) {
-            MobclickAgent.onError(mContext, "error occurred during load image: \n url=" + mUri.toString());
+            MobclickAgent.reportError(mContext, "error occurred during load image: \n url=" + mUri.toString());
             progress.setVisibility(View.GONE);
             timeOut.setOnClickListener(new OnClickListener() {
                 
