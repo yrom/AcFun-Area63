@@ -26,6 +26,7 @@ import tv.acfun.a63.AcApp;
 import tv.acfun.a63.R;
 import tv.acfun.a63.SettingsActivity;
 import tv.acfun.a63.swipe.SwipeSherlockActivity;
+import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.Theme;
 
 /**
@@ -35,6 +36,7 @@ import tv.acfun.a63.util.Theme;
 public class BaseActivity extends SwipeSherlockActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ActionBarUtil.compatibleDeviceWithSB(this);
         Theme.onActivityCreate(this, savedInstanceState);
         super.onCreate(savedInstanceState);
     }

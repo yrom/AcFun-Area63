@@ -79,6 +79,8 @@ import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -246,6 +248,12 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     private void initCommentsBar() {
         mCommentBar = findViewById(R.id.comments_bar);
+        if(ActionBarUtil.hasSB()){
+            RelativeLayout.LayoutParams params = (LayoutParams) mCommentBar.getLayoutParams();
+            params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            mCommentBar.setLayoutParams(params);
+        }
         mBtnSend = (ImageButton) findViewById(R.id.comments_send_btn);
         mCommentText = (EditText) findViewById(R.id.comments_edit);
         mBtnEmotion = findViewById(R.id.comments_emotion_btn);

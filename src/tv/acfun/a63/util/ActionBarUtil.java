@@ -16,12 +16,15 @@
 package tv.acfun.a63.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import tv.acfun.a63.R;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.view.ViewConfiguration;
 
@@ -83,5 +86,28 @@ public final class ActionBarUtil {
                 | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_USE_LOGO: ActionBar.DISPLAY_SHOW_TITLE
                 | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_USE_LOGO);
     }
+    /**
+     * 是否有SB
+     * @return 
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public static boolean hasSB(){
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+            return false;
+        try {
+            Method method = Build.class.getDeclaredMethod("hasSmartBar");
+            return ((Boolean) method.invoke(null)).booleanValue();
+        } catch (Exception e) {
+            // ignore
+        }
+        
+        return Build.DEVICE.equalsIgnoreCase("mx2") || Build.DEVICE.equalsIgnoreCase("mx3");
+    }
 
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public static void compatibleDeviceWithSB(Activity activity){
+        if(hasSB()){
+            activity.getWindow().setUiOptions(ActivityInfo.UIOPTION_SPLIT_ACTION_BAR_WHEN_NARROW); 
+        }
+    }
 }

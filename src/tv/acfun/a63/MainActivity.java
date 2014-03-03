@@ -119,12 +119,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ActionBarUtil.compatibleDeviceWithSB(this);
         Theme.onActivityCreate(this,savedInstanceState);
         super.onCreate(savedInstanceState);
         mUser = AcApp.getUser();
         setContentView(R.layout.activity_main);
         ActionBarUtil.forceShowActionBarOverflowMenu(this);
+        
         mBar = getSupportActionBar();
+        
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), true);
         mTitle = getTitle();
         mPlanetTitles = getResources().getStringArray(R.array.planets);

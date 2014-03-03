@@ -78,6 +78,7 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ActionBarUtil.compatibleDeviceWithSB(this);
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
