@@ -68,7 +68,6 @@ public class Connectivity {
         File cacheDir = AcApp.isExternalStorageAvailable() ? AcApp
                 .getExternalCacheDir(DEFAULT_CACHE_DIR) : new File(AcApp
                 .context().getCacheDir(), DEFAULT_CACHE_DIR);
-        Log.i(DEFAULT_CACHE_DIR, cacheDir.getAbsolutePath());
 
         if (stack == null) {
             if (Build.VERSION.SDK_INT >= 9) {
