@@ -213,13 +213,12 @@ public class MainActivity extends SherlockFragmentActivity implements
         mTitles = getResources().getStringArray(R.array.titles);
         mFragments = new ArrayList<Fragment>(mTitles.length);
         int position = 0;
-        if (savedInstanceState == null) {
-            selectItem(position);
-        }else{
+        if (savedInstanceState != null){
             position = savedInstanceState.getInt(KEY_CURRENT_ITEM, 0);
         }
         if(position == 0)
             setActionbarNavigation();
+        selectItem(position);
         if (AcApp.getConfig().getBoolean("is_first_open", true)) {
             mDrawerLayout.openDrawer(mDrawer);
             AcApp.putBoolean("is_first_open", false);
@@ -227,7 +226,6 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putInt(KEY_CURRENT_ITEM, mCurrentNavPosition);
     }
     private void setUserInfo() {
@@ -1319,6 +1317,17 @@ public class MainActivity extends SherlockFragmentActivity implements
                 invalidateAvatarFrame();
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mDrawerLayout.isDrawerOpen(mDrawer)){
+            mDrawerLayout.closeDrawer(mDrawer);
+        }else if(mCurrentNavPosition != 0 ){
+            selectItem(0);
+            mDrawerToggle.onDrawerClosed(mDrawer);
+        }else
+            super.onBackPressed();
     }
 
     @Override
