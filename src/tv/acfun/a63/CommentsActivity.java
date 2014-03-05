@@ -42,16 +42,17 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
-import android.text.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -198,6 +199,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
             private int mMotionY;
 
             public boolean onTouch(View v, MotionEvent event) {
+                if(isInputShow) return false;
                 int y = (int) event.getY();
                 switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -248,7 +250,9 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     private void initCommentsBar() {
         mCommentBar = findViewById(R.id.comments_bar);
-        if(ActionBarUtil.hasSB()){
+        
+        if(ActionBarUtil.hasSB() &&
+                getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE){
             RelativeLayout.LayoutParams params = (LayoutParams) mCommentBar.getLayoutParams();
             params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -280,6 +284,17 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         });
     }
 
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(ActionBarUtil.hasSB() ){
+            RelativeLayout.LayoutParams params = (LayoutParams) mCommentBar.getLayoutParams();
+            params.bottomMargin = 
+                    (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    ? 0 : getResources().getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            mCommentBar.setLayoutParams(params);
+        }
+    }
     ListAdapter mEmotionAdapter = new BaseAdapter() {
 
         @Override
