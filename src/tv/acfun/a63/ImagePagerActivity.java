@@ -301,25 +301,30 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
         String dest = AcApp.getPreferenceImageSaveDir();
         String path = mList.get(index);
         Uri uri = Uri.parse(path);
-        boolean success;
-        if(uri.getScheme().equals("http")){
-            //  FIXME: volley 的缓存任务还没有被执行的时候是会获取不到数据的
+        File saveFile;
+        if (uri.getScheme().equals("http")) {
+            // FIXME: volley 的缓存任务还没有被执行的时候是会获取不到数据的
             byte[] diskCache = AcApp.getDataInDiskCache(path);
-            if(diskCache != null)
-                success = FileUtil.save(diskCache,dest+"/"+FileUtil.getHashName(path));
-            else{
+            if (diskCache != null) {
+                saveFile = new File(dest + "/" + FileUtil.getHashName(path));
+                if (!FileUtil.save(diskCache, saveFile.getAbsolutePath())) {
+                    saveFile = null;
+                }
+            } else {
                 File cache = FileUtil.generateImageCacheFile(path);
-                success = FileUtil.copy(cache, dest);
+                saveFile = FileUtil.copy(cache, dest);
             }
         } else {
             File cache = new File(uri.getPath());
-            success = FileUtil.copy(cache, dest);
+            saveFile = FileUtil.copy(cache, dest);
         }
-        if(success){
+        if (saveFile != null && saveFile.exists()) {
             MobclickAgent.onEvent(this, "save_pic");
-            AcApp.showToast(getString(R.string.save_success));
-        }else
-            AcApp.showToast(getString(R.string.save_failed)); 
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.fromFile(saveFile));
+            sendBroadcast(intent);
+            AcApp.showToast(getString(R.string.save_success)+":"+saveFile.getAbsolutePath());
+        } else
+            AcApp.showToast(getString(R.string.save_failed));
     }
     
     @Override

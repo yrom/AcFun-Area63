@@ -281,8 +281,8 @@ public class FileUtil {
      * @param destDir
      * @return
      */
-    public static boolean copy(File sourceFile, String destDir){
-        if(!sourceFile.exists()) return false;
+    public static File copy(File sourceFile, String destDir){
+        if(!sourceFile.exists()) return null;
             
         InputStream in = null;
         OutputStream out = null;
@@ -293,9 +293,10 @@ public class FileUtil {
         }
         try {
             in = new FileInputStream(sourceFile);
-            out = new FileOutputStream(new File(saveFolder, sourceFile.getName()));
+            File saveFile = new File(saveFolder, sourceFile.getName());
+            out = new FileOutputStream(saveFile);
             copyStream(in, out);
-            return true;
+            return saveFile;
         } catch (Exception ex) {
             MobclickAgent.reportError(AcApp.context(), 
                     "Failed to copy: source=" + sourceFile.getAbsolutePath() 
@@ -306,7 +307,7 @@ public class FileUtil {
             IOUtils.close(out);
         }
             
-        return false;
+        return null;
     }
     
     public static boolean save(byte[] bytes, String savePath){
