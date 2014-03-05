@@ -1,6 +1,7 @@
 package tv.acfun.a63.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,9 @@ import android.os.Handler;
 import android.os.StatFs;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.alibaba.fastjson.util.IOUtils;
+import com.umeng.analytics.MobclickAgent;
 
 public class FileUtil {
     public static Uri getLocalFileUri(File file){
@@ -279,21 +283,29 @@ public class FileUtil {
      */
     public static boolean copy(File sourceFile, String destDir){
         if(!sourceFile.exists()) return false;
-        List<String> prog = new ArrayList<String>();
-        
-        prog.add(0,"cp");
-        if(sourceFile.isDirectory()){
-            prog.add("-R"); 
+            
+        InputStream in = null;
+        OutputStream out = null;
+        File saveFolder = new File(destDir);
+        if(!saveFolder.isDirectory()){
+            if(saveFolder.isFile()) saveFolder.delete();
+            saveFolder.mkdirs();
         }
-        prog.add(sourceFile.getAbsolutePath());
-        prog.add(destDir);
-        String[] progArray = prog.toArray(new String[prog.size()]);
         try {
-            Runtime.getRuntime().exec(progArray);
+            in = new FileInputStream(sourceFile);
+            out = new FileOutputStream(new File(saveFolder, sourceFile.getName()));
+            copyStream(in, out);
             return true;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            MobclickAgent.reportError(AcApp.context(), 
+                    "Failed to copy: source=" + sourceFile.getAbsolutePath() 
+                    + ",dest=" + destDir + "\n"
+                    + ex.toString());
+        } finally {
+            IOUtils.close(in);
+            IOUtils.close(out);
         }
+            
         return false;
     }
     
@@ -311,12 +323,9 @@ public class FileUtil {
             out.write(bytes);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         } finally {
-            try {
-                out.close();
-            } catch (Exception e) { }
+            IOUtils.close(out);
         }
         
     }

@@ -89,7 +89,7 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
         aid = extras.getInt("aid");
         mList = extras.getStringArrayList(EXTRA_IMAGES);
         int index = extras.getInt(EXTRA_INDEX,0);
-        MobclickAgent.onEvent(this, "view_big_pic", "ac"+aid+"/"+index);
+        MobclickAgent.onEvent(this, "view_big_pic");
         setContentView(R.layout.activity_images);
         
         indexText = (TextView) findViewById(R.id.index);
@@ -170,7 +170,12 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            mUri = Uri.parse(getArguments().getString(ARG_IMAGE_URL));
+            String url = getArguments().getString(ARG_IMAGE_URL);
+            Uri uri = Uri.parse(url);
+            if(uri.getHost() == null){
+                uri = Uri.parse("http://www.acfun.tv"+url);
+            }
+            mUri = uri;
         }
         OnPhotoTapListener onTap = new OnPhotoTapListener() {
             
