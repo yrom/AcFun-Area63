@@ -22,7 +22,9 @@ import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.Theme;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -83,17 +85,26 @@ public class FloorsView extends LinearLayout {
 
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
-	    
 	    if(!isPressed()){
-    		int i = getChildCount();
+    		final int i = getChildCount();
     		if(this.mBorder == null){
-    			this.mBorder = getContext().getResources().getDrawable(Theme.isNightMode()?R.drawable.comment_floor_bg_dark: R.drawable.comment_floor_bg);
+    		    // stroke border if above v14
+    		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    		        this.mBorder = getResources().getDrawable(Theme.isNightMode() ? R.drawable.floors_border_dark : R.drawable.floors_border);
+    		    else
+    		        this.mBorder = getResources().getDrawable(Theme.isNightMode() ? R.drawable.comment_floor_bg_dark : R.drawable.comment_floor_bg);
     		}
     		if ((this.mBorder != null) && (i > 0))
     			for (int j = i - 1; j >=0; j--) {
     				View child = getChildAt(j);
     				this.mBorder.setBounds(child.getLeft(), child.getLeft(),
     						child.getRight(), child.getBottom());
+    				// draw background color only once
+    				if (j == i - 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+    				    ColorDrawable drawable = new ColorDrawable(Theme.isNightMode()? 0xFF545454 : 0xFFFFFEEE);
+    				    drawable.setBounds(this.mBorder.getBounds());
+    				    drawable.draw(canvas);
+    				}
     				this.mBorder.draw(canvas);
     			}
 	    }
