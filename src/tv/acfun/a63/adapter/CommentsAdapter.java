@@ -130,6 +130,7 @@ public class CommentsAdapter extends BaseAdapter {
             RelativeLayout.LayoutParams floorsLayoutParams = new LayoutParams(-1, -2);
             int margin = DensityUtil.dip2px(mContext, 4);
             floorsLayoutParams.setMargins(margin, 0, margin, margin);
+            floorsLayoutParams.addRule(RelativeLayout.BELOW, R.id.requote);
             ((ViewGroup) convertView).addView(holder.quoteFrame, floorsLayoutParams);
         }
         RelativeLayout.LayoutParams userLayoutParams = (LayoutParams) holder.user.getLayoutParams();

@@ -110,6 +110,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  * 
  */
+@SuppressWarnings("deprecation")
 public class CommentsActivity extends BaseActivity implements OnClickListener,
          Listener<Comments>, ErrorListener, OnItemClickListener, OnItemLongClickListener {
 
@@ -122,7 +123,6 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     private View mFootview;
     private CommentsAdapter mAdapter;
     private int pageIndex = 1;
-    private int totalPage = 1;
     private boolean hasNextPage;
     private ImageButton mBtnSend;
     private EditText mCommentText;
@@ -574,7 +574,6 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         }
         ArrayUtil.putAll(response.commentArr, data);
         commentIdList.addAll(ArrayUtil.asList(response.commentList));
-        totalPage = response.totalPage;
         hasNextPage = response.nextPage > response.page;
         if (data != null && data.size() > 0) {
             mAdapter.setData(data, commentIdList);
