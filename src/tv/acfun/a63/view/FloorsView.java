@@ -99,12 +99,12 @@ public class FloorsView extends LinearLayout {
     		if ((this.mBorder != null) && (i > 0))
     			for (int j = i - 1; j >=0; j--) {
     				View child = getChildAt(j);
-    				Rect bounds = new Rect(child.getLeft(), child.getLeft(),
+    				this.mBorder.setBounds(child.getLeft(), child.getLeft(),
                             child.getRight(), child.getBottom());
-    				this.mBorder.setBounds(bounds);
     				// draw background color only once
-    				int border = DensityUtil.dip2px(getContext(), 1);
     				if (j == i - 1 ) {
+    				    int border = DensityUtil.dip2px(getContext(), 1);
+    				    Rect bounds = mBorder.copyBounds();
     				    ColorDrawable drawable = new ColorDrawable(Theme.isNightMode()? 0xFF545454 : 0xFFFFFEEE);
     				    drawable.setBounds(bounds.left + border, bounds.top + border, bounds.right - border, bounds.bottom - border);
     				    drawable.draw(canvas);
