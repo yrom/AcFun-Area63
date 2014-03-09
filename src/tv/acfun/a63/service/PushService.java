@@ -47,6 +47,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.umeng.analytics.MobclickAgent;
 
 /**
  * @author Yrom
@@ -97,10 +98,8 @@ public class PushService extends Service {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, i,
                     PendingIntent.FLAG_UPDATE_CURRENT);
             long interval = AcApp.getPreferenceRefreshingInterval();
-            long triggerAtTime = SystemClock.elapsedRealtime()+interval;
+            long triggerAtTime = SystemClock.elapsedRealtime()+interval/2;
             mAManager.setRepeating(AlarmManager.ELAPSED_REALTIME, triggerAtTime, interval, pendingIntent);
-            if(BuildConfig.DEBUG)
-                Log.i("PUSH", "start : id="+startId+", interval="+interval);
         }else{
             // 注销后，自我销毁
             stopSelf(); 
@@ -150,8 +149,6 @@ public class PushService extends Service {
             boolean needNotify = response.totalCount >0 
                     && lastTotalCount > 0   // 可能被回收了，所以被重置为0，因避免
                     && lastTotalCount < response.totalCount ;
-            if(BuildConfig.DEBUG)
-                needNotify = true;
             if (needNotify) {
                 Comment c = response.commentArr.get(response.commentList[0]);
                 if(c != null)
@@ -163,7 +160,9 @@ public class PushService extends Service {
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            Log.e("PUSH", "something error", error);
+            MobclickAgent.reportError(getApplicationContext(), error.toString());
+            if(BuildConfig.DEBUG)
+                Log.e("PUSH", "something error", error);
         }
     };
     private AlarmManager mAManager;
