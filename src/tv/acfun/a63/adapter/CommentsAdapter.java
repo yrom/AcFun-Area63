@@ -85,18 +85,6 @@ public class CommentsAdapter extends BaseAdapter {
     }
 
     private int frameId = R.id.floor;
-//    private View.OnClickListener mListener = new View.OnClickListener() {
-//
-//        @Override
-//        public void onClick(View v) {
-//
-//            if (mOnClickListener != null) {
-//                int position = (Integer) v.getTag();
-//                mOnClickListener.onClick(v, position);
-//            }
-//        }
-//
-//    };
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -118,8 +106,6 @@ public class CommentsAdapter extends BaseAdapter {
             convertView.findViewById(R.id.requote).setVisibility(View.GONE);
         }
         holder.user.setText("#" + c.count + " " + c.userName);
-//        holder.quoteImage.setTag(position);
-//        holder.quoteImage.setOnClickListener(mListener);
         TextViewUtils.setCommentContent(holder.content, c);
         int quoteId = c.quoteId;
         holder.hasQuote = quoteId > 0;

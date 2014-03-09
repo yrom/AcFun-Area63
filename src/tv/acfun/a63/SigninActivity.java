@@ -142,7 +142,6 @@ public class SigninActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home){
             setResult(RESULT_CANCELED);
-//            scrollToFinishActivity();
         }
         return super.onOptionsItemSelected(item);
     }

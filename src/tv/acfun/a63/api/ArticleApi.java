@@ -3,7 +3,6 @@ package tv.acfun.a63.api;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import tv.acfun.a63.AcApp;
