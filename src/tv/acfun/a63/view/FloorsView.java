@@ -22,6 +22,7 @@ import tv.acfun.a63.util.DensityUtil;
 import tv.acfun.a63.util.Theme;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -88,21 +89,24 @@ public class FloorsView extends LinearLayout {
 	    if(!isPressed()){
     		final int i = getChildCount();
     		if(this.mBorder == null){
-    		    // stroke border if above v14
-    		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    		    // stroke border if above v17
+    		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
     		        this.mBorder = getResources().getDrawable(Theme.isNightMode() ? R.drawable.floors_border_dark : R.drawable.floors_border);
+    		    // else using .9 png
     		    else
-    		        this.mBorder = getResources().getDrawable(Theme.isNightMode() ? R.drawable.comment_floor_bg_dark : R.drawable.comment_floor_bg);
+    		        this.mBorder = getResources().getDrawable(Theme.isNightMode() ? R.drawable.comment_floor_bg_dark_2 : R.drawable.comment_floor_bg_2);
     		}
     		if ((this.mBorder != null) && (i > 0))
     			for (int j = i - 1; j >=0; j--) {
     				View child = getChildAt(j);
-    				this.mBorder.setBounds(child.getLeft(), child.getLeft(),
-    						child.getRight(), child.getBottom());
+    				Rect bounds = new Rect(child.getLeft(), child.getLeft(),
+                            child.getRight(), child.getBottom());
+    				this.mBorder.setBounds(bounds);
     				// draw background color only once
-    				if (j == i - 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+    				int border = DensityUtil.dip2px(getContext(), 1);
+    				if (j == i - 1 ) {
     				    ColorDrawable drawable = new ColorDrawable(Theme.isNightMode()? 0xFF545454 : 0xFFFFFEEE);
-    				    drawable.setBounds(this.mBorder.getBounds());
+    				    drawable.setBounds(bounds.left + border, bounds.top + border, bounds.right - border, bounds.bottom - border);
     				    drawable.draw(canvas);
     				}
     				this.mBorder.draw(canvas);
