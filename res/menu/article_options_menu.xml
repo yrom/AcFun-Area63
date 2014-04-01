@@ -9,7 +9,7 @@
     <item
         android:id="@+id/menu_item_comment"
         android:icon="@drawable/social_chat"
-        android:showAsAction="always"
+        android:showAsAction="ifRoom"
         android:title="@string/action_bar_comment"/>
     <item
         android:id="@+id/menu_item_share_action_provider_action_bar"

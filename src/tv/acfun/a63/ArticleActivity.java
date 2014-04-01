@@ -41,6 +41,7 @@ import tv.acfun.a63.api.entity.Article;
 import tv.acfun.a63.api.entity.Article.SubContent;
 import tv.acfun.a63.base.BaseWebViewActivity;
 import tv.acfun.a63.db.DB;
+import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
 import tv.acfun.a63.util.Theme;
@@ -59,6 +60,7 @@ import android.webkit.WebViewClient;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.ShareActionProvider;
+import com.actionbarsherlock.widget.ShareActionProvider.OnShareTargetSelectedListener;
 import com.alibaba.fastjson.JSON;
 import com.android.volley.Cache.Entry;
 import com.android.volley.NetworkResponse;
@@ -185,6 +187,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         if(AcApp.getViewMode() != Constants.MODE_COMMIC){
             getSupportMenuInflater().inflate(R.menu.article_options_menu, menu);
             MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
+            if(ActionBarUtil.hasSB()){
+                actionItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            }
             ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
             actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
             actionProvider.setShareIntent(createShareIntent());

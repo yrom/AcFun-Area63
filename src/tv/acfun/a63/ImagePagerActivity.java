@@ -331,6 +331,9 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
     public boolean onCreateOptionsMenu(Menu menu) {
         getSupportMenuInflater().inflate(R.menu.image, menu);
         MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
+        if(ActionBarUtil.hasSB()){
+            actionItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        }
         ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
         actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
         actionProvider.setShareIntent(createShareIntent());
