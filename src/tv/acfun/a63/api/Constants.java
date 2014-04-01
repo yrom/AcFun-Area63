@@ -1,8 +1,8 @@
 package tv.acfun.a63.api;
 
 public interface Constants {
-
-    String URL_HOME = "http://www.acfun.tv/";
+    String HOME = "www.acfun.com";
+    String URL_HOME = "http://www.acfun.com/";
     String URL_BASE = URL_HOME + "api/getlistbyorder.aspx?orderby=%d&channelIds=%d&count=%d&first=%d";
     String URL_CONTENT = URL_HOME + "api/content.aspx?query=%d";
     String URL_COMMENT = URL_HOME + "comment_list_json.aspx?contentId=%d&currentPage=%d";

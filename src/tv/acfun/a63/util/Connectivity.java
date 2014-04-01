@@ -19,6 +19,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import tv.acfun.a63.AcApp;
+import tv.acfun.a63.api.Constants;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -123,7 +124,7 @@ public class Connectivity {
     }
 
     public static int doPost(PostMethod post, Cookie[] cks) throws HttpException, IOException {
-        return doPost(post, "www.acfun.tv", 0, null, cks);
+        return doPost(post, Constants.HOME, 0, null, cks);
     }
 
     public static JSONObject postResultJson(String url, NameValuePair[] nps, Cookie[] cks) {

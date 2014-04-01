@@ -12,6 +12,7 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.PostMethod;
 
+import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Comment;
 import tv.acfun.a63.api.entity.User;
 
@@ -33,7 +34,7 @@ public class MemberUtils{
 	        HttpClient client = new HttpClient();
 	        client.getParams().setParameter("http.protocol.single-cookie-header", true);
 	        client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
-	        client.getHostConfiguration().setHost("www.acfun.tv", 80, "http");
+	        client.getHostConfiguration().setHost(Constants.HOME, 80, "http");
 	        int state = client.executeMethod(post);
 	        
 	        if(state>200){
