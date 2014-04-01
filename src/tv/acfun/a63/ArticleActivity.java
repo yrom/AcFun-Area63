@@ -60,7 +60,6 @@ import android.webkit.WebViewClient;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.ShareActionProvider;
-import com.actionbarsherlock.widget.ShareActionProvider.OnShareTargetSelectedListener;
 import com.alibaba.fastjson.JSON;
 import com.android.volley.Cache.Entry;
 import com.android.volley.NetworkResponse;
@@ -89,6 +88,7 @@ import com.umeng.analytics.MobclickAgent;
  */
 @TargetApi(19)
 public class ArticleActivity extends BaseWebViewActivity implements Listener<Article>, ErrorListener {
+    private static final String URL_HOME = Constants.URL_HOME;
     private static String ARTICLE_PATH;
 
     public static void start(Context context, int aid, String title) {
@@ -167,7 +167,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                             || AcApp.getViewMode() == Constants.MODE_NO_PIC) // 无图模式
                         return;
 //                    Log.d(TAG, "on finished:" + url);
-                    if (url.equals(Constants.URL_HOME) && imgUrls.size() > 0 && !isDownloaded) {
+                    if (url.equals(URL_HOME) && imgUrls.size() > 0 && !isDownloaded) {
                         String[] arr = new String[imgUrls.size()];
                         mDownloadTask = new DownloadImageTask();
                         mDownloadTask.execute(imgUrls.toArray(arr));
@@ -458,7 +458,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         protected void onPostExecute(Boolean result) {
             setSupportProgressBarIndeterminateVisibility(false);
             if (result) {
-                mWeb.loadDataWithBaseURL("http://www.acfun.tv/", mDoc.html(), "text/html", "UTF-8",
+                mWeb.loadDataWithBaseURL(URL_HOME, mDoc.html(), "text/html", "UTF-8",
                         null);
                 if (hasUseMap)
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
@@ -467,7 +467,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.TEXT_AUTOSIZING);
                 }
-
             }
         }
 
@@ -494,7 +493,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     break;
                 }
                 File cache = imageCaches.get(imgUrls.indexOf(url));
-                Log.d(TAG, "cache file = "+cache.getAbsolutePath());
                 if (cache.exists() && cache.canRead()) {
                     publishProgress(index);
                     continue;
@@ -566,7 +564,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 String url = imgUrls.get(values[0]);
                 if (url == null)
                     return;
-                Log.d(TAG, url + " cached");
                 StringBuilder jsBuilder = new StringBuilder();
                 jsBuilder.append("javascript:(function(){")
                          .append("var images = document.getElementsByTagName(\"img\"); ")
