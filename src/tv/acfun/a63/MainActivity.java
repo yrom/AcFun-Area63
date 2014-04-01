@@ -244,11 +244,12 @@ public class MainActivity extends SherlockFragmentActivity implements
                 new AlertDialog.Builder(this)
                 .setTitle(R.string.account_expired)
                 .setMessage(R.string.msg_account_expired)
-                .setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.logout, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                        AcApp.logout();
+                        invalidateAvatarFrame();
                     }
                 }).show();
             }

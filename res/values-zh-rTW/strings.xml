@@ -10,7 +10,7 @@
     <string name="view_mode_no_image">無圖</string>
     <string name="view_mode_comic">漫畫</string>
     <string name="user_name">用戶名</string>
-    <string name="signin">登錄</string>
+    <string name="signin">登入</string>
     <string name="password">密碼</string>
     <string name="time_out">獲取超時，點擊重試！ </string>
     <string name="loading">加載下一頁…</string>
@@ -60,5 +60,5 @@
     <string name="vibrator_enable">震動反饋</string>
     <string name="vibrator_back">滑動返回時的反饋</string>
     <string name="search_hint">輸入關鍵詞</string>
-
+	<string name="logout">登出</string>
 </resources>
