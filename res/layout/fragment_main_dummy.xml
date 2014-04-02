@@ -11,7 +11,8 @@
         android:listSelector="@drawable/article_item_background"
         android:dividerHeight="16dp"
         android:divider="@null"
-        android:layout_margin="16dp"
+        android:layout_marginLeft="@dimen/content_horizontal_margin"
+        android:layout_marginRight="@dimen/content_horizontal_margin"
 	    />
 	<ProgressBar
         android:id="@+id/loading"
