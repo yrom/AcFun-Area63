@@ -203,7 +203,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
 
     private Intent createShareIntent() {
-        String shareurl = title + " http://www.acfun.tv/a/ac" + aid;
+        String shareurl = title + " http://www.acfun.com/a/ac" + aid;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareurl += " ——#Acfun文章区#客户端 http://t.cn/8kLMite";
         shareIntent.setType("text/plain");
@@ -265,7 +265,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 .append("</h1>")
                 .append("<div id=\"info\" class=\"article-info\">")
                 .append("<span class=\"article-publisher\">✎")
-                .append("<a href=\"http://www.acfun.tv/member/user.aspx?uid=")
+                .append("<a href=\"http://www.acfun.com/member/user.aspx?uid=")
                 .append(article.poster.id).append("\" >")
                 .append(article.poster.name)
                 .append("</a>").append("</span>")
@@ -394,7 +394,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 if (src.startsWith("file"))
                     continue;
                 if (!src.startsWith("http")) {
-                    src = "http://www.acfun.tv" + src;
+                    src = "http://www.acfun.com" + src;
                 }
                 File cache = FileUtil.generateImageCacheFile(src);
                 imageCaches.add(cache);

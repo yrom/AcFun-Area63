@@ -154,7 +154,7 @@ public class Connectivity {
     }
 
     public static int doGet(GetMethod get, Cookie[] cookies) throws HttpException, IOException {
-        return doGet(get, "www.acfun.tv", 0, null, cookies);
+        return doGet(get, "www.acfun.com", 0, null, cookies);
     }
 
     public static String doGet(String url, String queryString, Cookie[] cookies) {
