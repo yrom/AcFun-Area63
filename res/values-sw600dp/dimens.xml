@@ -10,4 +10,5 @@
 	<dimen name="edge_size">60dp</dimen>
 	<dimen name="logo_width">200dp</dimen>
 	<dimen name="content_horizontal_margin">32dp</dimen>
+	<dimen name="logo_margin_left">100dp</dimen>
 </resources>

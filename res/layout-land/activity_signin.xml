@@ -6,10 +6,10 @@
     <EditText
         android:id="@+id/user_name"
         android:layout_width="match_parent"
-        android:layout_marginRight="@dimen/logo_margin_left"
         android:layout_height="wrap_content"
         android:layout_above="@+id/password"
         android:layout_marginLeft="16dp"
+        android:layout_marginRight="@dimen/logo_margin_left"
         android:layout_toRightOf="@+id/logo"
         android:background="@drawable/edit_text_holo_light"
         android:ems="10"
@@ -21,13 +21,13 @@
 
     <EditText
         android:id="@+id/password"
-                android:layout_width="match_parent"
-        android:layout_marginRight="@dimen/logo_margin_left"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@+id/logo"
+        android:layout_marginRight="@dimen/logo_margin_left"
         android:layout_marginTop="8dp"
+        android:layout_toRightOf="@+id/logo"
         android:background="@drawable/edit_text_holo_light"
         android:ems="10"
         android:hint="@string/password"
@@ -45,10 +45,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:padding="10dp"
         android:text="@string/signin"
-        android:textColor="@color/button_text_color_selector"
         android:textSize="18sp" />
 
     <ImageView

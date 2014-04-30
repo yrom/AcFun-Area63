@@ -8,6 +8,6 @@
 	<dimen name="left_drawer_width">350dp</dimen>
 	<dimen name="emotions_column_width">56dp</dimen>
 	<dimen name="edge_size">200dp</dimen>
-	<dimen name="logo_margin_left">340dp</dimen>
+	<dimen name="logo_margin_left">280dp</dimen>
 	<dimen name="content_horizontal_margin">64dp</dimen>
 </resources>
