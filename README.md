@@ -28,7 +28,7 @@ Acfun 63区（文章区），来，战个痛～
 
 依赖库
 ===========
-1. [Actionbar Sherlock][1]
+1. android-support-v7-appcompat
 2. [Volley][2]
 3. [Pager Sliding TabStrip][3]
 4. [Pull To Refresh][4]
@@ -37,7 +37,6 @@ Acfun 63区（文章区），来，战个痛～
 
 *请用我fork的分支
 
-[1]: https://github.com/JakeWharton/ActionBarSherlock
 [2]: https://android.googlesource.com/platform/frameworks/volley
 [3]: https://github.com/astuetz/PagerSlidingTabStrip
 [4]: https://github.com/chrisbanes/Android-PullToRefresh
