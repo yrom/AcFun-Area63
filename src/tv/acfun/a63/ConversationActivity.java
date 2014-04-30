@@ -8,6 +8,7 @@ import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.umeng.fb.FeedbackAgent;
 import com.umeng.fb.model.Conversation;
 import com.umeng.fb.model.DevReply;

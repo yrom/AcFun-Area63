@@ -17,7 +17,6 @@
 package tv.acfun.a63;
 
 import tv.acfun.a63.service.PushService;
-import tv.acfun.a63.swipe.SwipeSherlockPreferenceActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FileUtil;
 import tv.acfun.a63.util.Theme;
@@ -33,10 +32,11 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceActivity;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.actionbarsherlock.view.MenuItem;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 import com.umeng.update.UmengUpdateListener;
@@ -47,7 +47,7 @@ import com.umeng.update.UpdateResponse;
  * 
  */
 @SuppressWarnings("deprecation")
-public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
+public class SettingsActivity extends PreferenceActivity implements
         OnPreferenceClickListener, OnPreferenceChangeListener {
     private static final String KEY_UPDATE = "update";
     private static final String KEY_FEED_BACK = "feedback";
@@ -64,7 +64,7 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
         Theme.onActivityCreate(this, savedInstanceState);
         super.onCreate(savedInstanceState);
         getListView().setFooterDividersEnabled(false);
-        ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
+//        ActionBarUtil.setXiaomiFilterDisplayOptions(getActionBar(), false);
         addPreferencesFromResource(R.xml.preferences);
         setCache();
         Preference feedback = findPreference(KEY_FEED_BACK);
@@ -195,7 +195,8 @@ public class SettingsActivity extends SwipeSherlockPreferenceActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case android.R.id.home:
-            scrollToFinishActivity();
+//            scrollToFinishActivity();
+            finish();
             break;
 
         default:

@@ -24,6 +24,6 @@
     android:paddingRight="16dp"
     android:textColor="#fff"
     android:textAppearance="?attr/textAppearanceListItemSmall"
-    android:background="?attr/activatedBackgroundIndicator"
+    android:background="@drawable/activated_background_holo_light"
     android:minHeight="?attr/listPreferredItemHeightSmall"
    />

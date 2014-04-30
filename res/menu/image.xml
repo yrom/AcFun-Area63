@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    	<item
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item
         android:id="@+id/menu_item_comment"
         android:icon="@drawable/social_chat"
-        android:showAsAction="always"
-        android:title="@string/action_bar_comment"/>
-    	<item
+        android:title="@string/action_bar_comment"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/menu_item_save_image"
         android:icon="@drawable/ic_save"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_bar_save"/>
-    	<item
+        android:title="@string/action_bar_save"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/menu_item_share_action_provider_action_bar"
         android:actionProviderClass="com.actionbarsherlock.widget.ShareActionProvider"
         android:icon="@drawable/social_share"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_bar_share"/>
+        android:title="@string/action_bar_share"
+        app:showAsAction="ifRoom"/>
 
 </menu>

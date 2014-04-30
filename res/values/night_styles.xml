@@ -1,6 +1,6 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme.Night" parent="@style/Theme.Sherlock">
+    <style name="AppTheme.Night" parent="@style/Theme.AppCompat">
        
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar.Night</item>
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar.Night</item>
@@ -11,10 +11,10 @@
         <item name="actionButtonStyle">@style/Widget.Styled.ActionButton</item>
         <item name="android:actionButtonStyle">@style/Widget.Styled.ActionButton</item>
         <item name="android:windowBackground">@color/primary_text_color</item>
-        <item name="android:listSelector">@drawable/abs__list_selector_holo_dark</item>
+        <item name="android:listSelector">@drawable/abc_list_selector_holo_dark</item>
         
-        <item name="spinnerDropDownItemStyle">@style/Widget.Sherlock.Light.DropDownItem.Spinner</item>
-        <item name="android:spinnerDropDownItemStyle">@style/Widget.Sherlock.Light.DropDownItem.Spinner</item>
+        <item name="spinnerDropDownItemStyle">@style/Widget.AppCompat.Light.DropDownItem.Spinner</item>
+        <item name="android:spinnerDropDownItemStyle">@style/Widget.AppCompat.Light.DropDownItem.Spinner</item>
         
         <item name="selectableItemBackground">@drawable/item_background_night</item>
         <item name="android:selectableItemBackground">@drawable/item_background_night</item>
@@ -49,7 +49,7 @@
 		<item name="android:windowContentOverlay">@null</item>
 		<item name="android:windowAnimationStyle">@style/Animation</item>
     </style>
-    <style name="Widget.Styled.ActionBar.Night" parent="Widget.Sherlock.ActionBar">
+    <style name="Widget.Styled.ActionBar.Night" parent="Widget.AppCompat.ActionBar">
         <item name="background">@color/main_color_dark</item>
         <item name="android:background">@color/main_color_dark</item>
     </style>

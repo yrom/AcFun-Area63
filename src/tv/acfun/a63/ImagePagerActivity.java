@@ -19,7 +19,7 @@ package tv.acfun.a63;
 import java.io.File;
 import java.util.ArrayList;
 
-import tv.acfun.a63.base.BaseFragmentActivity;
+import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.BaseAnimationListener;
 import tv.acfun.a63.util.FileUtil;
@@ -36,10 +36,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v4.view.WindowCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -49,10 +54,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
-import com.actionbarsherlock.widget.ShareActionProvider;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
@@ -63,7 +64,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  *
  */
-public class ImagePagerActivity extends BaseFragmentActivity implements OnPageChangeListener {
+public class ImagePagerActivity extends BaseActivity implements OnPageChangeListener {
     private static final String EXTRA_IMAGES = "images";
     private static final String EXTRA_INDEX = "index";
     private ViewPager pager;
@@ -79,7 +80,7 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ActionBarUtil.compatibleDeviceWithSB(this);
-        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        requestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
         getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
@@ -284,7 +285,7 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
         }
     }
     @Override
-    public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
         case R.id.menu_item_comment:
@@ -329,12 +330,12 @@ public class ImagePagerActivity extends BaseFragmentActivity implements OnPageCh
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.image, menu);
+        getMenuInflater().inflate(R.menu.image, menu);
         MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
         if(ActionBarUtil.hasSB()){
-            actionItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            MenuItemCompat.setShowAsAction(actionItem, MenuItemCompat.SHOW_AS_ACTION_NEVER);
         }
-        ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
+        ShareActionProvider actionProvider = (ShareActionProvider)MenuItemCompat.getActionProvider(actionItem);
         actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
         actionProvider.setShareIntent(createShareIntent());
         return super.onCreateOptionsMenu(menu);

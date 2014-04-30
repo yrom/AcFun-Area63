@@ -52,14 +52,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.ShareActionProvider;
 import com.alibaba.fastjson.JSON;
 import com.android.volley.Cache.Entry;
 import com.android.volley.NetworkResponse;
@@ -185,12 +186,12 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if(AcApp.getViewMode() != Constants.MODE_COMMIC){
-            getSupportMenuInflater().inflate(R.menu.article_options_menu, menu);
+            getMenuInflater().inflate(R.menu.article_options_menu, menu);
             MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
             if(ActionBarUtil.hasSB()){
-                actionItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                MenuItemCompat.setShowAsAction(actionItem, MenuItemCompat.SHOW_AS_ACTION_NEVER);
             }
-            ShareActionProvider actionProvider = (ShareActionProvider) actionItem.getActionProvider();
+            ShareActionProvider actionProvider =  (ShareActionProvider) MenuItemCompat.getActionProvider(actionItem);
             actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
             actionProvider.setShareIntent(createShareIntent());
             if(isFaved){

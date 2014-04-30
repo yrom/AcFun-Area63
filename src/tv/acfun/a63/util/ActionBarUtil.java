@@ -18,20 +18,14 @@ package tv.acfun.a63.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import tv.acfun.a63.R;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.SearchManager;
-import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
+import android.support.v7.app.ActionBar;
 import android.view.ViewConfiguration;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
 
 /**
  * Action Bar 相关工具类
@@ -58,22 +52,6 @@ public final class ActionBarUtil {
         }
     }
 
-    public static void addSearchView(Activity activity, Menu menu) {
-        SearchView searchView = new SearchView(activity);
-        searchView.setSubmitButtonEnabled(true);
-        SearchManager searchManager = (SearchManager) activity
-                .getSystemService(Context.SEARCH_SERVICE);
-        SearchableInfo info = searchManager.getSearchableInfo(activity
-                .getComponentName());
-        searchView.setSearchableInfo(info);
-        menu.add("Search")
-                .setIcon(R.drawable.action_search)
-                .setActionView(searchView)
-                .setShowAsAction(
-                        MenuItem.SHOW_AS_ACTION_IF_ROOM
-                                | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-
-    }
     /**
      * 过滤掉小米设备。。其只显示title
      * @param bar

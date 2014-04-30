@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-        <item
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item
         android:id="@+id/action_view_mode"
-        android:showAsAction="always|withText"
-        android:title="@string/action_view_mode">
+        android:title="@string/action_view_mode"
+        app:showAsAction="always|withText">
         <menu>
             <item
                 android:id="@+id/mode_mix"
-                android:showAsAction="always|withText"
-                android:title="@string/view_mode_mix"/>
+                android:title="@string/view_mode_mix"
+                app:showAsAction="always|withText"/>
             <item
                 android:id="@+id/mode_no_image"
-                android:showAsAction="always|withText"
-                android:title="@string/view_mode_no_image"/>
+                android:title="@string/view_mode_no_image"
+                app:showAsAction="always|withText"/>
             <item
                 android:id="@+id/mode_comic"
-                android:showAsAction="always|withText"
-                android:title="@string/view_mode_comic"/>
+                android:title="@string/view_mode_comic"
+                app:showAsAction="always|withText"/>
         </menu>
     </item>
 

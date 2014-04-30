@@ -20,15 +20,14 @@ import me.imid.swipebacklayout.lib.SwipeBackLayout;
 import me.imid.swipebacklayout.lib.SwipeBackLayout.SwipeListener;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityBase;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
 /**
  * @author Yrom
  *
  */
-public class SwipeSherlockPreferenceActivity extends SherlockPreferenceActivity implements SwipeBackActivityBase {
+public class SwipeAppcompatActivity extends ActionBarActivity implements SwipeBackActivityBase{
     
     private SwipeBackHelper mHelper;
 
@@ -74,5 +73,4 @@ public class SwipeSherlockPreferenceActivity extends SherlockPreferenceActivity 
     public void scrollToFinishActivity() {
         getSwipeBackLayout().scrollToFinishActivity();
     }
-
 }

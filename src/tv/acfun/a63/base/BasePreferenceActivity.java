@@ -15,36 +15,36 @@
  */
 
 package tv.acfun.a63.base;
-
-import com.actionbarsherlock.view.MenuItem;
-import com.umeng.analytics.MobclickAgent;
-
-import tv.acfun.a63.AcApp;
-import tv.acfun.a63.swipe.SwipeSherlockPreferenceActivity;
-
-/**
- * @author Yrom
- *
- */
-public class BasePreferenceActivity extends SwipeSherlockPreferenceActivity {
-    @Override
-    protected void onResume() {
-        super.onResume();
-        MobclickAgent.onResume(this);
-        setViratorEnable(AcApp.isViratorEnabled());
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        MobclickAgent.onPause(this);
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
-            scrollToFinishActivity();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-}
+//
+//import com.actionbarsherlock.view.MenuItem;
+//import com.umeng.analytics.MobclickAgent;
+//
+//import tv.acfun.a63.AcApp;
+//import tv.acfun.a63.swipe.SwipeSherlockPreferenceActivity;
+//
+///**
+// * @author Yrom
+// *
+// */
+//public class BasePreferenceActivity extends SwipeSherlockPreferenceActivity {
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        MobclickAgent.onResume(this);
+//        setViratorEnable(AcApp.isViratorEnabled());
+//    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        MobclickAgent.onPause(this);
+//    }
+//    
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        if(item.getItemId() == android.R.id.home){
+//            scrollToFinishActivity();
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
+//}

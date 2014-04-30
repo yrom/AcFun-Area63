@@ -23,13 +23,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
 import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -336,20 +337,21 @@ public class AcApp extends Application {
     }
 
     public static void addSearchView(Activity activity,
-            com.actionbarsherlock.view.Menu menu) {
-        SearchView searchView = new SearchView(activity);
+            Menu menu) {
+        android.support.v7.widget.SearchView searchView = new android.support.v7.widget.SearchView(activity);
         searchView.setSubmitButtonEnabled(true);
         SearchManager searchManager = (SearchManager) activity
                 .getSystemService(Context.SEARCH_SERVICE);
         SearchableInfo info = searchManager.getSearchableInfo(activity
                 .getComponentName());
         searchView.setSearchableInfo(info);
-        menu.add("Search")
-                .setIcon(R.drawable.action_search)
-                .setActionView(searchView)
-                .setShowAsAction(
-                        MenuItem.SHOW_AS_ACTION_IF_ROOM
-                                | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        
+        MenuItem item = menu.add("Search")
+                .setIcon(R.drawable.action_search);
+        MenuItemCompat.setActionView(item, searchView);
+        MenuItemCompat.setShowAsAction(item,
+                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+                                | MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
     }
 
     public static void showNotification(Intent mIntent, int notificationId,

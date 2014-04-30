@@ -32,6 +32,9 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar.OnNavigationListener;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -40,6 +43,9 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -60,13 +66,6 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -96,7 +95,7 @@ import com.umeng.fb.model.DevReply;
 import com.umeng.fb.model.Reply;
 import com.umeng.update.UmengUpdateAgent;
 
-public class MainActivity extends SherlockFragmentActivity implements
+public class MainActivity extends ActionBarActivity implements
         OnItemClickListener, OnNavigationListener, OnClickListener {
     private static final String KEY_CURRENT_ITEM = "current_item";
     private static final String TAG = "MainActivity";
@@ -416,7 +415,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
     
@@ -478,7 +477,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     /**
      * 主页，四个频道列表，三种阅读模式
      */
-    public static class HomeFragment extends SherlockFragment {
+    public static class HomeFragment extends Fragment {
         public static final String ARG_TITLES = "titles";
 
         public static final String ARG_PLANET_NUMBER = "planet_number";

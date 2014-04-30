@@ -130,7 +130,7 @@ public class CommentsAdapter extends BaseAdapter {
         int padding = DensityUtil.dip2px(mContext, 8);
         if (position == 0) {
             int paddingTop = mInflater.getContext().getResources()
-                    .getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
+                    .getDimensionPixelSize(R.dimen.abc_action_bar_default_height);
             convertView.setPadding(padding, paddingTop + padding, padding, padding*2);
         } else
             convertView.setPadding(padding, padding*2, padding, padding*2);

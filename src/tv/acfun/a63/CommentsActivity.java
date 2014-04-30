@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.HttpException;
@@ -52,6 +53,9 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.WindowCompat;
+import android.support.v7.app.ActionBar;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.Spannable;
@@ -60,6 +64,8 @@ import android.text.style.ImageSpan;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -85,10 +91,6 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Cache;
@@ -139,7 +141,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        requestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         aid = getIntent().getIntExtra("aid", 0);
         if (aid == 0)
@@ -254,7 +256,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         if(ActionBarUtil.hasSB() &&
                 getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE){
             RelativeLayout.LayoutParams params = (LayoutParams) mCommentBar.getLayoutParams();
-            params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
+            params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height);
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             mCommentBar.setLayoutParams(params);
         }
@@ -290,7 +292,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
             RelativeLayout.LayoutParams params = (LayoutParams) mCommentBar.getLayoutParams();
             params.bottomMargin = 
                     (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
-                    ? 0 : getResources().getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
+                    ? 0 : getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height);
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             mCommentBar.setLayoutParams(params);
         }
@@ -316,7 +318,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         public String getItem(int position) {
             String cat = position >= 54 ? "ais" : "ac";
             int id = position >= 54 ? position - 53 : position + 1;
-            return String.format("[emot=%s,%02d/]", cat, id);
+            return String.format(Locale.US, "[emot=%s,%02d/]", cat, id);
         }
 
         @Override
@@ -746,8 +748,8 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        menu.add(0, android.R.id.button1, 0, R.string.font_size).setIcon(R.drawable.ic_text_size)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItem item = menu.add(0, android.R.id.button1, 0, R.string.font_size).setIcon(R.drawable.ic_text_size);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -774,7 +776,6 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         MobclickAgent.onPause(this);
     }
 
-    @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
