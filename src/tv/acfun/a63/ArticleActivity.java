@@ -307,6 +307,11 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     protected void onDestroy() {
         super.onDestroy();
         AcApp.cancelAllRequest(TAG);
+        if(mDoc != null){
+            Element content = mDoc.getElementById("content");
+            if(content != null)
+                content.empty();
+        }
         if (mDownloadTask != null && !isDownloaded) {
             mDownloadTask.cancel(false);
         }
@@ -349,26 +354,41 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 Element title = mDoc.getElementById("title");
                 title.html(buildTitle(params[0]));
                 Element content = mDoc.getElementById("content");
+                content.empty();
 
                 ArrayList<SubContent> contents = params[0].contents;
-
+                if(contents.size()>1){
+                    content.appendElement("div").attr("id", "artcle-pager").html(buildParts(contents));
+                }
                 for (int i = 0; i < contents.size(); i++) {
                     SubContent sub = contents.get(i);
-                    handleSubContent(content, sub, params[0]);
+                    handleSubContent(i, content, sub, params[0]);
                 }
-
+                //TODO: cache HTML document to file
             } catch (IOException e) {
                 return false;
             }
             return true;
         }
 
-        private void handleSubContent(Element content, SubContent sub, Article article) {
-            content.empty();
-            if (!article.title.equals(sub.subTitle)) {
-                content.append("<h2 class=\"article-subtitle\">" + sub.subTitle + "</h2><hr>");
+        private String buildParts(ArrayList<SubContent> contents) {
+            StringBuilder builder = new StringBuilder();
+            for(int i=0;i<contents.size();i++){
+                builder.append("<li><a class=\"pager\" href=\"#p")
+                    .append(i).append("\" title=\"Part ").append(i+1).append("\">")
+                    .append(contents.get(i).subTitle)
+                    .append("</a></li>");
             }
-            content.append(sub.content);
+            builder.append("<hr>");
+            return builder.toString();
+        }
+
+        private void handleSubContent(int p, Element content, SubContent sub, Article article) {
+            if (!article.title.equals(sub.subTitle)) {
+                content.append("<h2 class=\"article-subtitle\"><a class=\"anchor\" name=\"p"+p+"\"></a>Part "+(p+1)+". "+sub.subTitle + "</h2>");
+            }
+            content.append(sub.content).appendElement("hr");
+            
             handleImages(content);
             handleStyles(content);
         }

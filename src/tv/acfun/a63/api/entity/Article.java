@@ -124,7 +124,8 @@ public class Article {
             SubContent content = new SubContent();
             JSONObject sub = contentArray.getJSONObject(i);
             content.content = sub.getString("content");
-            content.subTitle = sub.getString("subtitle");
+            
+            content.subTitle = sub.getString("subtitle").replaceAll("<span[^>]+>", "").replaceAll("</span>", "");
             Matcher matcher = imageReg.matcher(content.content);
             while (matcher.find()) {
                 article.imgUrls.add(matcher.group(1));
