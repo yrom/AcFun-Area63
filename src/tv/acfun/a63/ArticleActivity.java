@@ -19,6 +19,7 @@ package tv.acfun.a63;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -62,6 +63,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.util.IOUtils;
 import com.android.volley.Cache.Entry;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -91,7 +93,7 @@ import com.umeng.analytics.MobclickAgent;
 public class ArticleActivity extends BaseWebViewActivity implements Listener<Article>, ErrorListener {
     private static final String URL_HOME = Constants.URL_HOME;
     private static String ARTICLE_PATH;
-
+    private static final String NAME_ARTICLE_HTML = "a63-article.html";
     public static void start(Context context, int aid, String title) {
         Intent intent = new Intent(context, ArticleActivity.class);
         intent.putExtra("aid", aid);
@@ -168,7 +170,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                             || AcApp.getViewMode() == Constants.MODE_NO_PIC) // 无图模式
                         return;
 //                    Log.d(TAG, "on finished:" + url);
-                    if (url.equals(URL_HOME) && imgUrls.size() > 0 && !isDownloaded) {
+                    if ((url.equals(URL_HOME) || url.contains(NAME_ARTICLE_HTML))
+                            && imgUrls.size() > 0 && !isDownloaded) {
                         String[] arr = new String[imgUrls.size()];
                         mDownloadTask = new DownloadImageTask();
                         mDownloadTask.execute(imgUrls.toArray(arr));
@@ -307,11 +310,6 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     protected void onDestroy() {
         super.onDestroy();
         AcApp.cancelAllRequest(TAG);
-        if(mDoc != null){
-            Element content = mDoc.getElementById("content");
-            if(content != null)
-                content.empty();
-        }
         if (mDownloadTask != null && !isDownloaded) {
             mDownloadTask.cancel(false);
         }
@@ -341,9 +339,12 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     
     private class BuildDocTask extends AsyncTask<Article, Void, Boolean> {
         boolean hasUseMap;
+        private File cacheFile;
 
         @Override
         protected void onPreExecute() {
+            
+            cacheFile =new File(ARTICLE_PATH, NAME_ARTICLE_HTML);
         }
 
         @Override
@@ -364,7 +365,17 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     SubContent sub = contents.get(i);
                     handleSubContent(i, content, sub, params[0]);
                 }
-                //TODO: cache HTML document to file
+                FileWriter writer = null;
+                try{
+                    writer = new FileWriter(cacheFile);
+                    writer.write(mDoc.outerHtml());
+                    content.empty(); // release
+                }catch(IOException e){
+                    cacheFile.delete();
+                }finally{
+                    IOUtils.close(writer);
+                }
+                
             } catch (IOException e) {
                 return false;
             }
@@ -477,8 +488,12 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
         @Override
         protected void onPostExecute(Boolean result) {
+            if(isFinishing()) return;
             setSupportProgressBarIndeterminateVisibility(false);
             if (result) {
+                if(cacheFile.exists()){
+                    mWeb.loadUrl(Uri.fromFile(cacheFile).toString());
+                }else
                 mWeb.loadDataWithBaseURL(URL_HOME, mDoc.html(), "text/html", "UTF-8",
                         null);
                 if (hasUseMap)
