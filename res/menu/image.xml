@@ -14,7 +14,7 @@
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_item_share_action_provider_action_bar"
-        android:actionProviderClass="com.actionbarsherlock.widget.ShareActionProvider"
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
         android:icon="@drawable/social_share"
         android:title="@string/action_bar_share"
         app:showAsAction="ifRoom"/>
