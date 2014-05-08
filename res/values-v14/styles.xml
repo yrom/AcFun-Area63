@@ -1,24 +1,24 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
+        <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
         
-        <item name="actionBarItemBackground">?attr/selectableItemBackground</item>
+        <item name="android:actionBarItemBackground">?attr/selectableItemBackground</item>
         
-        <item name="actionButtonStyle">@style/Widget.Styled.ActionButton</item>
+        <item name="android:actionButtonStyle">@style/Widget.Styled.ActionButton</item>
         <item name="android:windowBackground">@drawable/background_main</item>
         <item name="android:listSelector">@drawable/abc_list_selector_holo_dark</item>
         
-        <item name="spinnerDropDownItemStyle">@style/Widget.AppCompat.Light.DropDownItem.Spinner</item>
+        <item name="android:spinnerDropDownItemStyle">@style/Widget.AppCompat.Light.DropDownItem.Spinner</item>
         
-        <item name="selectableItemBackground">@drawable/item_background</item>
+        <item name="android:selectableItemBackground">@drawable/item_background</item>
         
-        <item name="actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
+        <item name="android:actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
         
-        <item name="dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
+        <item name="android:dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
         
-        <item name="popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
-        <item name="actionBarWidgetTheme">@style/Widget.Styled</item>
+        <item name="android:popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
+        <item name="android:actionBarWidgetTheme">@style/Widget.Styled</item>
 		<item name="android:editTextBackground">@drawable/edit_text_holo_light</item> 
 		<item name="SwipeBackLayoutStyle">@style/Widget.Styled.SwipeBackLayout</item>
 		
@@ -38,15 +38,13 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 	<style name="Widget.Styled" parent="Theme.AppCompat">
-        <item name="popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
         <item name="android:popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
         
-        <item name="dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
         <item name="android:dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
     </style>
 
     <style name="Widget.Styled.ActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="background">@color/main_color</item>
+        <item name="android:background">@color/main_color</item>
     </style>
     
     <style name="Widget.Styled.Spinner.DropDown.ActionBar" parent="Widget.AppCompat.Spinner.DropDown.ActionBar">
@@ -63,19 +61,6 @@
     
     <style name="Widget.Styled.ListView.DropDown" parent="Widget.AppCompat.ListView.DropDown">
         <item name="android:listSelector">@drawable/abc_list_selector_holo_dark</item>
-    </style>
-    
-    <style name="divider">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">1dp</item>
-        <item name="android:background">@drawable/divider_light</item>
-    </style>
-    <style name="Widget.Styled.SwipeBackLayout" parent="SwipeBackLayout">
-        <item name="edge_size">@dimen/edge_size</item>
-    </style>
-    <style name="Animation" parent="@android:style/Animation.Translucent">
-        <item name="android:windowEnterAnimation">@anim/activity_open_enter</item>
-        <item name="android:windowExitAnimation">@anim/activity_close_exit</item>
     </style>
     
 </resources>
