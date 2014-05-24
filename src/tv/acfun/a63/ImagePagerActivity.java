@@ -262,7 +262,7 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
             });
         }
         private void onError(final PhotoView image) {
-            MobclickAgent.reportError(mContext, "error occurred during load image: \n url=" + mUri.toString());
+//            MobclickAgent.reportError(mContext, "error occurred during load image: \n url=" + mUri.toString());
             progress.setVisibility(View.GONE);
             timeOut.setOnClickListener(new OnClickListener() {
                 

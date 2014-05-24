@@ -39,6 +39,7 @@ import org.jsoup.select.Elements;
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Article;
+import tv.acfun.a63.api.entity.Article.InvalideArticleError;
 import tv.acfun.a63.api.entity.Article.SubContent;
 import tv.acfun.a63.base.BaseWebViewActivity;
 import tv.acfun.a63.db.DB;
@@ -66,6 +67,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.util.IOUtils;
 import com.android.volley.Cache.Entry;
 import com.android.volley.NetworkResponse;
@@ -337,15 +339,20 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             try {
                 String json = new String(response.data,
                         HttpHeaderParser.parseCharset(response.headers));
-                return Response.success(Article.newArticle(JSON.parseObject(json)),
+                JSONObject articleJson = JSON.parseObject(json);
+                
+                return Response.success(Article.newArticle(articleJson),
                         HttpHeaderParser.parseCacheHeaders(response));
+            } catch(InvalideArticleError e){
+                Log.w(TAG, "Invalide Article! Need to redirect intent");
+                return Response.error(e);
             } catch (Exception e) {
                 Log.e(TAG, "parse article error", e);
                 return Response.error(new ParseError(e));
             }
         }
     }
-
+    
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -368,7 +375,19 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
     @Override
     public void onErrorResponse(VolleyError error) {
-        MobclickAgent.onError(this,error.toString());
+        if(error instanceof InvalideArticleError){
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            intent.setData(Uri.parse("av://ac"+aid));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                startActivity(intent);
+                finish();
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         setSupportProgressBarIndeterminateVisibility(false);
         showErrorDialog();
     }

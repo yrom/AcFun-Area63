@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.android.volley.VolleyError;
 
 /***
 {
@@ -98,7 +99,7 @@ public class Article {
     private static String TAG = "Article";
     private static Pattern imageReg = Pattern.compile("<img.+?src=[\"|'](.+?)[\"|']");
 
-    public static Article newArticle(JSONObject articleJson) {
+    public static Article newArticle(JSONObject articleJson) throws InvalideArticleError {
         if (Boolean.TRUE != articleJson.getBoolean("success")) {
             return null;
         }
@@ -124,7 +125,7 @@ public class Article {
             SubContent content = new SubContent();
             JSONObject sub = contentArray.getJSONObject(i);
             content.content = sub.getString("content");
-            
+            if(content.content == null) throw new InvalideArticleError();
             content.subTitle = sub.getString("subtitle").replaceAll("<span[^>]+>", "").replaceAll("</span>", "");
             Matcher matcher = imageReg.matcher(content.content);
             while (matcher.find()) {
@@ -150,4 +151,8 @@ public class Article {
         return poster;
     }
     
+    public static class InvalideArticleError extends VolleyError{
+        private static final long serialVersionUID = 1111L;
+        
+    }
 }

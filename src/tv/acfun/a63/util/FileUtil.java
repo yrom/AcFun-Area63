@@ -81,6 +81,7 @@ public class FileUtil {
      * 
      * @return SD卡未挂载则返回-1
      */
+    @SuppressWarnings("deprecation")
     public static long getExternalAvailable() {
         if (AcApp.isExternalStorageAvailable()) {
             StatFs sf = new StatFs(Environment.getExternalStorageDirectory().getPath());
@@ -106,7 +107,7 @@ public class FileUtil {
             String ext = "";
             if (start > 0 && start < url.length() - 1) {
                 try{
-                ext = url.substring(start, end).toLowerCase();
+                ext = url.substring(start, end).toLowerCase(Locale.US);
                 
                 return ext.substring(ext.lastIndexOf('.'));
                 }catch (StringIndexOutOfBoundsException e) {

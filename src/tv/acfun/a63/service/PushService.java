@@ -47,7 +47,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.umeng.analytics.MobclickAgent;
 
 /**
  * @author Yrom
@@ -160,7 +159,7 @@ public class PushService extends Service {
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            MobclickAgent.reportError(getApplicationContext(), error.toString());
+//            MobclickAgent.reportError(getApplicationContext(), error.toString());
             if(BuildConfig.DEBUG)
                 Log.e("PUSH", "something error", error);
         }
