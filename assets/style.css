@@ -126,18 +126,12 @@ text-align: center;
     margin-left: auto;
     margin-right: auto;
 }
-@media screen and (min-width: 500px) {
+@media screen and (min-width: 480px) {
   button {
-    width: 60%;
+    min-width: 40%;
   } 
 }
 
-@media screen and (min-width: 750px) {
-  button {
-    width: 40%;
-    max-width: 400px;
-  } 
-}
 #footer {
 padding:4%;
 text-align: center;
