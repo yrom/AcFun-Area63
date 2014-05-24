@@ -17,11 +17,11 @@
 package tv.acfun.a63.base;
 
 import java.io.IOException;
-
 import tv.acfun.a63.BuildConfig;
 import tv.acfun.a63.R;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.Connectivity;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -38,6 +38,7 @@ import android.webkit.WebView;
  * @author Yrom
  * 
  */
+@SuppressLint("SetJavaScriptEnabled")
 @TargetApi(19)
 public class BaseWebViewActivity extends BaseActivity {
     protected WebView mWeb;

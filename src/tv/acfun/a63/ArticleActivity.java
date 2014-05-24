@@ -47,7 +47,9 @@ import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
 import tv.acfun.a63.util.Theme;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -183,6 +185,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             mWeb.getSettings().setBuiltInZoomControls(true);
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                 mWeb.getSettings().setDisplayZoomControls(false);
+            setTextZoom(AcApp.getConfig().getInt("text_size", 0));
         }
     }
 
@@ -202,6 +205,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 fav.setIcon(R.drawable.rating_favorite_p);
                 fav.setTitle("取消收藏");
             }
+            
+            MenuItem item = menu.add(0, android.R.id.button1, 0, R.string.font_size).setIcon(R.drawable.ic_text_size);
+            MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -239,10 +245,37 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 }
             }
             return true;
+            
+        case android.R.id.button1:
+            if (mSizeChooser == null) {
+                final int checked = AcApp.getConfig().getInt("text_size", 0);
+                mSizeChooser = new AlertDialog.Builder(this)
+                        .setCancelable(true)
+                        .setTitle(R.string.font_size)
+                        .setSingleChoiceItems(R.array.title_sizes, checked,
+                                new DialogInterface.OnClickListener() {
+                                    int lastSelected = checked;
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (lastSelected != which) {
+                                            AcApp.putInt("text_size", which);
+                                            setTextZoom(which);
+                                            dialog.dismiss();
+                                            lastSelected = which;
+                                        }
+                                    }
+                                }).create();
+            }
+            mSizeChooser.show();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    void setTextZoom(int level){
+        mWeb.getSettings().setTextZoom(100 + level * 25);
+    }
     protected void initData() {
         super.initData();
         request = new ArticleRequest(aid, this, this);
@@ -286,6 +319,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
     private static final String TAG = "Article";
     private Article mArticle;
+    private AlertDialog mSizeChooser;
     static class ArticleRequest extends CustomUARequest<Article> {
 
         public ArticleRequest(int aid, Listener<Article> listener, ErrorListener errListener) {
