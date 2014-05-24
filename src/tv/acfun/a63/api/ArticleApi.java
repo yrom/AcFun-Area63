@@ -111,10 +111,16 @@ public final class ArticleApi {
 
         return isRecommended;
     }
-
+    @Deprecated
     public static String getRankListUrl(int page) {
-        return String.format(Constants.URL_RANK, (page-1)*20+1,page*20,System.currentTimeMillis()/300000*300000);
+        return getRankListUrl();
+//        return String.format(Constants.URL_RANK, (page-1)*20+1,page*20,System.currentTimeMillis()/300000*300000);
     }
+    
+    public static String getRankListUrl(){
+        return Constants.URL_RANK;
+    }
+    
     static SparseArray<String> channels = new SparseArray<String>();
     
     static{

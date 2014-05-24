@@ -800,28 +800,29 @@ public class MainActivity extends ActionBarActivity implements
     static Contents parseJson(String rankJson){
         JSONObject rankList = JSON.parseObject(rankJson);
         
-        if(!rankList.getBooleanValue("success")){
+        if(rankList.getIntValue("status") != 200){
             return null;
         }
-        JSONArray jsonArr = rankList.getJSONObject("content").getJSONArray("json");
+        JSONArray jsonArr = rankList.getJSONObject("data").getJSONObject("page").getJSONArray("list");
         
         List<Content> contents = new ArrayList<Content>();
         for(int i=0;i<jsonArr.size();i++){
-            JSONArray carr = jsonArr.getJSONArray(i);
+            JSONObject carr = jsonArr.getJSONObject(i);
             Content c = new Content();
-            c.aid = carr.getIntValue(0);
-            c.title =carr.getString(1);
-            c.description = carr.getString(2);
-            c.releaseDate = carr.getLongValue(5)*1000;
-            c.views = carr.getIntValue(10);
-            c.comments = carr.getIntValue(11);
-            c.stows = carr.getIntValue(12);
-            c.channelId = carr.getIntValue(17);
+            c.aid = carr.getIntValue("contentId");
+            c.title =carr.getString("title");
+            c.description = carr.getString("description");
+            c.releaseDate = carr.getLongValue("releaseDate");
+            c.views = carr.getIntValue("views");
+            c.comments = carr.getIntValue("comments");
+            c.stows = carr.getIntValue("stows");
+            c.channelId = carr.getIntValue("channelId");
             contents.add(c);
         }
         
         Contents cs = new Contents();
         cs.setContents(contents);
+        cs.totalpage = 1;
         return cs;
         
     }
@@ -918,14 +919,27 @@ public class MainActivity extends ActionBarActivity implements
                 @Override
                 public void onLastItemVisible() {
                     if(!isLoading){
-                        if(BuildConfig.DEBUG)
-                            Log.d(TAG, String.format("[%d] 加载下一页, mode=%d",section,listMode));
-                        loadData(false,false);
+                        if(hasNextPage()){
+                            if(BuildConfig.DEBUG)
+                                Log.d(TAG, String.format("[%d] 加载下一页, mode=%d",section,listMode));
+                            loadData(false,false);
+                        }else{
+                            timeOut.setVisibility(View.GONE);
+                            TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
+                            text.setText(R.string.no_more);
+                            footView.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
+                            footView.setOnClickListener(null);
+                        }
                     }
                 }
             });
             list.setOnItemClickListener(this);
             return rootView;
+        }
+
+        protected boolean hasNextPage() {
+            // 排行版只加载一页
+            return listMode != 3;
         }
 
         boolean isShowing;
@@ -1064,7 +1078,7 @@ public class MainActivity extends ActionBarActivity implements
             case 2:
                 return ArticleApi.getDefaultUrl(Constants.CAT_IDS[section], DEFAULT_COUT, page);
             case 3:
-                return ArticleApi.getRankListUrl(page);
+                return ArticleApi.getRankListUrl();
             case 0:
             default:
                 return ArticleApi.getHotListUrl(Constants.CAT_IDS[section],page);

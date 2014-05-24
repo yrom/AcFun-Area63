@@ -8,7 +8,8 @@ public interface Constants {
     String URL_COMMENT = URL_HOME + "comment_list_json.aspx?contentId=%d&currentPage=%d";
     String URL_PROFILE = URL_HOME + "api/member.aspx?name=profile";
     String URL_SPLAH = URL_HOME + "api/member.aspx?name=splash";
-    String URL_RANK = "http://trend.acfun.tv/api.ntr?page=bd_article&mode=rank&cid=63&ttype=1&stype=1&tdetail=2&start=%d&end=%d&timestamp=%d";
+//    String URL_RANK = "http://trend.acfun.tv/api.ntr?page=bd_article&mode=rank&cid=63&ttype=1&stype=1&tdetail=2&start=%d&end=%d&timestamp=%d";
+    String URL_RANK = "http://api.acfun.com/apiserver/content/rank?channelIds=110,73,74,75&pageSize=20";
     /**
      * 我关注的
      */
