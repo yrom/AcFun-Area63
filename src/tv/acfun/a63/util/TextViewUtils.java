@@ -46,6 +46,8 @@ import android.widget.TextView;
 public class TextViewUtils {
     
 	public static void setCommentContent(final TextView comment, Comment c) {
+	    if(comment.getMovementMethod() != null) // reset focus
+	        comment.setMovementMethod(null);
         String text = c.content;
         text = replace(text);
         try{
