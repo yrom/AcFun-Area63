@@ -61,6 +61,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebSettings.LayoutAlgorithm;
+import android.webkit.WebSettings.TextSize;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -91,7 +92,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author Yrom
  * 
  */
-@TargetApi(19)
+@SuppressWarnings("deprecation")
 public class ArticleActivity extends BaseWebViewActivity implements Listener<Article>, ErrorListener {
     private static final String URL_HOME = Constants.URL_HOME;
     private static String ARTICLE_PATH;
@@ -111,6 +112,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     private boolean isDownloaded;
     private DB db;
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void initView(Bundle savedInstanceState) {
         ARTICLE_PATH = AcApp.getExternalCacheDir("article").getAbsolutePath();
@@ -274,7 +276,11 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
 
     void setTextZoom(int level){
-        mWeb.getSettings().setTextZoom(100 + level * 25);
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+            if(level > 4) level = 3;
+            mWeb.getSettings().setTextSize(TextSize.values()[level+1]);
+        }else
+            mWeb.getSettings().setTextZoom(100 + level * 25);
     }
     protected void initData() {
         super.initData();
@@ -371,6 +377,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     private int aid;
     private boolean isFaved;
     
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     private class BuildDocTask extends AsyncTask<Article, Void, Boolean> {
         boolean hasUseMap;
         private File cacheFile;
