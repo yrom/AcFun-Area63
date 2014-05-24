@@ -58,6 +58,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -309,17 +310,20 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 .append(article.title)
                 .append("</h1>")
                 .append("<div id=\"info\" class=\"article-info\">")
-                .append("<span class=\"article-publisher\">✎")
+                .append("<span class=\"article-publisher\">")
+                .append("<img src=\"")
+                .append(TextUtils.isEmpty(article.poster.avatar) ? "file:///android_asset/wen2.png" : article.poster.avatar)
+                .append("\" >")
                 .append("<a href=\"http://www.acfun.com/member/user.aspx?uid=")
                 .append(article.poster.id).append("\" >")
                 .append(article.poster.name)
                 .append("</a>").append("</span>")
-                .append("<span class=\"article-pubdate\">")
-                .append(AcApp.getPubDate(article.postTime))
-                .append("发布于</span>")
-                .append("<span class=\"article-category\">")
-                .append(article.channelName)
-                .append("</span>")
+//                .append("<span class=\"article-pubdate\">")
+//                .append(AcApp.getPubDate(article.postTime))
+//                .append("发布于</span>")
+//                .append("<span class=\"article-category\">")
+//                .append(article.channelName)
+//                .append("</span>")
                 .append("</div>");
 
         return builder.toString();
@@ -458,7 +462,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             if (!article.title.equals(sub.subTitle)) {
                 content.append("<h2 class=\"article-subtitle\"><a class=\"anchor\" name=\"p"+p+"\"></a>Part "+(p+1)+". "+sub.subTitle + "</h2>");
             }
-            String data = sub.content.replaceAll("background-color:#[^;]+;", "").replaceAll("font-family:[^;]+;", "");
+            String data = sub.content.replaceAll("background-color:[^;]+;", "").replaceAll("font-family:[^;]+;", "");
             
             content.append(data).appendElement("hr");
             handleImages(content);
@@ -664,7 +668,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 StringBuilder jsBuilder = new StringBuilder();
                 jsBuilder.append("javascript:(function(){")
                          .append("var images = document.getElementsByTagName(\"img\"); ")
-                         .append("var img = images[").append(values[0]).append("];")
+                         .append("var img = images[").append(values[0]+1).append("];")
                          .append("img.src = img.getAttribute(\"loc\");")
                          .append("})()");
                 evaluateJavascript(jsBuilder.toString(),null);
