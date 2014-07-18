@@ -23,7 +23,7 @@ import com.alibaba.fastjson.JSONObject;
 
 public class MemberUtils{
 	
-	public static HashMap<String, Object> login(String username,String password) throws HttpException, IOException,UnknownHostException, JSONException{
+	public static HashMap<String, Object> login(String host, String username,String password) throws HttpException, IOException,UnknownHostException, JSONException{
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			PostMethod post = new PostMethod("/login.aspx");
 	        NameValuePair[] nps = new NameValuePair[2];
@@ -34,7 +34,7 @@ public class MemberUtils{
 	        HttpClient client = new HttpClient();
 	        client.getParams().setParameter("http.protocol.single-cookie-header", true);
 	        client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
-	        client.getHostConfiguration().setHost(Constants.HOME, 80, "http");
+	        client.getHostConfiguration().setHost(host, 80, "http");
 	        int state = client.executeMethod(post);
 	        
 	        if(state>200){
@@ -71,10 +71,10 @@ public class MemberUtils{
 	        return map;
 	}
 	
-	public static boolean postComments(String comment,int aid,Cookie[] cks) throws HttpException, IOException{
-	    return postComments(comment, null, aid, cks);
+	public static boolean postComments(String comment,int aid, String host, Cookie[] cks) throws HttpException, IOException{
+	    return postComments(comment, null, aid,host, cks);
 	}
-	public static boolean postComments(String comment, Comment quote,int aid, Cookie[] cks) throws HttpException, IOException{
+	public static boolean postComments(String comment, Comment quote,int aid, String host, Cookie[] cks) throws HttpException, IOException{
 	    PostMethod post = new PostMethod("/comment.aspx");
         NameValuePair[] nps = { new NameValuePair("name", "sendComm()"),
                 new NameValuePair("name", "mimiko"), 
@@ -85,54 +85,25 @@ public class MemberUtils{
                 new NameValuePair("quoteName", quote == null ? "" : quote.userName) };
         post.setRequestBody(nps);
         post.setRequestHeader("Content-Type",Connectivity.CONTENT_TYPE_FORM);
-        int state  = Connectivity.doPost(post, cks);
+        int state  = Connectivity.doPost(post, host, cks);
         return state == 200;
 	}
-	public static boolean addFavourite(String cid, Cookie[] cks){
+
+    public static boolean addFavourite(String cid, String host, Cookie[] cks) {
         NameValuePair[] nps = new NameValuePair[2];
         nps[0] = new NameValuePair("cId", cid);
         nps[1] = new NameValuePair("operate", "1");
-        return Connectivity.postResultJson("/member/collect.aspx", nps, cks).getBooleanValue("success");
-	}
-	public static boolean deleteFavourite(String cid, Cookie[] cookies){
-	    NameValuePair[] nps = new NameValuePair[2];
-	    nps[0] = new NameValuePair("cId", cid);
+        return Connectivity.postResultJson("/member/collect.aspx", host, nps, cks).getBooleanValue("success");
+    }
+
+    public static boolean deleteFavourite(String cid, String host, Cookie[] cookies) {
+        NameValuePair[] nps = new NameValuePair[2];
+        nps[0] = new NameValuePair("cId", cid);
         nps[1] = new NameValuePair("operate", "0");
-        return Connectivity.postResultJson("/member/collect.aspx", nps, cookies).getBooleanValue("success");
-	}
-//	public static List<Favorite> getFavouriteOnline(Cookie[] cookies, int pageNo){
-//	    return getFavouriteOnline(cookies, 15, pageNo);
-//	}
-//	public static int totalPage;
-//	public static List<Favorite> getFavouriteOnline(Cookie[] cookies, int pageSize, int pageNo){
-//	    JSONObject json = Connectivity.getResultJson("/member/collection.aspx", String.format("count=%d&pageNo=%d",pageSize,pageNo), cookies);
-//        
-//        List<Favorite> favs = null;
-//        if(json != null){
-//            try {
-//                if(!json.getBoolean("success")){
-//                    return null;
-//                }
-//                totalPage = json.getJSONObject("page").getInt("totalPage");
-//                favs = new ArrayList<Favorite>();
-//                JSONArray array = json.getJSONArray("contents");
-//                for(int i=0;i<array.length();i++){
-//                    JSONObject content = array.getJSONObject(i);
-//                    Favorite fav = new Favorite();
-//                    fav.aid = content.getString("aid");
-//                    fav.channelid = content.getInt("channelId");
-//                    fav.title = content.getString("title");
-//                    fav.type = ChannelApi.getChannelType(fav.channelid);
-//                    favs.add(fav);
-//                }
-//            } catch (JSONException e) {
-//                Log.e("Member", "try to get favorite data online",e);
-//            }
-//            
-//        }
-//        return favs;
-//	}
-	public static JSONObject checkIn(Cookie[] cks){
-	    return Connectivity.postResultJson("/member/checkin.aspx", null, cks);
-	}
+        return Connectivity.postResultJson("/member/collect.aspx", host, nps, cookies).getBooleanValue("success");
+    }
+
+    public static JSONObject checkIn(String host, Cookie[] cks) {
+        return Connectivity.postResultJson("/member/checkin.aspx", host, null, cks);
+    }
 }

@@ -17,7 +17,6 @@
 package tv.acfun.a63;
 
 import tv.acfun.a63.service.PushService;
-import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FileUtil;
 import tv.acfun.a63.util.Theme;
 import android.annotation.TargetApi;

@@ -19,6 +19,7 @@ package tv.acfun.a63;
 import java.io.File;
 import java.util.ArrayList;
 
+import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.BaseAnimationListener;
@@ -174,7 +175,7 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
             String url = getArguments().getString(ARG_IMAGE_URL);
             Uri uri = Uri.parse(url);
             if(uri.getHost() == null){
-                uri = Uri.parse("http://www.acfun.com"+url);
+                uri = Uri.parse("http://"+ArticleApi.getDomainRoot(mContext)+url);
             }
             mUri = uri;
         }
@@ -346,7 +347,7 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
         String path = mList.get(mCurrentImage);
         Uri uri = Uri.parse(path);
         shareIntent.setType("image/*");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("#Acfun文章区# 分享图片，%s - http://www.acfun.com/a/ac%d",title,aid));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("#Acfun文章区# 分享图片，%s - http://%s/a/ac%d",ArticleApi.getDomainRoot(getApplicationContext()), title, aid));
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         return shareIntent;
     }

@@ -15,11 +15,9 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import tv.acfun.a63.AcApp;
-import tv.acfun.a63.api.Constants;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -29,7 +27,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -123,57 +120,57 @@ public class Connectivity {
         return request(post, host, port, protocal, cks);
     }
 
-    public static int doPost(PostMethod post, Cookie[] cks) throws HttpException, IOException {
-        return doPost(post, Constants.HOME, 0, null, cks);
+    public static int doPost(PostMethod post, String host, Cookie[] cks) throws HttpException, IOException {
+        return doPost(post, host, 0, null, cks);
     }
 
-    public static JSONObject postResultJson(String url, NameValuePair[] nps, Cookie[] cks) {
-        if (TextUtils.isEmpty(url))
-            throw new NullPointerException("url cannot be null!");
-        PostMethod post = new PostMethod(url);
+    public static JSONObject postResultJson(String path, String host, NameValuePair[] nps, Cookie[] cks) {
+        if (TextUtils.isEmpty(path))
+            throw new NullPointerException("path cannot be null!");
+        PostMethod post = new PostMethod(path);
         if (nps != null) {
             post.setRequestBody(nps);
             post.setRequestHeader("Content-Type", CONTENT_TYPE_FORM);
         }
         try {
-            int state = Connectivity.doPost(post, cks);
+            int state = Connectivity.doPost(post, host, cks);
             if (state == 200) {
                 String json = post.getResponseBodyAsString();
                 JSONObject re = JSON.parseObject(json);
                 return re;
             }
         } catch (Exception e) {
-            Log.e(TAG, "try to post Result Json :"+url ,e);
+            Log.e(TAG, "try to post Result Json :"+path ,e);
         }
         return null;
     }
 
-    public static int doGet(GetMethod get, String host, int port, String protocal, Cookie[] cookies)
-            throws HttpException, IOException {
-        return request(get, host, port == 0 ? 80 : port, protocal == null ? "http" : protocal, cookies);
-    }
-
-    public static int doGet(GetMethod get, Cookie[] cookies) throws HttpException, IOException {
-        return doGet(get, "www.acfun.com", 0, null, cookies);
-    }
-
-    public static String doGet(String url, String queryString, Cookie[] cookies) {
-        if (TextUtils.isEmpty(url))
-            throw new NullPointerException("url cannot be null!");
-        GetMethod get = new GetMethod(url);
-        get.setRequestHeader("User-Agent", UA);
-        if(queryString != null)
-            get.setQueryString(queryString);
-        try {
-            int state = doGet(get, cookies);
-            if (state == 200) {
-                return readData(get.getResponseBodyAsStream(),"utf-8");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "try to get :"+url ,e);
-        }
-        return null;
-    }
+//    public static int doGet(GetMethod get, String host, int port, String protocal, Cookie[] cookies)
+//            throws HttpException, IOException {
+//        return request(get, host, port == 0 ? 80 : port, protocal == null ? "http" : protocal, cookies);
+//    }
+//
+//    public static int doGet(GetMethod get, Cookie[] cookies) throws HttpException, IOException {
+//        return doGet(get, ArticleApi.getDomainRoot(null), 0, null, cookies);
+//    }
+//
+//    public static String doGet(String url, String queryString, Cookie[] cookies) {
+//        if (TextUtils.isEmpty(url))
+//            throw new NullPointerException("url cannot be null!");
+//        GetMethod get = new GetMethod(url);
+//        get.setRequestHeader("User-Agent", UA);
+//        if(queryString != null)
+//            get.setQueryString(queryString);
+//        try {
+//            int state = doGet(get, cookies);
+//            if (state == 200) {
+//                return readData(get.getResponseBodyAsStream(),"utf-8");
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG, "try to get :"+url ,e);
+//        }
+//        return null;
+//    }
     private static final int BUFF_SIZE = 1 << 13;
     private static String readData(InputStream in, String encoding) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -186,15 +183,15 @@ public class Connectivity {
         return new String(baos.toByteArray(),encoding);
     }
 
-    public static JSONObject getResultJson(String url, String queryString, Cookie[] cookies) {
-        String result = doGet(url, queryString, cookies);
-        try {
-            return TextUtils.isEmpty(result) ? null : JSON.parseObject(result);
-        } catch (JSONException e) {
-            Log.e(TAG, "try to get Result Json :"+url ,e);
-            return null;
-        }
-    }
+//    public static JSONObject getResultJson(String url, String queryString, Cookie[] cookies) {
+//        String result = doGet(url, queryString, cookies);
+//        try {
+//            return TextUtils.isEmpty(result) ? null : JSON.parseObject(result);
+//        } catch (JSONException e) {
+//            Log.e(TAG, "try to get Result Json :"+url ,e);
+//            return null;
+//        }
+//    }
     
     public static boolean isWifiConnected(Context context){
         NetworkInfo info = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))

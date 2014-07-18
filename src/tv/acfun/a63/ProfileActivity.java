@@ -23,13 +23,12 @@ import org.apache.commons.httpclient.Cookie;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import tv.acfun.a63.api.Constants;
+import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.base.BaseWebViewActivity;
 import tv.acfun.a63.util.DocumentRequest;
 import tv.acfun.a63.util.MemberUtils;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -52,7 +51,7 @@ public class ProfileActivity extends BaseWebViewActivity {
         @Override
         public void onResponse(Document response) {
             String data = response.html();
-            mWeb.loadDataWithBaseURL(Constants.URL_HOME, data, "text/html", "utf-8", null);
+            mWeb.loadDataWithBaseURL(getBaseUrl(), data, "text/html", "utf-8", null);
             setSupportProgressBarIndeterminateVisibility(false);
         }
         
@@ -61,14 +60,16 @@ public class ProfileActivity extends BaseWebViewActivity {
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            Log.e(TAG, "VolleyError", error);
             setSupportProgressBarIndeterminateVisibility(false);
             showErrorDialog();
         }
     };
     private Cookie[] cookies;
 
-    
+    protected String getBaseUrl() {
+        return ArticleApi.getDomainRoot(getApplicationContext());
+    }
+
     @Override
     protected void initView(Bundle savedInstanceState) {
         getSupportActionBar().setTitle(R.string.pofile);
@@ -93,7 +94,7 @@ public class ProfileActivity extends BaseWebViewActivity {
 
         public SplashDocumentRequest(Cookie[] cookies, Listener<Document> listener,
                 ErrorListener errorListner) {
-            super(Constants.URL_SPLAH, cookies, listener, errorListner);
+            super(ArticleApi.getSplashUrl(getApplicationContext()), cookies, listener, errorListner);
         }
 
         @Override
@@ -125,7 +126,7 @@ public class ProfileActivity extends BaseWebViewActivity {
         }
         @android.webkit.JavascriptInterface
         public void checkin(){
-            JSONObject checkIn = MemberUtils.checkIn(cookies);
+            JSONObject checkIn = MemberUtils.checkIn(getBaseUrl(), cookies);
             if(checkIn != null){
                 if(checkIn.getBooleanValue("success")){
                     AcApp.showToast(getString(R.string.check_in_success));

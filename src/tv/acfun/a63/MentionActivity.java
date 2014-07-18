@@ -171,7 +171,7 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
                 mLoadingBar.setVisibility(View.VISIBLE);
         }
         isloading = true;
-        Request<?> request = new MentionsRequest(page, mCookies, listener, error);
+        Request<?> request = new MentionsRequest(getApplicationContext(), page, mCookies, listener, error);
         request.setShouldCache(true);
         request.setTag(TAG);
         AcApp.addRequest(request);
@@ -238,9 +238,9 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
 
     public static class MentionsRequest extends UsingCookiesRequest<Mentions>{
       
-        public MentionsRequest(int page, Cookie[] cookies, Listener<Mentions> listener,
+        public MentionsRequest(Context context, int page, Cookie[] cookies, Listener<Mentions> listener,
                 ErrorListener errorListner) {
-            super(ArticleApi.getMentionsUrl(10,page), cookies, Mentions.class, listener, errorListner);
+            super(ArticleApi.getMentionsUrl(context, 10,page), cookies, Mentions.class, listener, errorListner);
         }
         
         @Override

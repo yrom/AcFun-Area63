@@ -3,6 +3,7 @@ package tv.acfun.a63;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.Constants;
@@ -122,6 +123,7 @@ public class MainActivity extends ActionBarActivity implements
         Theme.onActivityCreate(this,savedInstanceState);
         super.onCreate(savedInstanceState);
         mUser = AcApp.getUser();
+        initUmeng();
         setContentView(R.layout.activity_main);
         ActionBarUtil.forceShowActionBarOverflowMenu(this);
         
@@ -134,14 +136,14 @@ public class MainActivity extends ActionBarActivity implements
         mQueue = AcApp.getGloableQueue();
         
         PushService.start(this);
-        // umeng
-        initUmeng();
+        
     }
 
     private void initUmeng() {
         MobclickAgent.setDebugMode(BuildConfig.DEBUG);
         UmengUpdateAgent.update(this);
         MobclickAgent.onError(this);
+        ArticleApi.updateConfig(getApplicationContext());
         SyncListener listener = new Conversation.SyncListener() {
 
             @Override
@@ -649,7 +651,7 @@ public class MainActivity extends ActionBarActivity implements
                     else{
                         holder.comments.setText(R.string.no_desc);
                     }
-                    String tip = String.format("于%s收藏，有%d人同好", AcApp.getPubDate(content.releaseDate),content.stows);
+                    String tip = String.format(Locale.CHINA, "于%s收藏，有%d人同好", AcApp.getPubDate(content.releaseDate),content.stows);
                     holder.postTime.setText(tip);
                     holder.channel.setText(ArticleApi.getChannelName(content.channelId));
                     return convertView;
@@ -754,7 +756,7 @@ public class MainActivity extends ActionBarActivity implements
         private void startSearch(String query, int page) {
             mProgress.setVisibility(View.VISIBLE);
             mPage = page;
-            String url = ArticleApi.getSearchUrl(query, 2, 1, mPage, 20);
+            String url = ArticleApi.getSearchUrl(getActivity(), query, 2, 1, mPage, 20);
             if (BuildConfig.DEBUG) Log.d(TAG, "query url=" + url);
             Request<?> request = new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
             AcApp.addRequest(request);
@@ -1074,14 +1076,14 @@ public class MainActivity extends ActionBarActivity implements
             
             switch (listMode) {
             case 1:
-                return ArticleApi.getLatestRepliedUrl(Constants.CAT_IDS[section],page);
+                return ArticleApi.getLatestRepliedUrl(getActivity(),Constants.CAT_IDS[section],page);
             case 2:
-                return ArticleApi.getDefaultUrl(Constants.CAT_IDS[section], DEFAULT_COUT, page);
+                return ArticleApi.getDefaultUrl(getActivity(),Constants.CAT_IDS[section], DEFAULT_COUT, page);
             case 3:
-                return ArticleApi.getRankListUrl();
+                return ArticleApi.getRankListUrl(getActivity());
             case 0:
             default:
-                return ArticleApi.getHotListUrl(Constants.CAT_IDS[section],page);
+                return ArticleApi.getHotListUrl(getActivity(),Constants.CAT_IDS[section],page);
             }
         }
         @Override
@@ -1201,7 +1203,7 @@ public class MainActivity extends ActionBarActivity implements
                 } else
                     rank.setVisibility(View.GONE);
             }
-            String tip = String.format(" %s / %d条评论，%d人围观", AcApp.getPubDate(art.releaseDate),art.comments,art.views);
+            String tip = String.format(Locale.CHINA, " %s / %d条评论，%d人围观", AcApp.getPubDate(art.releaseDate),art.comments,art.views);
 //            holder.postTime.setText(AcApp.getPubDate(art.releaseDate));
             holder.postTime.setText(tip);
             return convertView;

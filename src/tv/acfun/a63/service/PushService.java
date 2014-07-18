@@ -120,7 +120,7 @@ public class PushService extends Service {
                 try {
                     if (BuildConfig.DEBUG) Log.i("RefreshReceiver", "request refresh");
                     Cookie[] cookies = JSON.parseObject(AcApp.getUser().cookies, Cookie[].class);
-                    MentionsRequest mentionsRequest = new MentionActivity.MentionsRequest(1, cookies, mListener, mError);
+                    MentionsRequest mentionsRequest = new MentionActivity.MentionsRequest(getApplicationContext(), 1, cookies, mListener, mError);
                     // 缓存，使从消息栏打开 Activity 后可以直接读取
                     mentionsRequest.setShouldCache(true);
                     byte[] data = AcApp.getDataInDiskCache(mentionsRequest.getCacheKey());

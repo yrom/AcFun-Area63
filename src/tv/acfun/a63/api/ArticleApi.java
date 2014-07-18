@@ -4,15 +4,59 @@ package tv.acfun.a63.api;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Locale;
+
+import org.json.JSONObject;
 
 import tv.acfun.a63.AcApp;
+import tv.acfun.a63.BuildConfig;
 import tv.acfun.a63.api.entity.Content;
+import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.alibaba.fastjson.JSON;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.analytics.onlineconfig.UmengOnlineConfigureListener;
 
 public final class ArticleApi {
-
+    private static final String DOMAIN_ROOT = "domain_root";
+    private static final String DOMAIN_API = "domain_api";
+    
+    public static String HOME = Constants.HOME;
+    public static String API_HOME = Constants.API_HOME;
+    
+    public static void updateConfig(Context context){
+        HOME = MobclickAgent.getConfigParams(context, DOMAIN_ROOT);
+        API_HOME = MobclickAgent.getConfigParams(context, DOMAIN_API);
+        MobclickAgent.updateOnlineConfig(context);
+        MobclickAgent.setOnlineConfigureListener(new UmengOnlineConfigureListener() {
+            @Override
+            public void onDataReceived(JSONObject json) {
+                if(BuildConfig.DEBUG){
+                    Log.v("api", "received online config:"+json);
+                }
+                if(json == null) return;
+                String root = json.optString(DOMAIN_ROOT, Constants.HOME);
+                String api = json.optString(DOMAIN_API, Constants.API_HOME);
+                HOME = root;
+                API_HOME = api;
+            }
+        });
+    }
+    public static String getDomainRoot(Context context) {
+        if(context == null) return HOME;
+        String params = MobclickAgent.getConfigParams(context, DOMAIN_ROOT);
+        return TextUtils.isEmpty(params) ? HOME : params;
+    }
+    
+    public static String getDomainApi(Context context) {
+        if(context == null) return API_HOME;
+        String params = MobclickAgent.getConfigParams(context, DOMAIN_API);
+        return TextUtils.isEmpty(params) ? API_HOME : params;
+    }
+    
     /**
      * @param type
      *            {@code TYPE_*}
@@ -22,49 +66,72 @@ public final class ArticleApi {
      *            default 20
      * @param page
      *            default 1
+     * @param context 
      * @return
      */
-    public static String getUrl(int type, int catId, int count, int page) {
+    public static String getUrl(Context context, int type, int catId, int count, int page) {
         if (count <= 0)
             count = 20;
         if (page < 1)
             page = 1;
-        return String.format(Constants.URL_BASE, type, catId, count, 20 * (page - 1));
+        return getBaseUrl(context, type, catId, count, 20 * (page - 1));
     }
-
+    
+    public static String getBaseUrl(Context context, int order, int channelId, int count, int first){
+        String root = getDomainRoot(context);
+        return String.format(Locale.US, "http://%s/api/getlistbyorder.aspx?orderby=%d&channelIds=%d&count=%d&first=%d", root, order, channelId, count, first);
+    }
+    
     /**
      * 获得默认形式(最新发布)列表的url
      */
-    public static String getDefaultUrl(int channelId, int count, int page) {
-        return getUrl(Constants.TYPE_DEFAULT, channelId, count, page);
+    public static String getDefaultUrl(Context context, int channelId, int count, int page) {
+        return getUrl(context, Constants.TYPE_DEFAULT, channelId, count, page);
     }
 
     /**
      * 获得周热门列表url
      */
-    public static String getHotListUrl(int channelId,int page) {
-        return getUrl(Constants.TYPE_HOT, channelId, Constants.COUNT_HOT, page);
+    public static String getHotListUrl(Context context, int channelId,int page) {
+        return getUrl(context, Constants.TYPE_HOT, channelId, Constants.COUNT_HOT, page);
     }
 
     /**
      * 获得最新回复列表url
      */
-    public static String getLatestRepliedUrl(int channelId,int page) {
-        return getUrl(Constants.TYPE_LATEST_REPLY, channelId, Constants.COUNT_LAST_REPLY, page);
+    public static String getLatestRepliedUrl(Context context, int channelId,int page) {
+        return getUrl(context, Constants.TYPE_LATEST_REPLY, channelId, Constants.COUNT_LAST_REPLY, page);
     }
-
-    public static String getContentUrl(int aid) {
+    
+    public static String getContentUrl(Context context, int aid){
         if (aid <= 0)
             return null;
-        return String.format(Constants.URL_CONTENT, aid);
+        String root = getDomainRoot(context);
+        return String.format(Locale.US, "http://%s/api/content.aspx?query=%d", root, aid);
+    }
+    
+    public static String getCommentUrl(Context context, int id, int page){
+        String root = getDomainRoot(context);
+        return String.format(Locale.US, "http://%s/comment_list_json.aspx?contentId=%d&currentPage=%d", root, id, page);
+    }
+    
+    public static String getProfileUrl(Context context){
+        String root = getDomainRoot(context);
+        return "http://"+root+"/api/member.aspx?name=profile";
+    }
+    
+    public static String getSplashUrl(Context context){
+        String root = getDomainRoot(context);
+        return "http://"+root+"/api/member.aspx?name=splash";
+    }
+    
+    public static String getRankListUrl(Context context){
+        String api = getDomainApi(context);
+        return "http://"+api+"/apiserver/content/rank?channelIds=110,73,74,75&pageSize=20";
     }
 
     public static List<Content> getChannelContents(String json) {
         return JSON.parseArray(json, Content.class);
-    }
-
-    public static String getCommentUrl(int aid, int page) {
-        return String.format(Constants.URL_COMMENT, aid, page);
     }
 
     public static boolean isHotArticle(Content art) {
@@ -77,17 +144,17 @@ public final class ArticleApi {
         } else if (art.channelId == Constants.CAT_AN_CULTURE) {
             isHot = art.comments >= 35 || art.views >= 3500;
         } else if (e <= AcApp._1_hour * 3) {
-            isHot = art.comments >= 50 || art.views >= 3500;
+            isHot = art.comments >= 50 || art.views >= 4500;
         } else if (e <= AcApp._1_hour * 5) {
-            isHot = art.comments >= 65 || art.views >= 5000;
+            isHot = art.comments >= 65 || art.views >= 6000;
         } else if (e <= AcApp._1_hour * 8) {
-            isHot = art.comments >= 80 || art.views >= 7000;
+            isHot = art.comments >= 80 || art.views >= 10000;
         } else if (e <= AcApp._1_hour * 12) {
-            isHot = art.comments >= 95 || art.views >= 9000;
+            isHot = art.comments >= 95 || art.views >= 12000;
         } else if (e <= AcApp._1_hour * 18) {
-            isHot = art.comments >= 110 || art.views >= 12500;
+            isHot = art.comments >= 110 || art.views >= 14500;
         } else {
-            isHot = art.comments >= 120 || art.views >= 14000;
+            isHot = art.comments >= 120 || art.views >= 15000;
         }
 
         return isHot;
@@ -110,15 +177,6 @@ public final class ArticleApi {
             isRecommended = art.views >= 11000 && art.comments >= 65 && art.stows >= 40;
 
         return isRecommended;
-    }
-    @Deprecated
-    public static String getRankListUrl(int page) {
-        return getRankListUrl();
-//        return String.format(Constants.URL_RANK, (page-1)*20+1,page*20,System.currentTimeMillis()/300000*300000);
-    }
-    
-    public static String getRankListUrl(){
-        return Constants.URL_RANK;
     }
     
     static SparseArray<String> channels = new SparseArray<String>();
@@ -175,8 +233,9 @@ public final class ArticleApi {
     /**
      * http://www.acfun.tv/api/member.aspx?name=mentions&pageNo=1&pageSize=10
      */
-    public static String getMentionsUrl(int size, int page) {
-        return String.format(Constants.URL_MENTIONS, page, size);
+    public static String getMentionsUrl(Context context, int size, int page) {
+        String root = getDomainRoot(context);
+        return String.format(Locale.US, "http://%s/api/member.aspx?name=mentions&pageNo=%d&pageSize=%d", root, page, size);
     }
     
     /**
@@ -187,12 +246,12 @@ public final class ArticleApi {
      * @param pageSize http://www.acfun.tv/api/search.aspx?query={query}&exact=1&channelIds=63&orderId=2&orderBy=1&pageNo=1&pageSize=10&_=1387786184949
      * @return
      */
-    public static String getSearchUrl(String query, int orderId, int orderBy, int pageNo, int pageSize){
+    public static String getSearchUrl(Context context, String query, int orderId, int orderBy, int pageNo, int pageSize){
         String url = null;
         try {
             String key = URLEncoder.encode(query, "UTF-8");
-            String format = Constants.URL_SEARCH; 
-            url = String.format(format, key,orderId,orderBy,pageNo,pageSize);
+            String format = "http://%s/api/search.aspx?query=%s&exact=1&channelIds=63&orderId=%d&orderBy=%d&pageNo=%d&pageSize=%d";
+            url = String.format(Locale.US, format, getDomainApi(context), key, orderId, orderBy, pageNo, pageSize);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

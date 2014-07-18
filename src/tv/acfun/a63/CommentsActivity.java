@@ -329,7 +329,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     private void requestData(int page, boolean requestNewData) {
         isloading = true;
-        Request<?> request = new CommentsRequest(aid, page, this, this);
+        Request<?> request = new CommentsRequest(getApplicationContext(), aid, page, this, this);
         request.setTag(TAG);
         request.setShouldCache(true);
         if (requestNewData) {
@@ -389,9 +389,9 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     static class CommentsRequest extends CustomUARequest<Comments> {
 
-        public CommentsRequest(int aid, int page, Listener<Comments> listener,
+        public CommentsRequest(Context context, int aid, int page, Listener<Comments> listener,
                 ErrorListener errListener) {
-            super(ArticleApi.getCommentUrl(aid, page), Comments.class, listener, errListener);
+            super(ArticleApi.getCommentUrl(context, aid, page), Comments.class, listener, errListener);
 
         }
 
@@ -502,7 +502,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
             Cookie[] cookies = JSON.parseObject(mUser.cookies, Cookie[].class);
             for (int i = 0; i < 3; i++)
                 try {
-                    if (MemberUtils.postComments(comment, quote, aid, cookies))
+                    if (MemberUtils.postComments(comment, quote, aid, ArticleApi.getDomainRoot(getApplicationContext()), cookies))
                         return true;
                 } catch (HttpException e) {
                     e.printStackTrace();

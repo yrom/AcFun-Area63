@@ -97,7 +97,6 @@ import com.umeng.analytics.MobclickAgent;
  */
 @SuppressWarnings("deprecation")
 public class ArticleActivity extends BaseWebViewActivity implements Listener<Article>, ErrorListener {
-    private static final String URL_HOME = Constants.URL_HOME;
     private static String ARTICLE_PATH;
     private static final String NAME_ARTICLE_HTML = "a63-article.html";
     public static void start(Context context, int aid, String title) {
@@ -177,7 +176,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                             || AcApp.getViewMode() == Constants.MODE_NO_PIC) // 无图模式
                         return;
 //                    Log.d(TAG, "on finished:" + url);
-                    if ((url.equals(URL_HOME) || url.contains(NAME_ARTICLE_HTML))
+                    if ((url.equals(getBaseUrl()) || url.contains(NAME_ARTICLE_HTML))
                             && imgUrls.size() > 0 && !isDownloaded) {
                         String[] arr = new String[imgUrls.size()];
                         mDownloadTask = new DownloadImageTask();
@@ -192,6 +191,10 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 mWeb.getSettings().setDisplayZoomControls(false);
             setTextZoom(AcApp.getConfig().getInt("text_size", 0));
         }
+    }
+
+    protected String getBaseUrl() {
+        return ArticleApi.getDomainRoot(getApplicationContext());
     }
 
     @Override
@@ -218,7 +221,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
 
     private Intent createShareIntent() {
-        String shareurl = title + " http://www.acfun.com/a/ac" + aid;
+        String shareurl = title + " http://"+ArticleApi.getDomainRoot(getApplicationContext())+"/a/ac" + aid;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareurl += " ——#Acfun文章区#客户端 http://t.cn/8kLMite";
         shareIntent.setType("text/plain");
@@ -287,7 +290,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
     protected void initData() {
         super.initData();
-        request = new ArticleRequest(aid, this, this);
+        request = new ArticleRequest(getApplicationContext(), aid, this, this);
         request.setTag(TAG);
         request.setShouldCache(true);
         Entry entry = AcApp.getGloableQueue().getCache().get(request.getCacheKey());
@@ -314,7 +317,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 .append("<img src=\"")
                 .append(TextUtils.isEmpty(article.poster.avatar) ? "file:///android_asset/wen2.png" : article.poster.avatar)
                 .append("\" >")
-                .append("<a href=\"http://www.acfun.com/member/user.aspx?uid=")
+                .append("<a href=\"http://").append(ArticleApi.getDomainRoot(getApplicationContext())).append("/member/user.aspx?uid=")
                 .append(article.poster.id).append("\" >")
                 .append(article.poster.name)
                 .append("</a>").append("</span>")
@@ -334,8 +337,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     private AlertDialog mSizeChooser;
     static class ArticleRequest extends CustomUARequest<Article> {
 
-        public ArticleRequest(int aid, Listener<Article> listener, ErrorListener errListener) {
-            super(ArticleApi.getContentUrl(aid), Article.class, listener, errListener);
+        public ArticleRequest(Context context, int aid, Listener<Article> listener, ErrorListener errListener) {
+            super(ArticleApi.getContentUrl(context, aid), Article.class, listener, errListener);
         }
 
         @Override
@@ -490,8 +493,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 String src = img.attr("src").trim();
                 if (src.startsWith("file"))
                     continue;
-                if (!src.startsWith("http")) {
-                    src = "http://www.acfun.com" + src;
+                if (!src.startsWith("http") && src.charAt(0) == '/') {
+                    src = "http://"+ArticleApi.getDomainRoot(getApplicationContext()) + src;
                 }
                 File cache = FileUtil.generateImageCacheFile(src);
                 imageCaches.add(cache);
@@ -559,7 +562,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 if(cacheFile.exists()){
                     mWeb.loadUrl(Uri.fromFile(cacheFile).toString());
                 }else
-                mWeb.loadDataWithBaseURL(URL_HOME, mDoc.html(), "text/html", "UTF-8",
+                mWeb.loadDataWithBaseURL(getBaseUrl(), mDoc.html(), "text/html", "UTF-8",
                         null);
                 if (hasUseMap)
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
