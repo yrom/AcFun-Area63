@@ -251,7 +251,7 @@ public final class ArticleApi {
         try {
             String key = URLEncoder.encode(query, "UTF-8");
             String format = "http://%s/api/search.aspx?query=%s&exact=1&channelIds=63&orderId=%d&orderBy=%d&pageNo=%d&pageSize=%d";
-            url = String.format(Locale.US, format, getDomainApi(context), key, orderId, orderBy, pageNo, pageSize);
+            url = String.format(Locale.US, format, getDomainRoot(context), key, orderId, orderBy, pageNo, pageSize);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
