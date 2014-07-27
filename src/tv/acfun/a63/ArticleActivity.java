@@ -465,7 +465,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             if (!article.title.equals(sub.subTitle)) {
                 content.append("<h2 class=\"article-subtitle\"><a class=\"anchor\" name=\"p"+p+"\"></a>Part "+(p+1)+". "+sub.subTitle + "</h2>");
             }
-            String data = sub.content.replaceAll("background-color:[^;]+;", "").replaceAll("font-family:[^;]+;", "");
+            String data = sub.content.replaceAll("background-color:[^;\"]+;?", "").replaceAll("font-family:[^;\"]+;?", "");
             
             content.append(data).appendElement("hr");
             handleImages(content);
