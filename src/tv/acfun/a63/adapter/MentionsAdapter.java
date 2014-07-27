@@ -18,6 +18,7 @@ package tv.acfun.a63.adapter;
 
 import java.util.List;
 
+import tv.acfun.a63.ArticleActivity;
 import tv.acfun.a63.R;
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.Comment;
@@ -70,25 +71,41 @@ public class MentionsAdapter extends BaseAdapter {
         } else {
             holder = (MentionsHolder) convertView.getTag();
         }
-        holder.channel.setText(ArticleApi.getChannelName(article.channelId));
-        holder.contentTitle.setText(Html.fromHtml("<font color=\"#33B5E5\">"+article.title+"</font> <font color=\"#cccccc\">(ac"+article.aid+")</font>"));
-        holder.user.setText("#" + c.count + " " + c.userName);
-        TextViewUtils.setCommentContent(holder.comments, c);
         int quoteId = c.quoteId;
         Comment quote = data.get(quoteId);
-        if(quote != null){
-            holder.quoteLayout.setVisibility(View.VISIBLE);
-            holder.quotedUser.setText("#" + quote.count + " " + quote.userName);
-            TextViewUtils.setCommentContent( holder.quotedComments,quote);
-        }else{
-            holder.quoteLayout.setVisibility(View.GONE);
-        }
+        holder.bind(c, article, quote);
         return convertView;
     }
 
-    static class MentionsHolder {
+
+    static class MentionsHolder implements View.OnClickListener{
         TextView contentTitle, channel, user, quotedUser, comments, quotedComments;
         ViewGroup quoteLayout;
+        int aid;
+        String title;
+        void bind(Comment c, Content article, Comment quote) {
+            aid = article.aid;
+            title = article.title;
+            channel.setText(ArticleApi.getChannelName(article.channelId));
+            contentTitle.setText(Html.fromHtml("<font color=\"#33B5E5\">"+article.title+"</font> <font color=\"#cccccc\">(ac"+article.aid+")</font>"));
+            contentTitle.setOnClickListener(this);
+            user.setText("#" + c.count + " " + c.userName);
+            TextViewUtils.setCommentContent(comments, c);
+            if(quote != null){
+                quoteLayout.setVisibility(View.VISIBLE);
+                quotedUser.setText("#" + quote.count + " " + quote.userName);
+                TextViewUtils.setCommentContent( quotedComments,quote);
+                
+            }else{
+                quoteLayout.setVisibility(View.GONE);
+            }
+        }
+        @Override
+        public void onClick(View v) {
+            if(v == contentTitle)
+                ArticleActivity.start(v.getContext(), aid, title);
+        }
+        
     }
     private Comment getCommentItem(int position){
         try {
