@@ -12,7 +12,6 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.PostMethod;
 
-import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Comment;
 import tv.acfun.a63.api.entity.User;
 
