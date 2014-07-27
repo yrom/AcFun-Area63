@@ -17,6 +17,7 @@
 package tv.acfun.a63.swipe;
 
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
+import me.imid.swipebacklayout.lib.Utils;
 import me.imid.swipebacklayout.lib.SwipeBackLayout.SwipeListener;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityBase;
 import android.os.Bundle;
@@ -71,6 +72,7 @@ public class SwipeAppcompatActivity extends ActionBarActivity implements SwipeBa
     
     @Override
     public void scrollToFinishActivity() {
+        Utils.convertActivityToTranslucent(this);
         getSwipeBackLayout().scrollToFinishActivity();
     }
 }
