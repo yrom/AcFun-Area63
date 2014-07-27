@@ -144,7 +144,6 @@ public class SettingsActivity extends PreferenceActivity implements
     }
 
     private void update() {
-        UmengUpdateAgent.update(this);
         UmengUpdateAgent.setUpdateAutoPopup(false);
         UmengUpdateAgent.setUpdateListener(new UmengUpdateListener() {
 
@@ -168,6 +167,7 @@ public class SettingsActivity extends PreferenceActivity implements
             }
 
         });
+        UmengUpdateAgent.forceUpdate(this);
     }
 
     protected void onDestroy() {

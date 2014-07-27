@@ -79,6 +79,16 @@
                     android:textColor="#AAABAF" />
             </LinearLayout>
         </ScrollView>
+        
+        <!-- Ignore CheckBox -->
+
+		<CheckBox
+		    android:id="@+id/umeng_update_id_check"
+	        android:layout_width="fill_parent"
+	        android:layout_height="32dp"
+	        android:text="@string/UMIgnore"
+	        android:button="@drawable/umeng_update_button_check_selector"
+	        android:textColor="#AAABAF" />
 
         <!-- OK&Cancel Button -->
 

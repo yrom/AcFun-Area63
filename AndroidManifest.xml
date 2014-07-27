@@ -68,7 +68,9 @@
             android:configChanges="screenSize|orientation"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
         <activity android:name=".ConversationActivity" />
-		
+        <activity
+            android:name="com.umeng.update.UpdateDialogActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="523706eb56240b0db70293fe" />
@@ -77,9 +79,9 @@
             android:value="GooglePlay" />
 		<service android:name="tv.acfun.a63.service.PushService"/>
         <service
-            android:name="com.umeng.common.net.DownloadingService"
-            android:exported="true"
+            android:name="com.umeng.update.net.DownloadingService"
             android:process=":DownloadingService" />
+
     </application>
 
 </manifest>

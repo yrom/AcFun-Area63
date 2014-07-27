@@ -263,7 +263,6 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
             });
         }
         private void onError(final PhotoView image) {
-//            MobclickAgent.reportError(mContext, "error occurred during load image: \n url=" + mUri.toString());
             progress.setVisibility(View.GONE);
             timeOut.setOnClickListener(new OnClickListener() {
                 
@@ -374,15 +373,5 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
     public void onPageSelected(int arg0) {
         mCurrentImage = arg0;
         indexText.setText(String.format("%d/%d",mCurrentImage+1,mList.size()));
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        MobclickAgent.onResume(this);
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        MobclickAgent.onPause(this);
     }
 }

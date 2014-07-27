@@ -35,7 +35,7 @@
     <string name="comment_failed">提交失败!</string>
     <string name="posting_comment">提交中…</string>
     <string name="no_desc">无简介…</string>
-    <string name="new_replay">有新的回复</string>
+    <string name="new_replay">开发者回复了你</string>
     <string name="mentions">提到我的</string>
     <string name="no_data_need_retry">加载失败，可能还没下载到数据，请重试</string>
     <string name="save_success">保存成功</string>

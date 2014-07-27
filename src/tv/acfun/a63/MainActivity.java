@@ -141,26 +141,37 @@ public class MainActivity extends ActionBarActivity implements
 
     private void initUmeng() {
         MobclickAgent.setDebugMode(BuildConfig.DEBUG);
-        UmengUpdateAgent.update(this);
-        MobclickAgent.onError(this);
-        ArticleApi.updateConfig(getApplicationContext());
-        SyncListener listener = new Conversation.SyncListener() {
-
-            @Override
-            public void onSendUserReply(List<Reply> replyList) {
-            }
-
-            @Override
-            public void onReceiveDevReply(List<DevReply> replyList) {
-                if(replyList == null || replyList.isEmpty()){
-                    return;
+        MobclickAgent.setCatchUncaughtExceptions(true);
+        MobclickAgent.openActivityDurationTrack(false);
+        Runnable action = new Runnable(){
+            public void run() {
+                
+            UmengUpdateAgent.update(MainActivity.this);
+            ArticleApi.updateConfig(getApplicationContext());
+            SyncListener listener = new Conversation.SyncListener() {
+    
+                @Override
+                public void onSendUserReply(List<Reply> replyList) {
                 }
-                Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
-                String text = replyList.get(0).getContent();
-                AcApp.showNotification(intent, R.id.comments_content, text, R.drawable.notify_chat, getString(R.string.new_replay));
+    
+                @Override
+                public void onReceiveDevReply(List<DevReply> replyList) {
+                    if(replyList == null || replyList.isEmpty()){
+                        return;
+                    }
+                    Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
+                    String text = replyList.get(0).getContent();
+                    AcApp.showNotification(intent, R.id.comments_content, text, R.drawable.notify_chat, getString(R.string.new_replay));
+                }
+            };
+            new FeedbackAgent(MainActivity.this).getDefaultConversation().sync(listener);
             }
         };
-        new FeedbackAgent(this).getDefaultConversation().sync(listener);
+        View decorView = getWindow().peekDecorView();
+        if(decorView == null)
+            action.run();
+        else
+            decorView.postDelayed(action, 2000);
     }
 
     private void initDrawerLayout(Bundle savedInstanceState) {
@@ -479,7 +490,7 @@ public class MainActivity extends ActionBarActivity implements
     /**
      * 主页，四个频道列表，三种阅读模式
      */
-    public static class HomeFragment extends Fragment {
+    public static class HomeFragment extends BaseFragment {
         public static final String ARG_TITLES = "titles";
 
         public static final String ARG_PLANET_NUMBER = "planet_number";
@@ -494,7 +505,7 @@ public class MainActivity extends ActionBarActivity implements
         public HomeFragment() {
             VIEW_MODE_CODE = AcApp.getViewMode();
         }
-
+        
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
@@ -575,8 +586,14 @@ public class MainActivity extends ActionBarActivity implements
                 Log.d(TAG, "on adapter change Content ListMode = " +itemPosition );
             mSectionsPagerAdapter.changeContentListMode(itemPosition);
         }
+        
+        @Override
+        protected String getPageTitle() {
+            return "Home";
+        }
+        
     }
-    public static class FavListFragment extends Fragment{
+    public static class FavListFragment extends BaseFragment{
 
         @Override
         public void onResume() {
@@ -584,6 +601,11 @@ public class MainActivity extends ActionBarActivity implements
             mEmptyView.setVisibility(View.GONE);
             loadData();
         }
+        @Override
+        protected String getPageTitle() {
+            return "FavList";
+        }
+        
         LayoutInflater inflater;
         private ListView mList;
         private View mProgress;
@@ -671,7 +693,7 @@ public class MainActivity extends ActionBarActivity implements
     /**
      * 搜索
      */
-    public static class SearchFragment extends Fragment implements OnClickListener, OnEditorActionListener, 
+    public static class SearchFragment extends BaseFragment implements OnClickListener, OnEditorActionListener, 
             OnScrollListener,OnItemClickListener {
         private View mBtnClear;
         private EditText mSearchText;
@@ -778,6 +800,12 @@ public class MainActivity extends ActionBarActivity implements
             startViewArticle(parent, position);
             
         }
+        
+        @Override
+        protected String getPageTitle() {
+            return "Search";
+        }
+        
     }
     
     /**
@@ -797,6 +825,11 @@ public class MainActivity extends ActionBarActivity implements
             return parseJson(new String(entry.data));
         }
 
+        @Override
+        protected String getPageTitle() {
+            return "RankList";
+        }
+        
         
     }
     static Contents parseJson(String rankJson){
@@ -860,7 +893,7 @@ public class MainActivity extends ActionBarActivity implements
      * 文章列表
      *
      */
-    public static class ArticleListFragment extends Fragment implements OnItemClickListener {
+    public static class ArticleListFragment extends BaseFragment implements OnItemClickListener {
 
         public static final String ARG_LIST_MODE = "list_mode";
         public static final String ARG_SECTION_NUMBER = "section_number";
@@ -875,6 +908,11 @@ public class MainActivity extends ActionBarActivity implements
         private ILoadingLayout loadingLayout;
         private View loadding;
         public ArticleListFragment() {
+        }
+        
+        @Override
+        protected String getPageTitle() {
+            return "Home.ArticleList["+section+"]";
         }
         
         public void setContentListMode(int contentListMode) {
