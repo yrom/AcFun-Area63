@@ -564,12 +564,16 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 }else
                 mWeb.loadDataWithBaseURL(getBaseUrl(), mDoc.html(), "text/html", "UTF-8",
                         null);
+                
                 if (hasUseMap)
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.NARROW_COLUMNS);
                 else
                     mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-                    mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.TEXT_AUTOSIZING);
+                    try {
+                        mWeb.getSettings().setLayoutAlgorithm(LayoutAlgorithm.TEXT_AUTOSIZING);
+                    } catch (IllegalArgumentException ignored) {
+                    }
                 }
             }
         }

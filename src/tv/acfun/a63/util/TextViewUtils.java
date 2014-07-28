@@ -36,6 +36,7 @@ import android.text.Html.ImageGetter;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.StrikethroughSpan;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -49,6 +50,10 @@ public class TextViewUtils {
 	    if(comment.getMovementMethod() != null) // reset focus
 	        comment.setMovementMethod(null);
         String text = c.content;
+        if(TextUtils.isEmpty(text)){
+            comment.setText("");
+            return;
+        }
         text = replace(text);
         try{
             comment.setText(Html.fromHtml(text, new ImageGetter() {
