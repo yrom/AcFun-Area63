@@ -4,10 +4,9 @@ AcFun-Area63
 Acfun 63区（文章区），来，战个痛～
 
 一个"学习"Android Design的产物。。。
+[![Get it on GooglePlay](http://www.android.com/images/brand/get_it_on_play_logo_large.png)](https://play.google.com/store/apps/details?id=tv.acfun.a63)
 
-<a href="https://play.google.com/store/apps/details?id=tv.acfun.a63"><img src="http://www.android.com/images/brand/get_it_on_play_logo_large.png"/></a>
-
-欢迎 加入Google+ 社群，参与讨论： https://plus.google.com/communities/109973498842592117118
+欢迎 加入Google+ 社群，参与讨论：<https://plus.google.com/communities/109973498842592117118>
 
 计划功能列表
 ============
@@ -32,13 +31,13 @@ Acfun 63区（文章区），来，战个痛～
 2. [Volley][2]
 3. [Pager Sliding TabStrip][3]
 4. [Pull To Refresh][4]
-5. [Photo view][5]
+5. [ByakuGallery][5]*
 6. [SwipeBackLayout][6]*
 
-*请用我fork的分支
+带*号的请用我fork的分支代码
 
 [2]: https://android.googlesource.com/platform/frameworks/volley
 [3]: https://github.com/astuetz/PagerSlidingTabStrip
 [4]: https://github.com/chrisbanes/Android-PullToRefresh
-[5]: https://github.com/chrisbanes/PhotoView
+[5]: https://github.com/diegocarloslima/ByakuGallery
 [6]: https://github.com/Issacw0ng/SwipeBackLayout
