@@ -125,10 +125,7 @@ public class Article {
             SubContent content = new SubContent();
             JSONObject sub = contentArray.getJSONObject(i);
             content.content = sub.getString("content");
-            if(content.content == null) throw new InvalideArticleError();
-            if(content.content.matches(".*\\[video\\]\\d+\\[/video\\].*")){
-                throw new InvalideArticleError();
-            }
+            validate(content);
             content.subTitle = sub.getString("subtitle").replaceAll("<span[^>]+>", "").replaceAll("</span>", "");
             Matcher matcher = imageReg.matcher(content.content);
             while (matcher.find()) {
@@ -142,6 +139,13 @@ public class Article {
         article.channelName = channel.getString("channelName");
 
         return article;
+    }
+
+    private static void validate(SubContent content) throws InvalideArticleError {
+        if(content.content == null) throw new InvalideArticleError();
+        if(content.content.matches(".*\\[[v|V]ideo\\]\\d+\\[/[v|V]ideo\\].*")){
+            throw new InvalideArticleError();
+        }
     }
 
     private static User parseUser(JSONObject info) throws JSONException {
