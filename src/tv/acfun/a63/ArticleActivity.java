@@ -97,6 +97,8 @@ import com.umeng.analytics.MobclickAgent;
  */
 @SuppressWarnings("deprecation")
 public class ArticleActivity extends BaseWebViewActivity implements Listener<Article>, ErrorListener {
+    private static final Pattern sAreg = Pattern.compile("/a/ac(\\d{5,})");
+    private static final Pattern sVreg = Pattern.compile("/v/ac(\\d{5,})");
     private static String ARTICLE_PATH;
     private static final String NAME_ARTICLE_HTML = "a63-article.html";
     public static void start(Context context, int aid, String title) {
@@ -119,10 +121,20 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     protected void initView(Bundle savedInstanceState) {
         ARTICLE_PATH = AcApp.getExternalCacheDir("article").getAbsolutePath();
         
-        if(Intent.ACTION_VIEW.equalsIgnoreCase(getIntent().getAction())
-                &&getIntent().getData()!=null &&  getIntent().getData().getScheme().equals("ac")){
-            // ac://ac000000
-            aid = Integer.parseInt(getIntent().getDataString().substring(7));
+        Uri data = getIntent().getData();
+        if(Intent.ACTION_VIEW.equalsIgnoreCase(getIntent().getAction()) && data!=null){
+            String scheme = data.getScheme();
+            if(scheme.equals("ac")){
+                // ac://ac000000
+                aid = Integer.parseInt(getIntent().getDataString().substring(7));
+            }else if(scheme.equals("http")){
+                // http://www.acfun.tv/v/ac123456
+                Matcher matcher;
+                if((matcher = sVreg.matcher(data.getPath())).find() 
+                        || (matcher = sAreg.matcher(data.getPath())).find()){
+                    aid = Integer.parseInt(matcher.group(1));
+                }
+            }
             title = "ac"+aid;
         }else{
             aid = getIntent().getIntExtra("aid", 0);
@@ -153,7 +165,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                         } catch (Exception e) {
                             // nothing
                         }
-                    }else if((matcher = Pattern.compile("/v/ac(\\d{5,})").matcher(url)).find()){
+                    }else if((matcher = sVreg.matcher(url)).find()){
                         String acId = matcher.group(1);
                         try {
                             intent.setData(Uri.parse("av://ac" + acId));
@@ -382,6 +394,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
     @Override
     public void onErrorResponse(VolleyError error) {
+        setSupportProgressBarIndeterminateVisibility(false);
         if(error instanceof InvalideArticleError){
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -390,13 +403,13 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             try {
                 startActivity(intent);
                 finish();
-                return;
             } catch (Exception e) {
-                e.printStackTrace();
+                //http://www.acfun.tv/lite/v/#ac=1317054
+                mWeb.loadUrl("http://"+ArticleApi.getDomainRoot(this)+"/lite/v/#ac="+aid);
             }
+        }else{
+            showErrorDialog();
         }
-        setSupportProgressBarIndeterminateVisibility(false);
-        showErrorDialog();
     }
 
     List<File> imageCaches;

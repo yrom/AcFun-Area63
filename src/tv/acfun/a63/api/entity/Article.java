@@ -126,6 +126,9 @@ public class Article {
             JSONObject sub = contentArray.getJSONObject(i);
             content.content = sub.getString("content");
             if(content.content == null) throw new InvalideArticleError();
+            if(content.content.matches(".*\\[video\\]\\d+\\[/video\\].*")){
+                throw new InvalideArticleError();
+            }
             content.subTitle = sub.getString("subtitle").replaceAll("<span[^>]+>", "").replaceAll("</span>", "");
             Matcher matcher = imageReg.matcher(content.content);
             while (matcher.find()) {
