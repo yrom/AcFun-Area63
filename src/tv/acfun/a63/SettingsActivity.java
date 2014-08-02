@@ -17,6 +17,7 @@
 package tv.acfun.a63;
 
 import tv.acfun.a63.service.PushService;
+import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.FileUtil;
 import tv.acfun.a63.util.Theme;
 import android.annotation.TargetApi;
@@ -25,6 +26,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -55,7 +57,7 @@ public class SettingsActivity extends PreferenceActivity implements
     private static final String KEY_INTERVAL = "mention_interval";
     private static final String KEY_MENTION_ENABLE = "mention_enable";
     private static final String KEY_MENTION_WIFI_ONLY = "mention_enable_wifi_only";
-    private static final String KEY_NIGHT_MODE = "is_night_mode";
+    private static final String KEY_RATING = "rating";
     private String oldPath;
 
     @Override
@@ -72,11 +74,12 @@ public class SettingsActivity extends PreferenceActivity implements
         Preference update = findPreference(KEY_UPDATE);
         update.setSummary(AcApp.instance().getVersionName());
         update.setOnPreferenceClickListener(this);
-
+        
+        Preference rating = findPreference(KEY_RATING);
+        rating.setOnPreferenceClickListener(this);
         findPreference(KEY_INTERVAL).setOnPreferenceChangeListener(this);
         findPreference(KEY_MENTION_ENABLE).setOnPreferenceChangeListener(this);
         findPreference(KEY_MENTION_WIFI_ONLY).setOnPreferenceChangeListener(this);
-//        findPreference(KEY_NIGHT_MODE).setOnPreferenceChangeListener(this);
     }
 
     private void setCache() {
@@ -117,6 +120,27 @@ public class SettingsActivity extends PreferenceActivity implements
         } else if (KEY_UPDATE.equals(preference.getKey())) {
             preference.setEnabled(false);
             update();
+        } else if(KEY_RATING.equals(preference.getKey())){
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            if(ActionBarUtil.hasSB()){
+                intent.setData(Uri.parse("mstore:http://app.meizu.com/phone/apps/3ccc35d9e3364b749df34d425c45667e"));
+                try {
+                    startActivity(intent);
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            intent.setData(Uri.parse("market://details?id=tv.acfun.a63"));
+            try {
+                startActivity(intent);
+                return true;
+            } catch (Exception e) {
+            }
+            intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=tv.acfun.a63"));
+            startActivity(intent);
+            return true;
         }
         return false;
     }
