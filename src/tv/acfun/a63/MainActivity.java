@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -57,6 +58,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -186,7 +189,7 @@ public class MainActivity extends ActionBarActivity implements
         setUserInfo();
         
         mDrawerList = (ListView) findViewById(R.id.list);
-
+        mDrawerList.setFooterDividersEnabled(false);
         // set a custom shadow that overlays the main content when the drawer
         // opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
@@ -195,9 +198,24 @@ public class MainActivity extends ActionBarActivity implements
         int[] iconIds = { R.drawable.ic_home,
                  R.drawable.ic_hot, R.drawable.ic_heart,  R.drawable.ic_at, R.drawable.ic_action_search};
         // set up the drawer's list view with items and click listener
+        View drawerFooter = getLayoutInflater().inflate(R.layout.drawer_footer_item, mDrawerList,false);
+        CheckBox check = (CheckBox) drawerFooter.findViewById(R.id.checkbox);
+        check.setChecked(Theme.isNightMode());
+        check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                AcApp.putBoolean("is_night_mode", isChecked);
+                if(Build.VERSION.SDK_INT >= 11)
+                    recreate();
+                else{
+                    finish();
+                    startActivity(getIntent());
+                }
+            }
+        });
+        mDrawerList.addFooterView(drawerFooter,null,false);
         mDrawerList.setAdapter(new NavigationAdapter(mPlanetTitles, iconIds));
         mDrawerList.setOnItemClickListener(this);
-
         mDrawerToggle = new ActionBarDrawerToggle(this, 
             mDrawerLayout, 
             R.drawable.ic_navigation_drawer, 
@@ -1316,9 +1334,12 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int position,
             long arg3) {
-        if(position == arg0.getCount() -2){
+        if(position == arg0.getCount() -2 - ((ListView)arg0).getFooterViewsCount()){
             MentionActivity.start(this);
             mDrawerList.setItemChecked(mCurrentNavPosition, true);
+            return;
+        }else if(position == arg0.getCount() - ((ListView)arg0).getFooterViewsCount()){
+            Log.i(TAG, "footer clicked");
             return;
         }
         if (mCurrentNavPosition != position)
