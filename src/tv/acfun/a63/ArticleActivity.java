@@ -64,6 +64,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebSettings.TextSize;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -99,6 +100,9 @@ import com.umeng.analytics.MobclickAgent;
 public class ArticleActivity extends BaseWebViewActivity implements Listener<Article>, ErrorListener {
     private static final Pattern sAreg = Pattern.compile("/a/ac(\\d{5,})");
     private static final Pattern sVreg = Pattern.compile("/v/ac(\\d{5,})");
+    private static final Pattern sLiteAreg = Pattern.compile("/v/#ac=(\\d{5,});type=article");
+    private static final Pattern sLiteVreg = Pattern.compile("/v/#ac=(\\d{5,})$");
+    private static final String sAppReg = "^http://www.acfun.(com|tv)/app/?$";
     private static String ARTICLE_PATH;
     private static final String NAME_ARTICLE_HTML = "a63-article.html";
     public static void start(Context context, int aid, String title) {
@@ -149,14 +153,16 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             isFaved = db.isFav(aid); 
             mWeb.getSettings().setAppCachePath(ARTICLE_PATH);
             mWeb.addJavascriptInterface(new ACJSObject(), "AC");
+            // Set a chrome client to handle the MediaResource on web page
+            // like video,video loading progress, etc.
+            mWeb.setWebChromeClient(new WebChromeClient());
             mWeb.setWebViewClient(new WebViewClient() {
                 
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    Pattern regex = Pattern.compile("/a/ac(\\d{5,})");
-                    Matcher matcher = regex.matcher(url);
+                    Matcher matcher = sAreg.matcher(url);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    if (matcher.find()) {
+                    if (matcher.find() || (matcher = sLiteAreg.matcher(url)).find()) {
                         String acId = matcher.group(1);
                         try {
                             intent.setData(Uri.parse("ac://ac" + acId));
@@ -165,7 +171,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                         } catch (Exception e) {
                             // nothing
                         }
-                    }else if((matcher = sVreg.matcher(url)).find()){
+                    }else if((matcher = sVreg.matcher(url)).find() 
+                            || (matcher = sLiteVreg.matcher(url)).find()){
                         String acId = matcher.group(1);
                         try {
                             intent.setData(Uri.parse("av://ac" + acId));
@@ -175,10 +182,19 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                             // nothing
                         }
                         
+                    }else if(Pattern.matches(sAppReg, url)){
+                        String appLink = getString(R.string.app_ac_video_link);
+                        try {
+                            intent.setData(Uri.parse(appLink));
+                            startActivity(intent);
+                            return true;
+                        } catch (Exception e) {
+                            view.loadUrl(appLink);
+                            return true;
+                        }
+                        
                     }
-                    intent.setData(Uri.parse(url));
-                    startActivity(intent);
-                    return true;
+                    return false;
                 }
 
                 @Override
@@ -205,6 +221,14 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if(mWeb.canGoBack()){
+            mWeb.goBack();
+        }else{
+            super.onBackPressed();
+        }
+    }
     protected String getBaseUrl() {
         return ArticleApi.getDomainRoot(getApplicationContext());
     }

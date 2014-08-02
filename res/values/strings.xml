@@ -80,4 +80,5 @@
     <string name="msg_account_expired">过期后会出现无法评论、签到等问题，请注销后重新登录！</string>
     <string name="btn_ok">OK</string>
     <string name="logout">Log out</string>
+    <string name="app_ac_video_link">http://www.coolapk.com/apk/tv.ac.fun</string>
 </resources>
