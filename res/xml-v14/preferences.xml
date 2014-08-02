@@ -83,7 +83,9 @@
             android:summary="@string/buy_me_coffee"
             android:title="@string/donate" >
             <intent
-                android:action="android.intent.action.VIEW"
+                android:action="@string/donate_action"
+                android:targetPackage="tv.acfun.a63"
+                android:targetClass="tv.acfun.a63.DonateActivity"
                 android:data="@string/donate_url" />
         </Preference>
     </PreferenceCategory>

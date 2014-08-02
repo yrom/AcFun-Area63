@@ -24,7 +24,7 @@
     <string name="action_bar_comment">Comment</string>
     <string name="action_bar_save">Save to Pictures Folder</string>
     <string name="pull_to_retry">Pull to retry</string>
-    <string name="donate_url">https://m.alipay.com/personal/payment.htm?reason=BUY ME A CUP OF COFFEE &amp;amount=5&amp;userId=2088002476381643&amp;weChat=true</string>
+    <string name="donate_url">https://qr.alipay.com/ap033jyji3w0rudm23</string>
     <string name="about_url">http://yrom.sinaapp.com/ac_a63.html</string>
     <string name="umeng_fb_powered_by">powered by</string>
     <string name="key_clear_cache">clear_cache</string>
@@ -82,4 +82,5 @@
     <string name="btn_ok">OK</string>
     <string name="logout">Log out</string>
     <string name="app_ac_video_link">http://www.coolapk.com/apk/tv.ac.fun</string>
+    <string name="donate_action">tv.acfun.a63.action.DONATE</string>
 </resources>

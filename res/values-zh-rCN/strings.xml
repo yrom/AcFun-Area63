@@ -24,7 +24,6 @@
     <string name="action_bar_comment">评论</string>
     <string name="action_bar_save">保存到图片文件夹</string>
     <string name="pull_to_retry">加载失败，下拉重试</string>
-    <string name="donate_url">https://qr.alipay.com/ap033jyji3w0rudm23</string>
     <string name="comment_hint">不吐嘈不舒服斯基</string>
     <string name="sign_in_first">请先登录</string>
     <string name="no_comment">评论不能为空哦</string>
