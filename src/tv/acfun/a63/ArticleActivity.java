@@ -43,6 +43,7 @@ import tv.acfun.a63.api.entity.Article.InvalideArticleError;
 import tv.acfun.a63.api.entity.Article.SubContent;
 import tv.acfun.a63.base.BaseWebViewActivity;
 import tv.acfun.a63.db.DB;
+import tv.acfun.a63.service.KeepOnlineService;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.Connectivity;
 import tv.acfun.a63.util.CustomUARequest;
@@ -426,6 +427,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     public void onResponse(Article response) {
         mArticle = response;
         imgUrls = response.imgUrls;
+        KeepOnlineService.requestOnline(getApplicationContext(), aid);
         if(AcApp.getViewMode() == Constants.MODE_COMMIC && imgUrls != null && !imgUrls.isEmpty()){
             ImagePagerActivity.startNetworkImage(this, (ArrayList<String>) imgUrls,0,aid,title);
             finish();
@@ -651,11 +653,12 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 String url = params[index];
                 if (isCancelled()) {
                     // cancel task on activity destory
-                    Log.w(TAG, String.format("break download task,index=%d,src=%s", index,url));
+//                    Log.w(TAG, String.format("break download task,[%d/%d]", index+1, params.length));
                     break;
                 }
                 File cache = imageCaches.get(imgUrls.indexOf(url));
                 if (cache.exists() && cache.canRead()) {
+//                    Log.i(TAG, String.format("already downloaded.[%d/%d]",index+1, params.length));
                     publishProgress(index);
                     continue;
                 } else {

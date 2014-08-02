@@ -258,4 +258,8 @@ public final class ArticleApi {
         return url;
     }
     
+    public static String getOnlineUrl(Context context, long uid) {
+        return "http://"+getDomainRoot(context)+"/online.aspx?uid="+uid;
+    }
+    
 }

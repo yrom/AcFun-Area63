@@ -10,6 +10,7 @@ import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.db.DB;
+import tv.acfun.a63.service.KeepOnlineService;
 import tv.acfun.a63.service.PushService;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.MemberUtils;
@@ -129,6 +130,7 @@ public class SigninActivity extends BaseActivity {
                 data.putExtra("user", user);
                 setResult(RESULT_OK, data);
                 PushService.start(SigninActivity.this); //登录成功后，开始接收召唤信息
+                KeepOnlineService.requestOnline(SigninActivity.this, 0);
                 finish();
             }else{
                 mNameView.setError(response);

@@ -89,6 +89,7 @@
             android:name="UMENG_CHANNEL"
             android:value="GooglePlay" />
 		<service android:name="tv.acfun.a63.service.PushService"/>
+		<service android:name="tv.acfun.a63.service.KeepOnlineService"/>
         <service
             android:name="com.umeng.update.net.DownloadingService"
             android:process=":DownloadingService" />

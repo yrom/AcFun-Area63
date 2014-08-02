@@ -11,6 +11,7 @@ import tv.acfun.a63.api.entity.Content;
 import tv.acfun.a63.api.entity.Contents;
 import tv.acfun.a63.api.entity.User;
 import tv.acfun.a63.db.DB;
+import tv.acfun.a63.service.KeepOnlineService;
 import tv.acfun.a63.service.PushService;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.DensityUtil;
@@ -138,9 +139,10 @@ public class MainActivity extends ActionBarActivity implements
         mPlanetTitles = getResources().getStringArray(R.array.planets);
         initDrawerLayout(savedInstanceState);
         mQueue = AcApp.getGloableQueue();
-        
-        PushService.start(this);
-        
+        if(mUser != null){
+            PushService.start(this);
+            KeepOnlineService.requestOnline(this, 0);
+        }
     }
 
     private void initUmeng() {
@@ -1413,6 +1415,7 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        KeepOnlineService.requestOffline(this);
         
     }
     @Override

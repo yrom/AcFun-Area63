@@ -224,6 +224,9 @@ public class AcApp extends Application {
         return mins * _1_min;
     }
     
+    public static long getOnlineInterval(){
+        return 5 * _1_min;
+    }
     public static boolean isMentionEnabled(){
         return sp.getBoolean("mention_enable", true);
     }

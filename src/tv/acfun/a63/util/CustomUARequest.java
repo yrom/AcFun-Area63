@@ -61,7 +61,7 @@ public abstract class CustomUARequest<T> extends Request<T> {
     protected final void deliverResponse(T response) {
         if(response == null) 
             deliverError(new VolleyError("error response !"));
-        else
+        else if(mListener != null)
             this.mListener.onResponse(response);
     }
     
