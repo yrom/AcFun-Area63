@@ -273,7 +273,7 @@ public class FileUtil {
     
     public static boolean validate(String file){
         File f = new File(file);
-        if(f.exists()) return f.isDirectory(); 
+        if(f.exists() && f.canWrite()) return f.isDirectory(); 
         return f.mkdirs();
     }
     /**
