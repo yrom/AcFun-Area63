@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -228,5 +230,14 @@ public class Connectivity {
         entry.serverDate = serverDate;
         entry.responseHeaders = headers;
         return entry;
+    }
+    
+    public static HttpURLConnection openDefaultConnection(URL url, int connectTimeOut, int readTimeOut) throws IOException{
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(connectTimeOut);
+        connection.setReadTimeout(readTimeOut);
+        connection.setUseCaches(false);
+        connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36");
+        return connection;
     }
 }

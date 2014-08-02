@@ -16,7 +16,7 @@ import android.view.MotionEvent;
  * 
  * @author Chris Banes
  */
-public class MyViewPager extends ViewPager {
+public class MyViewPager extends com.diegocarloslima.byakugallery.lib.GalleryViewPager {
     
     public MyViewPager(Context context) {
         super(context);

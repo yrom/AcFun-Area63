@@ -17,28 +17,39 @@
 package tv.acfun.a63;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.util.ActionBarUtil;
 import tv.acfun.a63.util.BaseAnimationListener;
+import tv.acfun.a63.util.Connectivity;
 import tv.acfun.a63.util.FileUtil;
-import uk.co.senab.photoview.PhotoView;
-import uk.co.senab.photoview.PhotoViewAttacher.OnPhotoTapListener;
+import tv.acfun.a63.view.MyViewPager;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.view.WindowCompat;
 import android.support.v7.widget.ShareActionProvider;
@@ -49,15 +60,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader.ImageContainer;
-import com.android.volley.toolbox.ImageLoader.ImageListener;
+import com.alibaba.fastjson.util.IOUtils;
+import com.diegocarloslima.byakugallery.lib.TileBitmapDrawable;
+import com.diegocarloslima.byakugallery.lib.TouchImageView;
 import com.umeng.analytics.MobclickAgent;
 
 
@@ -68,7 +80,7 @@ import com.umeng.analytics.MobclickAgent;
 public class ImagePagerActivity extends BaseActivity implements OnPageChangeListener {
     private static final String EXTRA_IMAGES = "images";
     private static final String EXTRA_INDEX = "index";
-    private ViewPager pager;
+    private MyViewPager pager;
     private TextView indexText;
 
     public static void startCacheImage(Context context, ArrayList<File> flist, int index, int aid, String title){
@@ -95,14 +107,33 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
         setContentView(R.layout.activity_images);
         
         indexText = (TextView) findViewById(R.id.index);
-        pager = (ViewPager) findViewById(R.id.pager);
+        if(ActionBarUtil.hasSB() && getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE){
+            setInfoBottomMargin(getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height));
+        }
+        pager = (MyViewPager) findViewById(R.id.pager);
         pager.setAdapter(new ImageAdapter(getSupportFragmentManager(),mList));
+        pager.setOffscreenPageLimit(1);
         pager.setOnPageChangeListener(this);
         pager.setCurrentItem(index);
         onPageSelected(index);
     }
-    
-    static class ImageAdapter extends FragmentPagerAdapter{
+    private void setInfoBottomMargin(int height) {
+        MarginLayoutParams params = (MarginLayoutParams) indexText.getLayoutParams();
+        params.bottomMargin = height;
+        indexText.setLayoutParams(params);
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(ActionBarUtil.hasSB() ){
+            if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+                setInfoBottomMargin(0);
+            }else if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+                setInfoBottomMargin(getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height));
+            }
+        }
+    }
+    static class ImageAdapter extends FragmentStatePagerAdapter{
         ArrayList<String> list;
         
         ImageAdapter(FragmentManager fm, ArrayList<String> imgUrls) {
@@ -114,10 +145,6 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
             return list.size();
         }
 
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
         @Override
         public Fragment getItem(int position) {
             Fragment fragment = new ImageFragment();
@@ -158,12 +185,30 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
     }
     public static class ImageFragment extends Fragment{
         public static final String ARG_IMAGE_URL = "image_url";
+        public static final String TAG = "ImagePaer.ImageFragment";
         private Uri mUri;
-        private ImageContainer imageContainer;
+        private DownloadImageTask task;
         ProgressBar progress;
         TextView timeOut;
         ImagePagerActivity mContext;
-        
+        TouchImageView imageView;
+        View.OnClickListener clicked = new View.OnClickListener() {
+            
+            @Override
+            public void onClick(View view) {
+                if(mContext.getSupportActionBar().isShowing()){
+                    mContext.getSupportActionBar().hide();
+                    mContext.hideInfo();
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+                }else{
+                    mContext.getSupportActionBar().show();
+                    mContext.showInfo();
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+                }
+            }
+        };
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
@@ -179,97 +224,72 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
             }
             mUri = uri;
         }
-        OnPhotoTapListener onTap = new OnPhotoTapListener() {
-            
-            @Override
-            public void onPhotoTap(View view, float x, float y) {
-                if(mContext.getSupportActionBar().isShowing()){
-                    mContext.getSupportActionBar().hide();
-                    mContext.hideInfo();
-                }else{
-                    mContext.getSupportActionBar().show();
-                    mContext.showInfo();
-                }
-            }
-        };
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_image, container,false);
             
-            final PhotoView image = (PhotoView) rootView.findViewById(R.id.image);
-            image.setOnPhotoTapListener(onTap);
+            imageView = (TouchImageView)rootView.findViewById(R.id.image);
+//            imageView.setMaxScale(3.0f);
             timeOut = (TextView)rootView.findViewById(R.id.time_out_text);
-            
-            Bitmap bitmap = AcApp.getBitmpInCache(mUri.toString());
-            if(bitmap != null && !bitmap.isRecycled()){
-                image.setImageBitmap(bitmap);
-                return rootView;
+            progress = (ProgressBar) rootView.findViewById(R.id.loading);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB &&
+                    !mContext.getSupportActionBar().isShowing()){
+                imageView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
             }
+            return rootView;
+        }
+        
+        @Override
+        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            getImage();
+        }
+        private void getImage() {
             if("file".equals(mUri.getScheme())){
                 File img = new File(mUri.getPath());
                 if(img.exists()){
-                    if(bitmap == null || bitmap.isRecycled()){
-                        bitmap= AcApp.decodeBitmap(mUri.getPath(), Bitmap.Config.RGB_565);
-                        if(bitmap == null) //could not be decoded
-                            img.delete();
-                        else
-                            AcApp.putBitmapInCache(mUri.toString(), bitmap);
-                    }
-                    if(bitmap != null)
-                        image.setImageBitmap(bitmap);
+                    loadImage(img.getAbsolutePath());
                 }else{
                     timeOut.setVisibility(View.VISIBLE);
                     timeOut.setText(R.string.no_data_need_retry);
                 }
                 
             }else{
-                File cache = FileUtil.generateImageCacheFile(mUri.toString());
-                if(cache.exists()){
-                    if(bitmap == null || bitmap.isRecycled()){
-                        bitmap= AcApp.decodeBitmap(cache.getAbsolutePath(), Bitmap.Config.RGB_565);
-                        AcApp.putBitmapInCache(mUri.toString(), bitmap);
-                    }
-                    image.setImageBitmap(bitmap);
-                    
-                }else{
-                    progress = (ProgressBar) rootView.findViewById(R.id.loading);
-                    get(image);
-                }
+                task = new DownloadImageTask();
+                task.execute(mUri);
             }
-            return rootView;
         }
-        private void get(final PhotoView image) {
-            progress.setVisibility(View.VISIBLE);
-            if(mUri.getHost() == null) {
-                onError(image);
-                return;
-            }
-            imageContainer = AcApp.getGloableLoader().get(mUri.toString(), new ImageListener() {
-                
+
+        private void loadImage(String path) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1)
+                usingTileBitmap(path);
+            else
+                imageView.setImageDrawable(Drawable.createFromPath(path));
+            imageView.setOnClickListener(clicked);
+        }
+        private void usingTileBitmap(String path) {
+            TileBitmapDrawable.attachTileBitmapDrawable(imageView, path, null, new TileBitmapDrawable.OnInitializeListener() {
                 @Override
-                public void onErrorResponse(VolleyError error) {
-                    onError(image);
+                public void onStartInitialization() {
+                    progress.setVisibility(View.VISIBLE);
                 }
 
-                
                 @Override
-                public void onResponse(ImageContainer response, boolean isImmediate) {
-                    if (response.getBitmap() != null) {
-                        image.setImageBitmap(response.getBitmap());
-                        progress.setVisibility(View.GONE);
-                    }
-                    
+                public void onEndInitialization() {
+                    progress.setVisibility(View.GONE);
+                    task = null;
                 }
             });
         }
-        private void onError(final PhotoView image) {
+        private void onError() {
             progress.setVisibility(View.GONE);
             timeOut.setOnClickListener(new OnClickListener() {
                 
                 @Override
                 public void onClick(View v) {
                     v.setVisibility(View.GONE);
-                    get(image);
+                    getImage();
                 }
             });
             timeOut.setVisibility(View.VISIBLE);
@@ -278,9 +298,76 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
         @Override
         public void onDestroyView() {
             super.onDestroyView();
-            if(imageContainer != null && imageContainer.getBitmap()==null){
-                Log.w("image loader", "cancle request:"+imageContainer.getRequestUrl());
-                imageContainer.cancelRequest();
+            if(task != null && task.loading && !task.isCancelled()){
+                task.cancel(true);
+            }
+        }
+        
+        class DownloadImageTask extends AsyncTask<Uri, Void, String>{
+            boolean loading;
+            @Override
+            protected void onPreExecute() {
+                progress.setVisibility(View.VISIBLE);
+            }
+            @Override
+            protected String doInBackground(Uri... params) {
+                loading = true;
+                Uri uri = params[0];
+                if(uri == null || mUri.getHost() == null) return null;
+                File cache = FileUtil.generateImageCacheFile(uri.toString());
+                if (cache.exists() && cache.canRead()) {
+                    return cache.getAbsolutePath();
+                } else {
+                    cache.getParentFile().mkdirs();
+                }
+                File temp = new File(cache.getAbsolutePath()+".tmp");
+                InputStream in = null;
+                OutputStream out = null;
+
+                try {
+                    URL parsedUrl = new URL(uri.toString());
+                    for (int i = 0; i < 3 && !isCancelled(); i++) {
+                        
+                        HttpURLConnection connection = Connectivity.openDefaultConnection(parsedUrl, 3000 + i * 1500, (3000 * (2 + i)));
+                        if(temp.exists()){
+                            connection.addRequestProperty("Range", "bytes="+temp.length()+"-");
+                            out = new FileOutputStream(temp,true);
+                        }else
+                            out = new FileOutputStream(temp);
+                        try {
+                            int responseCode = connection.getResponseCode();
+                            if (responseCode == 200 || responseCode == 206) {
+                                in = connection.getInputStream();
+                                FileUtil.copyStream(in, out);
+                                cache.delete();
+                                if(!temp.renameTo(cache)){
+                                    Log.w(TAG, "重命名失败"+temp.getName());
+                                }
+                                return cache.getAbsolutePath();
+                            }
+                        } catch (SocketTimeoutException e) {
+                            Log.w(TAG, "retry", e);
+                        }
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    IOUtils.close(in);
+                    IOUtils.close(out);
+                }
+                return null;
+            }
+            @Override
+            protected void onPostExecute(String result) {
+                loading = false;
+                if(result == null)
+                    onError();
+                else
+                    loadImage(result);
             }
         }
     }
@@ -321,7 +408,7 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
         }
         if (saveFile != null && saveFile.exists()) {
             MobclickAgent.onEvent(this, "save_pic");
-            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.fromFile(saveFile));
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(saveFile));
             sendBroadcast(intent);
             AcApp.showToast(getString(R.string.save_success)+":"+saveFile.getAbsolutePath());
         } else

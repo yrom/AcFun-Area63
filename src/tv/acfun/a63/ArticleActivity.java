@@ -44,6 +44,7 @@ import tv.acfun.a63.api.entity.Article.SubContent;
 import tv.acfun.a63.base.BaseWebViewActivity;
 import tv.acfun.a63.db.DB;
 import tv.acfun.a63.util.ActionBarUtil;
+import tv.acfun.a63.util.Connectivity;
 import tv.acfun.a63.util.CustomUARequest;
 import tv.acfun.a63.util.FileUtil;
 import tv.acfun.a63.util.Theme;
@@ -395,14 +396,30 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             }
         }
     }
-    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mArticle == null || imgUrls == null || imgUrls.isEmpty() 
+                || AcApp.getViewMode() == Constants.MODE_NO_PIC)
+            return;
+        if (!isDownloaded && imgUrls.size() > 0) {
+            String[] arr = new String[imgUrls.size()];
+            mDownloadTask = new DownloadImageTask();
+            mDownloadTask.execute(imgUrls.toArray(arr));
+        }
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mDownloadTask != null && !isDownloaded) {
+            mDownloadTask.cancel(false);
+            mDownloadTask = null;
+        }
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
         AcApp.cancelAllRequest(TAG);
-        if (mDownloadTask != null && !isDownloaded) {
-            mDownloadTask.cancel(false);
-        }
     }
 
     @Override
@@ -653,12 +670,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     URL parsedUrl = new URL(url);
                     retry: for (int i = 0; i < tryTimes && !isCancelled(); i++) {
                         
-                        HttpURLConnection connection = (HttpURLConnection) parsedUrl
-                                .openConnection();
-                        connection.setConnectTimeout(timeoutMs + i * 1500);
-                        connection.setReadTimeout(timeoutMs * (2 + i));
-                        connection.setUseCaches(false);
-                        connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36");
+                        HttpURLConnection connection = Connectivity.openDefaultConnection(parsedUrl, timeoutMs*(1+i/2), (timeoutMs * (2 + i)));
                         if(temp.exists()){
                             connection.addRequestProperty("Range", "bytes="+temp.length()+"-");
                             out = new FileOutputStream(temp,true);
