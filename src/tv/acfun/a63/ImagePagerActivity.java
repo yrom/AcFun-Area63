@@ -28,6 +28,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import pl.droidsonroids.gif.GifDrawable;
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.base.BaseActivity;
 import tv.acfun.a63.util.ActionBarUtil;
@@ -262,13 +263,24 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
         }
 
         private void loadImage(String path) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1)
+            if(path.endsWith(".gif")){
+                try {
+                    GifDrawable drawable = new GifDrawable(path);
+                    imageView.setImageDrawable(drawable);
+                    drawable.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1){
                 usingTileBitmap(path);
-            else
+            }
+            if(imageView.getDrawable() == null){
                 imageView.setImageDrawable(Drawable.createFromPath(path));
+            }
             imageView.setOnClickListener(clicked);
         }
-        private void usingTileBitmap(String path) {
+        private void usingTileBitmap(final String path) {
             TileBitmapDrawable.attachTileBitmapDrawable(imageView, path, null, new TileBitmapDrawable.OnInitializeListener() {
                 @Override
                 public void onStartInitialization() {
@@ -279,6 +291,12 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
                 public void onEndInitialization() {
                     progress.setVisibility(View.GONE);
                     task = null;
+                }
+                
+                @Override
+                public void onErrorInitialization() {
+                    onEndInitialization();
+                    imageView.setImageDrawable(Drawable.createFromPath(path));
                 }
             });
         }
@@ -297,6 +315,16 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
         
         @Override
         public void onDestroyView() {
+            Drawable drawable = imageView.getDrawable();
+            if(drawable != null){
+                if(drawable instanceof GifDrawable){
+                    ((GifDrawable) drawable).recycle();
+                }else {
+                    drawable.setCallback(null);
+                }
+                imageView.setImageDrawable(null);
+            }
+            
             super.onDestroyView();
             if(task != null && task.loading && !task.isCancelled()){
                 task.cancel(true);

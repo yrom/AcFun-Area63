@@ -43,7 +43,18 @@ import android.webkit.WebView;
 public class BaseWebViewActivity extends BaseActivity {
     protected WebView mWeb;
     private View mProgress;
-
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mWeb.pauseTimers();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mWeb.resumeTimers();
+    }
     @Override
     protected final void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
