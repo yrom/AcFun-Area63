@@ -148,11 +148,12 @@ public class TextViewUtils {
         while(m.find()){
             String id = m.group(2);
             String cat = m.group(1);
-            if (Integer.parseInt(id) > 54)
+            int parsedId = Integer.parseInt(id);
+            if (parsedId > 54)
                 id = "54";
-            String replace = cat.equals("ais") ? "<img src='emotion/ais/%02d.gif'/>"
-                    : "<img src='emotion/%02d.gif'/>";
-            text = text.replace(m.group(), String.format(replace, Integer.parseInt(id)));
+            String replace = cat.equals("ac") || cat.equals("tsj") ? "<img src='emotion/%02d.gif'/>"
+                    : "<img src='emotion/"+cat+"/%02d.gif'/>";
+            text = text.replace(m.group(), String.format(replace, parsedId));
         }
         reg = "\\[at\\](.*?)\\[\\/at\\]";
         m = Pattern.compile(reg).matcher(text);
