@@ -1188,7 +1188,7 @@ public class MainActivity extends ActionBarActivity implements
         LayoutInflater inflater;
         int mode;
         public ArticleListAdapter(LayoutInflater inflater, List<Content> contents, int listMode) {
-            this.contents = contents;
+            this.contents = contents == null ? new ArrayList<Content>() : contents;
             this.inflater = inflater;
             this.mode = listMode;
         }
