@@ -29,6 +29,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -400,7 +401,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     @Override
     protected void onResume() {
         super.onResume();
-        if (mArticle == null || imgUrls == null || imgUrls.isEmpty() 
+        if (isDocBuilding.get() || imageCaches == null // building doc
+                // on request data 
+                || mArticle == null || imgUrls == null || imgUrls.isEmpty()
                 || AcApp.getViewMode() == Constants.MODE_NO_PIC)
             return;
         if (!isDownloaded && imgUrls.size() > 0) {
@@ -458,7 +461,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     List<File> imageCaches;
     private int aid;
     private boolean isFaved;
-    
+    private AtomicBoolean isDocBuilding;
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private class BuildDocTask extends AsyncTask<Article, Void, Boolean> {
         boolean hasUseMap;
@@ -466,7 +469,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
         @Override
         protected void onPreExecute() {
-            
+            isDocBuilding.set(true);
             cacheFile =new File(ARTICLE_PATH, NAME_ARTICLE_HTML);
         }
 
@@ -612,6 +615,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
         @Override
         protected void onPostExecute(Boolean result) {
+            isDocBuilding.set(false);
             if(isFinishing()) return;
             setSupportProgressBarIndeterminateVisibility(false);
             if (result) {
