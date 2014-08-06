@@ -126,9 +126,12 @@ public class BaseWebViewActivity extends BaseActivity {
      */
     public void evaluateJavascript(String script, ValueCallback<String> resultCallback) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mWeb.evaluateJavascript(script, resultCallback);
-        } else {
-            mWeb.loadUrl(script);
+            try {
+                mWeb.evaluateJavascript(script, resultCallback);
+                return;
+            } catch (Exception ignored) {
+            }
         }
+        mWeb.loadUrl(script);
     }
 }
