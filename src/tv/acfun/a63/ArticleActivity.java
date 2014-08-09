@@ -55,6 +55,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -65,9 +66,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebSettings.TextSize;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -114,15 +115,22 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         intent.putExtra("title", title);
         context.startActivity(intent);
     }
-
+    
+    public static void start(Context context, String url) {
+        Intent intent = new Intent(context, ArticleActivity.class);
+        intent.setData(Uri.parse(url));
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.putExtra("webmode", true);
+        context.startActivity(intent);
+    }
     private Request<?> request;
     private Document mDoc;
     private List<String> imgUrls;
     private DownloadImageTask mDownloadTask;
     private String title;
     private boolean isDownloaded;
+    private boolean isWebMode;
     private DB db;
-
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -142,86 +150,94 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                     aid = Integer.parseInt(matcher.group(1));
                 }
             }
-            title = "ac"+aid;
+            if(aid != 0) title = "ac"+aid;
+            isWebMode = getIntent().getBooleanExtra("webmode", false) && aid == 0;
         }else{
             aid = getIntent().getIntExtra("aid", 0);
             title = getIntent().getStringExtra("title");
         }
-        if (aid == 0) {
-            throw new IllegalArgumentException("没有 id");
-        } else {
+        if (!isWebMode) {
+            if(aid == 0)
+                throw new IllegalArgumentException("没有 id");
             getSupportActionBar().setTitle("ac" + aid);
             MobclickAgent.onEvent(this, "view_article");
             db = new DB(this);
             isFaved = db.isFav(aid); 
-            mWeb.getSettings().setAppCachePath(ARTICLE_PATH);
-            mWeb.addJavascriptInterface(new ACJSObject(), "AC");
-            // Set a chrome client to handle the MediaResource on web page
-            // like video,video loading progress, etc.
-            mWeb.setWebChromeClient(new WebChromeClient());
-            mWeb.setWebViewClient(new WebViewClient() {
-                
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    Matcher matcher = sAreg.matcher(url);
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    if (matcher.find() || (matcher = sLiteAreg.matcher(url)).find()) {
-                        String acId = matcher.group(1);
-                        try {
-                            intent.setData(Uri.parse("ac://ac" + acId));
-                            startActivity(intent);
-                            return true;
-                        } catch (Exception e) {
-                            // nothing
-                        }
-                    }else if((matcher = sVreg.matcher(url)).find() 
-                            || (matcher = sLiteVreg.matcher(url)).find()){
-                        String acId = matcher.group(1);
-                        try {
-                            intent.setData(Uri.parse("av://ac" + acId));
-                            startActivity(intent);
-                            return true;
-                        } catch (Exception e) {
-                            // nothing
-                        }
-                        
-                    }else if(Pattern.matches(sAppReg, url)){
-                        String appLink = getString(R.string.app_ac_video_link);
-                        try {
-                            intent.setData(Uri.parse(appLink));
-                            startActivity(intent);
-                            return true;
-                        } catch (Exception e) {
-                            view.loadUrl(appLink);
-                            return true;
-                        }
-                        
-                    }
-                    return false;
-                }
-
-                @Override
-                public void onPageFinished(WebView view, String url) {
-                    if (imgUrls == null || imgUrls.isEmpty()
-                            || url.startsWith("file:///android_asset") 
-                            || AcApp.getViewMode() == Constants.MODE_NO_PIC) // 无图模式
-                        return;
-//                    Log.d(TAG, "on finished:" + url);
-                    if ((url.equals(getBaseUrl()) || url.contains(NAME_ARTICLE_HTML))
-                            && imgUrls.size() > 0 && !isDownloaded) {
-                        String[] arr = new String[imgUrls.size()];
-                        mDownloadTask = new DownloadImageTask();
-                        mDownloadTask.execute(imgUrls.toArray(arr));
-                    }
-                }
-
-            });
-            mWeb.getSettings().setSupportZoom(true);
-            mWeb.getSettings().setBuiltInZoomControls(true);
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-                mWeb.getSettings().setDisplayZoomControls(false);
-            setTextZoom(AcApp.getConfig().getInt("text_size", 0));
         }
+        mWeb.getSettings().setAppCachePath(ARTICLE_PATH);
+        mWeb.addJavascriptInterface(new ACJSObject(), "AC");
+        // Set a chrome client to handle the MediaResource on web page
+        // like video,video loading progress, etc.
+        mWeb.setWebChromeClient(new WebChromeClient(){
+            @Override
+            public void onReceivedTitle(WebView view, String title) {
+                setTitle(title);
+            }
+        });
+        mWeb.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                Matcher matcher = sAreg.matcher(url);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                if (matcher.find() || (matcher = sLiteAreg.matcher(url)).find() 
+                        || (matcher = sVreg.matcher(url)).find() 
+                        || (matcher = sLiteVreg.matcher(url)).find()){
+                    String acId = matcher.group(1);
+                    try {
+                        intent.setData(Uri.parse("ac://ac" + acId));
+                        startActivity(intent);
+                        return true;
+                    } catch (Exception e) {
+                        // nothing
+                    }
+                    
+                }else if(Pattern.matches(sAppReg, url)){
+                    String appLink = getString(R.string.app_ac_video_link);
+                    try {
+                        intent.setData(Uri.parse(appLink));
+                        startActivity(intent);
+                        return true;
+                    } catch (Exception e) {
+                        view.loadUrl(appLink);
+                        return true;
+                    }
+                    
+                }
+                if(!isWebMode){
+                    start(ArticleActivity.this, url);
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                setSupportProgressBarIndeterminateVisibility(true);
+            }
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                setSupportProgressBarIndeterminateVisibility(false);
+                if (isWebMode 
+                        || imgUrls == null || imgUrls.isEmpty()
+                        || url.startsWith("file:///android_asset") 
+                        || AcApp.getViewMode() == Constants.MODE_NO_PIC) // 无图模式
+                    return;
+//                    Log.d(TAG, "on finished:" + url);
+                if ((url.equals(getBaseUrl()) || url.contains(NAME_ARTICLE_HTML))
+                        && imgUrls.size() > 0 && !isDownloaded) {
+                    String[] arr = new String[imgUrls.size()];
+                    mDownloadTask = new DownloadImageTask();
+                    mDownloadTask.execute(imgUrls.toArray(arr));
+                }
+                
+            }
+
+        });
+        mWeb.getSettings().setSupportZoom(true);
+        mWeb.getSettings().setBuiltInZoomControls(true);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            mWeb.getSettings().setDisplayZoomControls(false);
+        setTextZoom(AcApp.getConfig().getInt("text_size", 0));
     }
 
     @Override
@@ -238,7 +254,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(AcApp.getViewMode() != Constants.MODE_COMMIC){
+        if(AcApp.getViewMode() != Constants.MODE_COMMIC && !isWebMode){
             getMenuInflater().inflate(R.menu.article_options_menu, menu);
             MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
             if(ActionBarUtil.hasSB()){
@@ -329,6 +345,14 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     }
     protected void initData() {
         super.initData();
+        if(isWebMode){
+            Uri uri = getIntent().getData();
+            // TODO: sync cookies to WebView
+            String url = uri.toString();
+            mWeb.loadUrl(url);
+            
+            return;
+        }
         request = new ArticleRequest(getApplicationContext(), aid, this, this);
         request.setTag(TAG);
         request.setShouldCache(true);
@@ -401,7 +425,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     @Override
     protected void onResume() {
         super.onResume();
-        if (isDocBuilding.get() || imageCaches == null // building doc
+        if (isWebMode // no images
+                || isDocBuilding.get() || imageCaches == null // building doc
                 // on request data 
                 || mArticle == null || imgUrls == null || imgUrls.isEmpty()
                 || AcApp.getViewMode() == Constants.MODE_NO_PIC)
