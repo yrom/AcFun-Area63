@@ -461,7 +461,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     List<File> imageCaches;
     private int aid;
     private boolean isFaved;
-    private AtomicBoolean isDocBuilding;
+    private AtomicBoolean isDocBuilding = new AtomicBoolean(false);
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private class BuildDocTask extends AsyncTask<Article, Void, Boolean> {
         boolean hasUseMap;
