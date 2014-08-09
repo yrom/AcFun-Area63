@@ -272,11 +272,12 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
                     e.printStackTrace();
                 }
             }
-            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1){
-                usingTileBitmap(path);
-            }
             if(imageView.getDrawable() == null){
-                imageView.setImageDrawable(Drawable.createFromPath(path));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1){
+                    usingTileBitmap(path);
+                }else{
+                    imageView.setImageDrawable(Drawable.createFromPath(path));
+                }
             }
             imageView.setOnClickListener(clicked);
         }
