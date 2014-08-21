@@ -82,6 +82,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.umeng.analytics.MobclickAgent;
@@ -409,9 +410,12 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             try {
                 String json = new String(response.data,
                         HttpHeaderParser.parseCharset(response.headers));
-                JSONObject articleJson = JSON.parseObject(json);
-                
-                return Response.success(Article.newArticle(articleJson),
+                JSONObject rsp = JSON.parseObject(json);
+                int status = rsp.getIntValue("status");
+                if(status != 200){
+                    throw new InvalideArticleError();
+                }
+                return Response.success(Article.newArticle(rsp.getJSONObject("data").getJSONObject("fullArticle")),
                         HttpHeaderParser.parseCacheHeaders(response));
             } catch(InvalideArticleError e){
                 Log.w(TAG, "Invalide Article! Need to redirect intent");
@@ -478,6 +482,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 //http://www.acfun.tv/lite/v/#ac=1317054
                 mWeb.loadUrl("http://"+ArticleApi.getDomainRoot(this)+"/lite/v/#ac="+aid);
             }
+        }else if(error instanceof ServerError){
+            mWeb.loadUrl("http://"+ArticleApi.getDomainRoot(this)+"/lite/v/#ac="+aid);
         }else{
             showErrorDialog();
         }

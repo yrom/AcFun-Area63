@@ -19,59 +19,44 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.alibaba.fastjson.JSONArray;
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.android.volley.VolleyError;
 
 /***
 {
-  "content": [
-    {
-      "content": "<span style=\"font-size:16px;font-family:微软雅黑, sans-serif;\"> 作者：兄贵解说老王&larr;他是A站UP：今天我路过<\/span>",
-      "subtitle": "【DOTA】随着中国战队的落败，一股风暴加地震正在袭来"
+  "status": 200,
+  "msg": "ok",
+  "data": {
+    "fullArticle": {
+      "txt": ".....",
+      "views": 29554,
+      "comments": 452,
+      "stows": 12,
+      "releaseDate": 1377511408000,
+      "description": "折戟了，而随着中国战队的落败，一股风暴加地震正在袭来。一个普通看客眼中的发展史",
+      "user": {
+        "userId": 319714,
+        "username": "续-R",
+        "userImg": "http://static.acfun.mm111.net/dotnet/artemis/u/cms/www/201408/19173024pofa.jpg"
+      },
+      "channel": {
+        "channelId": 110,
+        "channelName": ""
+      },
+      "tags": [
+        "DOTA",
+        "兄贵解说",
+        "原创"
+      ],
+      "viewOnly": 0,
+      "channelId": 110,
+      "contentId": 797651,
+      "title": "【DOTA】随着中国战队的落败，一股风暴加地震正在袭来",
+      "cover": "http://static.acfun.mm111.net/dotnet/20120923/style/image/cover.png"
     }
-  ],
-  "tags": [
-    {
-      "id": 1503,
-      "name": "DOTA"
-    },
-    {
-      "id": 228485,
-      "name": "兄贵解说"
-    },
-    {
-      "id": 533,
-      "name": "原创"
-    }
-  ],
-  "success": true,
-  "info": {
-    "id": 797651,
-    "title": "【DOTA】随着中国战队的落败，一股风暴加地震正在袭来",
-    "posttime": 1377511408000,
-    "description": "折戟了，而随着中国战队的落败，一股风暴加地震正在袭来。一个普通看客眼中的发展史",
-    "postuser": {
-      "uid": 319714,
-      "name": "续-R",
-      "avastar": "http://w5cdn.ranktv.cn/dotnet/artemis/u/cms/www/201308/29154301mql6.jpg",
-      "signature": "要开学了混蛋！\n衝動を解き放て！\n駆け巡り積もる意志 \nその眼を忘れはしない"
-    },
-    "titleimage": "http://w5cdn.ranktv.cn/dotnet/20120923/style/image/cover.png",
-    "channel": {
-      "channelName": "综合",
-      "channelID": 110,
-      "channelURL": "/a/list110/index.htm"
-    },
-    "statistics": [
-      29260,
-      451,
-      0,
-      0,
-      0,
-      11
-    ]
   }
 }
  * @author Yrom
@@ -100,45 +85,63 @@ public class Article {
     private static Pattern imageReg = Pattern.compile("<img.+?src=[\"|'](.+?)[\"|']");
 
     public static Article newArticle(JSONObject articleJson) throws InvalideArticleError {
-        if (Boolean.TRUE != articleJson.getBoolean("success")) {
-            return null;
-        }
         Article article = new Article();
         article.imgUrls = new ArrayList<String>();
         // parse info
-        JSONObject info = articleJson.getJSONObject("info");
-        article.title = info.getString("title");
-        article.postTime = info.getLong("posttime");
-        article.id = info.getIntValue("id");
-        article.description = info.getString("description");
-        article.poster = parseUser(info);
+//        JSONObject info = articleJson.getJSONObject("info");
+        article.title = articleJson.getString("title");
+        article.postTime = articleJson.getLong("releaseDate");
+        article.id = articleJson.getIntValue("contentId");
+        article.description = articleJson.getString("description");
+        article.poster = parseUser(articleJson);
         // statistics
-        JSONArray statistics = info.getJSONArray("statistics");
-        article.views = statistics.getIntValue(0);
-        article.comments = statistics.getIntValue(1);
-        article.stows = statistics.getIntValue(5);
+        article.views = articleJson.getIntValue("views");
+        article.comments = articleJson.getIntValue("comments");
+        article.stows = articleJson.getIntValue("stows");
         // sub contents and images
-        JSONArray contentArray = articleJson.getJSONArray("content");
-        article.contents = new ArrayList<Article.SubContent>(contentArray.size());
-
-        for (int i = 0; i < contentArray.size(); i++) {
-            SubContent content = new SubContent();
-            JSONObject sub = contentArray.getJSONObject(i);
-            content.content = sub.getString("content");
-            validate(content);
-            content.subTitle = sub.getString("subtitle").replaceAll("<span[^>]+>", "").replaceAll("</span>", "");
-            Matcher matcher = imageReg.matcher(content.content);
-            while (matcher.find()) {
-                article.imgUrls.add(matcher.group(1));
-            }
-            article.contents.add(content);
-        }
+        article.contents = new ArrayList<Article.SubContent>();
+        parseContentArray(articleJson, article);
         // channel
-        JSONObject channel = info.getJSONObject("channel");
-        article.channelId = channel.getIntValue("channelID");
+        JSONObject channel = articleJson.getJSONObject("channel");
+        article.channelId = channel.getIntValue("channelId");
         article.channelName = channel.getString("channelName");
 
         return article;
+    }
+
+    static Pattern pageReg = Pattern.compile("\\[NextPage\\]([^\\[\\]]+)\\[/NextPage\\]");
+    
+    private static void parseContentArray(JSONObject articleJson, Article article) throws InvalideArticleError {
+        String fullText = articleJson.getString("txt");
+        Matcher matcher = pageReg.matcher(fullText);
+        int start = 0;
+        while(matcher.find() && start < fullText.length()){
+            Log.i(TAG, "Find next page tag: "+matcher.group());
+            int index = matcher.start();
+            SubContent content = new SubContent();
+            content.subTitle = matcher.group(1).replaceAll("<span[^>]+>", "").replaceAll("</span>", "");
+            content.content = fullText.substring(start, index);
+            start = matcher.end();
+            validate(content);
+            findImageUrls(article, content);
+            article.contents.add(content);
+        }
+        
+        if(article.contents.isEmpty()){
+            SubContent content = new SubContent();
+            content.content = fullText;
+            content.subTitle = article.title;
+            validate(content);
+            findImageUrls(article, content);
+            article.contents.add(content);
+        }
+    }
+
+    private static void findImageUrls(Article article, SubContent content) {
+        Matcher imageMatcher = imageReg.matcher(content.content);
+        while (imageMatcher.find()) {
+            article.imgUrls.add(imageMatcher.group(1));
+        }
     }
 
     private static void validate(SubContent content) throws InvalideArticleError {
@@ -148,13 +151,12 @@ public class Article {
         }
     }
 
-    private static User parseUser(JSONObject info) throws JSONException {
-        JSONObject postuser = info.getJSONObject("postuser");
+    private static User parseUser(JSONObject article) throws JSONException {
+        JSONObject postuser = article.getJSONObject("user");
         User poster = new User();
-        poster.name = postuser.getString("name");
-        poster.id = postuser.getIntValue("uid");
-        poster.signature = postuser.getString("signature");
-        poster.avatar = postuser.getString("avastar");
+        poster.name = postuser.getString("username");
+        poster.id = postuser.getIntValue("userId");
+        poster.avatar = postuser.getString("userImg");
         return poster;
     }
     

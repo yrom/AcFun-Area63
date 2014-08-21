@@ -106,8 +106,8 @@ public final class ArticleApi {
     public static String getContentUrl(Context context, int aid){
         if (aid <= 0)
             return null;
-        String root = getDomainRoot(context);
-        return String.format(Locale.US, "http://%s/api/content.aspx?query=%d", root, aid);
+        String root = getDomainApi(context);
+        return String.format(Locale.US, "http://%s/apiserver/content/article?contentId=%d", root, aid);
     }
     
     public static String getCommentUrl(Context context, int id, int page){
