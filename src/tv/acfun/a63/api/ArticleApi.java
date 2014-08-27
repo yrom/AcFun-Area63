@@ -74,12 +74,12 @@ public final class ArticleApi {
             count = 20;
         if (page < 1)
             page = 1;
-        return getBaseUrl(context, type, catId, count, 20 * (page - 1));
+        return getBaseUrl(context, type, catId, count, page);
     }
     
-    public static String getBaseUrl(Context context, int order, int channelId, int count, int first){
-        String root = getDomainRoot(context);
-        return String.format(Locale.US, "http://%s/api/getlistbyorder.aspx?orderby=%d&channelIds=%d&count=%d&first=%d", root, order, channelId, count, first);
+    public static String getBaseUrl(Context context, int order, int channelId, int count, int page){
+        String root = getDomainApi(context);
+        return String.format(Locale.US, "http://%s/apiserver/content/channel?orderBy=%d&channelId=%d&pageSize=%d&pageNo=%d", root, order, channelId, count, page);
     }
     
     /**

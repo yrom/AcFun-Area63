@@ -15,9 +15,9 @@
         <item>漫画·小说</item>
     </string-array>
     <string-array name="modes">
-        <item>热门文章</item>
-        <item>最新回复</item>
-        <item>最近发布</item>
+        <item>人气最旺</item>
+        <item>评论最多</item>
+        <item>综合排序</item>
         <!-- item>本区推荐</item -->
     </string-array>
     <string-array name="title_sizes">

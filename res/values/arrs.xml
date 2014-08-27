@@ -16,8 +16,8 @@
     </string-array>
     <string-array name="modes">
         <item>What\'s Hot</item>
-        <item>Latest Commented</item>
-        <item>Recently Published</item>
+        <item>Most Commented</item>
+        <item>Default</item>
         <!-- item>本区推荐</item -->
     </string-array>
     <string-array name="title_sizes">

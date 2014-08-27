@@ -41,11 +41,11 @@ public interface Constants {
     int CAT_COMIC_LIGHT_NOVEL = 75;
     int[] CAT_IDS = {CAT_COLLECTION,CAT_WORK_EMOTION,CAT_AN_CULTURE,CAT_COMIC_LIGHT_NOVEL,CAT_ARTICLE};
     int TYPE_DEFAULT = 0;
-    int TYPE_HOT = 6;
-    int TYPE_LATEST_REPLY = 22;
+    int TYPE_HOT = 1;
+    int TYPE_LATEST_REPLY = 3;
     
-    int COUNT_HOT = 15;
-    int COUNT_LAST_REPLY = 15;
+    int COUNT_HOT = 20;
+    int COUNT_LAST_REPLY = 20;
     
     int MODE_MIX = 0;
     int MODE_NO_PIC = 1;

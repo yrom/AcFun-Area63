@@ -36,8 +36,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar.OnNavigationListener;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -73,7 +73,6 @@ import android.widget.TextView.OnEditorActionListener;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Cache;
 import com.android.volley.Cache.Entry;
@@ -835,16 +834,16 @@ public class MainActivity extends ActionBarActivity implements
      */
     public static class RankListFragment extends ArticleListFragment{
 
-        @Override
-        protected Request<?> getRequest(String url) {
-            
-            return new RankListRequest(url, listener, errorListner);
-        }
-
-        @Override
-        protected Contents loadDataFromCache(Entry entry) {
-            return parseJson(new String(entry.data));
-        }
+//        @Override
+//        protected Request<?> getRequest(String url) {
+//            
+//            return new ContentListRequest(url, listener, errorListner);
+//        }
+//
+//        @Override
+//        protected Contents loadDataFromCache(Entry entry) {
+//            return parseJson(new String(entry.data));
+//        }
 
         @Override
         protected String getPageTitle() {
@@ -859,7 +858,8 @@ public class MainActivity extends ActionBarActivity implements
         if(rankList.getIntValue("status") != 200){
             return null;
         }
-        JSONArray jsonArr = rankList.getJSONObject("data").getJSONObject("page").getJSONArray("list");
+        JSONObject page = rankList.getJSONObject("data").getJSONObject("page");
+        JSONArray jsonArr = page.getJSONArray("list");
         
         List<Content> contents = new ArrayList<Content>();
         for(int i=0;i<jsonArr.size();i++){
@@ -879,12 +879,13 @@ public class MainActivity extends ActionBarActivity implements
         Contents cs = new Contents();
         cs.setContents(contents);
         cs.totalpage = 1;
+        cs.totalcount = page.getIntValue("totalCount");
         return cs;
         
     }
-    static class RankListRequest extends FastJsonRequest<Contents>{
+    static class ContentListRequest extends FastJsonRequest<Contents>{
 
-        public RankListRequest(String url, Listener<Contents> listener,
+        public ContentListRequest(String url, Listener<Contents> listener,
                 ErrorListener errorListner) {
             super(url, Contents.class, listener, errorListner);
         }
@@ -954,8 +955,7 @@ public class MainActivity extends ActionBarActivity implements
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             this.inflater = inflater;
-            View rootView = inflater.inflate(R.layout.fragment_main_dummy,
-                    container, false);
+            View rootView = inflater.inflate(R.layout.fragment_main_dummy, container, false);
             list = (PullToRefreshListView) rootView.findViewById(R.id.list);
             timeOut = rootView.findViewById(R.id.time_out_text);
             loadding = rootView.findViewById(R.id.loading);
@@ -1111,20 +1111,29 @@ public class MainActivity extends ActionBarActivity implements
                 Log.d(TAG, String.format("[%d] new request: %s",section,request.getUrl()));
             mQueue.add(request);
         }
-
-        protected Request<?> getRequest(String url) {
-            return new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
-        }
         
-        protected Contents loadDataFromCache(final Cache.Entry entry) {
-            Contents contents;
-            try {
-                contents = JSON.parseObject(new String(entry.data), Contents.class);
-            } catch (JSONException e) {
-                contents = null;
-            }
-            return contents;
+        protected Request<?> getRequest(String url) {
+            
+            return new ContentListRequest(url, listener, errorListner);
         }
+
+        protected Contents loadDataFromCache(Entry entry) {
+            return parseJson(new String(entry.data));
+        }
+
+//        protected Request<?> getRequest(String url) {
+//            return new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
+//        }
+//        
+//        protected Contents loadDataFromCache(final Cache.Entry entry) {
+//            Contents contents;
+//            try {
+//                contents = JSON.parseObject(new String(entry.data), Contents.class);
+//            } catch (JSONException e) {
+//                contents = null;
+//            }
+//            return contents;
+//        }
         protected void initPage(boolean newData) {
             timeOut.setVisibility(View.GONE);
             TextView text = (TextView) footView.findViewById(R.id.list_footview_text);
