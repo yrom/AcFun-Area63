@@ -151,8 +151,8 @@ public class TextViewUtils {
             int parsedId = Integer.parseInt(id);
             if (parsedId > 54)
                 id = "54";
-            String replace = cat.equals("ac") || cat.equals("tsj") ? "<img src='emotion/%02d.gif'/>"
-                    : "<img src='emotion/"+cat+"/%02d.gif'/>";
+            String replace = cat.equals("brd") || cat.equals("td") ? 
+                    "<img src='emotion/"+cat+"/%02d.gif'/>" : "<img src='emotion/%02d.gif'/>";
             text = text.replace(m.group(), String.format(replace, parsedId));
         }
         reg = "\\[at\\](.*?)\\[\\/at\\]";
