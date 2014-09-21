@@ -22,6 +22,7 @@ import java.io.InputStream;
 import org.apache.commons.httpclient.Cookie;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.entity.User;
@@ -103,16 +104,26 @@ public class ProfileActivity extends BaseWebViewActivity {
                 InputStream in = getAssets().open("splash.html");
                 Document doc = Jsoup.parse(in, "utf-8","");
                 doc.getElementById("area-cont-splash").html(htmlFromNet);
-                doc.getElementsByClass("alert-info").remove();
-                doc.getElementById("hint-unread-splash").remove();
-                String html = "<div id=\"control\"><a class=\"button\" href=\"javascript:window.AC.logout();\" >注销</a> &nbsp;&nbsp;&nbsp; <a class=\"button\" href=\"javascript:window.AC.checkin();\">签到</a> </div>";
-                doc.getElementById("list-info-splash").before(html);
+                remove(doc.getElementById("btn-toggle-info"));
+                remove(doc.getElementById("hint-unread-splash"));
+                String btnHtml = getOptionsButtonHtml();
+                Element list = doc.getElementById("info-hidden-splash");
+                if(list != null)
+                    list.before(btnHtml);
+                else
+                    doc.append(btnHtml);
                 return doc;
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ignored) {
             }
             
             return null;
+        }
+
+        private String getOptionsButtonHtml() {
+            return "<div id=\"control\"><a class=\"button\" href=\"javascript:window.AC.logout();\" >注销</a> &nbsp;&nbsp;&nbsp; <a class=\"button\" href=\"javascript:window.AC.checkin();\">签到</a> </div>";
+        }
+        void remove(Element e){
+            if(e != null) e.remove();
         }
         
     }

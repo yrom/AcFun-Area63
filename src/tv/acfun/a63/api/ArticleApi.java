@@ -122,7 +122,7 @@ public final class ArticleApi {
     
     public static String getSplashUrl(Context context){
         String root = getDomainRoot(context);
-        return "http://"+root+"/api/member.aspx?name=splash";
+        return "http://"+root+"/member/splash.aspx";
     }
     
     public static String getRankListUrl(Context context){
