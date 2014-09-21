@@ -462,7 +462,7 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
         String path = mList.get(mCurrentImage);
         Uri uri = Uri.parse(path);
         shareIntent.setType("image/*");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("#Acfun文章区# 分享图片，%s - http://%s/a/ac%d",ArticleApi.getDomainRoot(getApplicationContext()), title, aid));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("#Acfun文章区# 分享图片，%s - http://%s/a/ac%d", title, ArticleApi.getDomainRoot(getApplicationContext()), aid));
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         return shareIntent;
     }
