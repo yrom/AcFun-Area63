@@ -148,7 +148,13 @@ public class TextViewUtils {
         while(m.find()){
             String id = m.group(2);
             String cat = m.group(1);
-            int parsedId = Integer.parseInt(id);
+            int parsedId;
+            try {
+                parsedId = Integer.parseInt(id);
+            } catch (NumberFormatException e) {
+                // Invalid format text
+                continue;
+            }
             if (parsedId > 54)
                 id = "54";
             String replace = cat.equals("brd") || cat.equals("td") ? 

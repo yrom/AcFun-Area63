@@ -146,8 +146,13 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             }else if(scheme.equals("http")){
                 // http://www.acfun.tv/v/ac123456
                 Matcher matcher;
-                if((matcher = sVreg.matcher(data.getPath())).find() 
-                        || (matcher = sAreg.matcher(data.getPath())).find()){
+                String path = data.getPath();
+                if(path==null){
+                    finish();
+                    return;
+                }
+                if((matcher = sVreg.matcher(path)).find() 
+                        || (matcher = sAreg.matcher(path)).find()){
                     aid = Integer.parseInt(matcher.group(1));
                 }
             }
@@ -581,6 +586,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             for (int imgIndex = 0; imgIndex < imgs.size(); imgIndex++) {
                 Element img = imgs.get(imgIndex);
                 String src = img.attr("src").trim();
+                if (TextUtils.isEmpty(src))
+                    continue;
                 if (src.startsWith("file"))
                     continue;
                 if (!src.startsWith("http") && src.charAt(0) == '/') {

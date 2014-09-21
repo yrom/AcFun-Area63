@@ -969,7 +969,8 @@ public class MainActivity extends ActionBarActivity implements
                     if(BuildConfig.DEBUG) 
                         Log.d(TAG, String.format("[%d] on refresh ",section));
                     isLoading = true;
-                    String label = DateUtils.formatDateTime(getActivity() == null?getActivity():AcApp.context(), System.currentTimeMillis(),
+                    String label = DateUtils.formatDateTime(getActivity() != null ? getActivity() : AcApp.context(),
+                            System.currentTimeMillis(),
                             DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
                     loadingLayout.setLastUpdatedLabel(label);
                     loadData(true,false);
