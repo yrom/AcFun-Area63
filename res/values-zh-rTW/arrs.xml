@@ -6,7 +6,7 @@
         <item>排行榜</item>
         <item>收藏夾</item>
         <item>召喚</item>
-        <item>搜索</item>
+        <item>檢索</item>
     </string-array>
     <string-array name="titles">
         <item>綜合</item>
@@ -16,7 +16,7 @@
     </string-array>
     <string-array name="modes">
         <item>熱門文章</item>
-        <item>最新回复</item>
+        <item>最多回复</item>
         <item>最近發布</item>
         <!-- item>本區推薦</item -->
     </string-array>
