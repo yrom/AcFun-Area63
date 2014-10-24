@@ -1,8 +1,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
-        
+        <item name="colorPrimary">@color/main_color</item>
         <item name="actionBarItemBackground">?attr/selectableItemBackground</item>
         
         <item name="actionButtonStyle">@style/Widget.Styled.ActionButton</item>
@@ -42,12 +41,8 @@
         <item name="android:dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
     </style>
 
-    <style name="Widget.Styled.ActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="background">@color/main_color</item>
-    </style>
-    
     <style name="Widget.Styled.Spinner.DropDown.ActionBar" parent="Widget.AppCompat.Spinner.DropDown.ActionBar">
-        <item name="android:background">@drawable/spinner_ab</item>
+        <!-- <item name="android:background">@drawable/abc_spinner_mtrl_am_alpha</item> -->
     </style>
     
     <style name="Widget.Styled.PopupMenu" parent="Widget.AppCompat.ListPopupWindow">

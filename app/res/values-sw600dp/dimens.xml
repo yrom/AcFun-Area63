@@ -1,9 +1,6 @@
 <resources>
-
-    <!--
-         Customize dimensions originally defined in res/values/dimens.xml (such as
-         screen margins) for sw600dp devices (e.g. 7" tablets) here.
-    -->
+	<!-- Default height of an action bar. -->
+    <dimen name="abc_action_bar_default_height">56dip</dimen>
 	<dimen name="left_drawer_width">300dp</dimen>
 	<dimen name="emotions_column_width">56dp</dimen>
 	<dimen name="emotions_height">256dp</dimen>

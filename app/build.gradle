@@ -7,7 +7,7 @@ dependencies {
     compile project(':lib-byakugallery')
     compile 'org.jsoup:jsoup:1.8.1'
     compile 'com.alibaba:fastjson:1.1.45.android'
-    compile 'com.android.support:appcompat-v7:20.0.0@aar'
+    compile 'com.android.support:appcompat-v7:21.0.3@aar'
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1@aar'
     compile 'com.mcxiaoke.volley:library:1.0.+'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'

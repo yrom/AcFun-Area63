@@ -27,7 +27,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -221,7 +221,6 @@ public class MainActivity extends ActionBarActivity implements
         mDrawerList.setOnItemClickListener(this);
         mDrawerToggle = new ActionBarDrawerToggle(this, 
             mDrawerLayout, 
-            R.drawable.ic_navigation_drawer, 
             R.string.app_name_open, 
             R.string.app_name 
             ) {
