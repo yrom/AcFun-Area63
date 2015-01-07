@@ -85,28 +85,29 @@ public class Article {
     private static Pattern imageReg = Pattern.compile("<img.+?src=[\"|'](.+?)[\"|']");
 
     public static Article newArticle(JSONObject articleJson) throws InvalideArticleError {
-        Article article = new Article();
-        article.imgUrls = new ArrayList<String>();
-        // parse info
-//        JSONObject info = articleJson.getJSONObject("info");
-        article.title = articleJson.getString("title");
-        article.postTime = articleJson.getLong("releaseDate");
-        article.id = articleJson.getIntValue("contentId");
-        article.description = articleJson.getString("description");
-        article.poster = parseUser(articleJson);
-        // statistics
-        article.views = articleJson.getIntValue("views");
-        article.comments = articleJson.getIntValue("comments");
-        article.stows = articleJson.getIntValue("stows");
-        // sub contents and images
-        article.contents = new ArrayList<Article.SubContent>();
-        parseContentArray(articleJson, article);
-        // channel
-        JSONObject channel = articleJson.getJSONObject("channel");
-        article.channelId = channel.getIntValue("channelId");
-        article.channelName = channel.getString("channelName");
+        try {
+            Article article = new Article();
+            article.imgUrls = new ArrayList<String>();
+            // parse info
+            article.title = articleJson.getString("title");
+            article.postTime = articleJson.getLong("releaseDate");
+            article.id = articleJson.getIntValue("contentId");
+            article.description = articleJson.getString("description");
+            article.poster = parseUser(articleJson);
+            // statistics
+            article.views = articleJson.getIntValue("views");
+            article.comments = articleJson.getIntValue("comments");
+            article.stows = articleJson.getIntValue("stows");
+            // sub contents and images
+            article.contents = new ArrayList<Article.SubContent>();
+            parseContentArray(articleJson, article);
+            // channel
+            article.channelId = articleJson.getIntValue("channelId");
+            return article;
+        } catch (Throwable e) {
+            throw new InvalideArticleError(e);
+        }
 
-        return article;
     }
 
     static Pattern pageReg = Pattern.compile("\\[NextPage\\]([^\\[\\]]+)\\[/NextPage\\]");
@@ -162,6 +163,14 @@ public class Article {
     
     public static class InvalideArticleError extends VolleyError{
         private static final long serialVersionUID = 1111L;
+
+        public InvalideArticleError() {
+            super();
+        }
+
+        public InvalideArticleError(Throwable cause) {
+            super(cause);
+        }
         
     }
 }
