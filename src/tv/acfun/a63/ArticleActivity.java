@@ -420,7 +420,10 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 if(status != 200){
                     throw new InvalideArticleError();
                 }
-                return Response.success(Article.newArticle(rsp.getJSONObject("data").getJSONObject("fullArticle")),
+                JSONObject articleJson = rsp.getJSONObject("data").getJSONObject("fullArticle");
+                if(articleJson == null)
+                    return Response.error(new InvalideArticleError());
+                return Response.success(Article.newArticle(articleJson),
                         HttpHeaderParser.parseCacheHeaders(response));
             } catch(InvalideArticleError e){
                 Log.w(TAG, "Invalide Article! Need to redirect intent");
