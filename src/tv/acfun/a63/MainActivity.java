@@ -19,6 +19,7 @@ import tv.acfun.a63.util.FastJsonRequest;
 import tv.acfun.a63.util.TextViewUtils;
 import tv.acfun.a63.util.Theme;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -53,6 +54,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
@@ -771,6 +773,11 @@ public class MainActivity extends ActionBarActivity implements
             if(actionId == EditorInfo.IME_ACTION_SEARCH 
                     || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
                 startSearch(v.getText().toString(),1);
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null && imm.isActive(mSearchText)) {
+                    imm.hideSoftInputFromWindow(mSearchText.getWindowToken(), 0);
+                }
+                return true;
             }
             return false;
         }
@@ -793,14 +800,21 @@ public class MainActivity extends ActionBarActivity implements
                 mTotalCount = response.totalcount;
                 
             }};
-        ErrorListener errorListner;
+        ErrorListener errorListner = new ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.w(TAG, "search failed!", error.getCause());
+                mProgress.setVisibility(View.GONE);
+                AcApp.showToast("搜索失败！");
+            }};
         private boolean mLastItemVisible;
         private void startSearch(String query, int page) {
             mProgress.setVisibility(View.VISIBLE);
             mPage = page;
-            String url = ArticleApi.getSearchUrl(getActivity(), query, 2, 1, mPage, 20);
+            String url = ArticleApi.getSearchUrl(getActivity(), query, mPage, 20);
             if (BuildConfig.DEBUG) Log.d(TAG, "query url=" + url);
-            Request<?> request = new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
+            Request<?> request = new ContentListRequest(url, listener, errorListner);
             AcApp.addRequest(request);
         }
         @Override
@@ -865,7 +879,11 @@ public class MainActivity extends ActionBarActivity implements
         for(int i=0;i<jsonArr.size();i++){
             JSONObject carr = jsonArr.getJSONObject(i);
             Content c = new Content();
-            c.aid = carr.getIntValue("contentId");
+            String contentId = carr.getString("contentId");
+            if(TextUtils.isDigitsOnly(contentId))
+                c.aid = Integer.parseInt(contentId);
+            else if(contentId.startsWith("ac"))
+                c.aid = Integer.parseInt(contentId.substring(2));
             c.title =carr.getString("title");
             c.description = carr.getString("description");
             c.releaseDate = carr.getLongValue("releaseDate");

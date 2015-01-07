@@ -239,6 +239,7 @@ public final class ArticleApi {
     }
     
     /**
+     * @deprecated
      * @param query key word
      * @param orderId 相关、日期、点击、评论、收藏，0~4
      * @param orderBy 按标题标签、用户、内容简介查找，1~3
@@ -247,17 +248,18 @@ public final class ArticleApi {
      * @return
      */
     public static String getSearchUrl(Context context, String query, int orderId, int orderBy, int pageNo, int pageSize){
-        String url = null;
-        try {
-            String key = URLEncoder.encode(query, "UTF-8");
-            String format = "http://%s/api/search.aspx?query=%s&exact=1&channelIds=63&orderId=%d&orderBy=%d&pageNo=%d&pageSize=%d";
-            url = String.format(Locale.US, format, getDomainRoot(context), key, orderId, orderBy, pageNo, pageSize);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return url;
+        return getSearchUrl(context, query, pageNo, pageSize);
     }
     
+    public static String getSearchUrl(Context context, String query, int pageNo, int pageSize){
+        try {
+            String key = URLEncoder.encode(query, "UTF-8");
+            String format = "http://search.acfun.tv/search?type=2&field=title&sortField=releaseDate&parentChannelId=63&q=%s&pageNo=%d&pageSize=%d";
+            return String.format(format, key, pageNo, pageSize);
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+    }
     public static String getOnlineUrl(Context context, long uid) {
         return "http://"+getDomainRoot(context)+"/online.aspx?uid="+uid;
     }
