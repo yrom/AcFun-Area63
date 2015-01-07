@@ -76,11 +76,17 @@ public class MemberUtils{
         client.setState(localHttpState);
         client.executeMethod(getInfo);
         String jsonstring = getInfo.getResponseBodyAsString();
-        JSONObject job = JSON.parseObject(jsonstring);
-        if (job.getBoolean("success")) {
-            JSONObject userjson = job.getJSONObject("userjson");
-            signature = userjson.getString("sign");
-            uname = userjson.getString("name");
+        try {
+            JSONObject job = JSON.parseObject(jsonstring);
+            if (job.getBoolean("success")) {
+                JSONObject userjson = job.getJSONObject("userjson");
+                signature = userjson.getString("sign");
+                uname = userjson.getString("name");
+            }
+        } catch (Exception e) {
+            map.put("success", false);
+            map.put("result", "登录失败");
+            return map;
         }
         User user = new User(Integer.parseInt(uid), uname, avatar, signature);
         user.cookies = JSON.toJSONString(cks, false);
