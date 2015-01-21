@@ -1,9 +1,10 @@
 AcFun-Area63
 ============
-![icon](https://raw.github.com/yrom/AcFun-Area63/master/res/drawable-xxhdpi/ic_launcher.png)  
+![icon](https://raw.github.com/yrom/AcFun-Area63/master/app/res/drawable-xxhdpi/ic_launcher.png)  
 Acfun 63区（文章区），来，战个痛～
 
-一个"学习"Android Design的产物。。。
+<del>一个"学习"Android Design的产物。。。</del>
+
 [![Get it on GooglePlay](http://www.android.com/images/brand/get_it_on_play_logo_large.png)](https://play.google.com/store/apps/details?id=tv.acfun.a63)
 
 欢迎 加入Google+ 社群，参与讨论：<https://plus.google.com/communities/109973498842592117118>
@@ -27,14 +28,18 @@ Acfun 63区（文章区），来，战个痛～
 
 依赖库
 ===========
-1. android-support-v7-appcompat
+1. android-support-v7-appcompat(v20.0.0)
 2. [Volley][2]
-3. [Pager Sliding TabStrip][3]
-4. [Pull To Refresh][4]
-5. [ByakuGallery][5]*
-6. [SwipeBackLayout][6]*
+3. [PagerSlidingTabStrip][3]
+4. [PullToRefresh][4]
+5. [ByakuGallery][5]
+6. [SwipeBackLayout][6]
 
-带*号的请用我fork的分支代码
+编译
+===========
+
+将项目导入Android Studio 或者 `./gradlew assembleDebug`
+
 
 [2]: https://android.googlesource.com/platform/frameworks/volley
 [3]: https://github.com/astuetz/PagerSlidingTabStrip
