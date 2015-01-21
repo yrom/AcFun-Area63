@@ -28,8 +28,12 @@ public final class ArticleApi {
     public static String API_HOME = Constants.API_HOME;
     
     public static void updateConfig(Context context){
-        HOME = MobclickAgent.getConfigParams(context, DOMAIN_ROOT);
-        API_HOME = MobclickAgent.getConfigParams(context, DOMAIN_API);
+        final String domainRoot = MobclickAgent.getConfigParams(context, DOMAIN_ROOT);
+        if (!TextUtils.isEmpty(domainRoot))
+            HOME = domainRoot;
+        final String domainApi = MobclickAgent.getConfigParams(context, DOMAIN_API);
+        if (!TextUtils.isEmpty(domainApi))
+            API_HOME = domainApi;
         MobclickAgent.updateOnlineConfig(context);
         MobclickAgent.setOnlineConfigureListener(new UmengOnlineConfigureListener() {
             @Override

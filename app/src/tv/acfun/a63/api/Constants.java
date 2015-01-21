@@ -2,11 +2,11 @@ package tv.acfun.a63.api;
 
 public interface Constants {
     @Deprecated
-    String HOME = "www.acfun.com";
+    String HOME = "www.acfun.tv";
     @Deprecated
-    String API_HOME = "api.acfun.com";
+    String API_HOME = "api.acfun.tv";
     @Deprecated
-    String URL_HOME = "http://www.acfun.com/";
+    String URL_HOME = "http://www.acfun.tv/";
     @Deprecated
     String URL_BASE = URL_HOME + "api/getlistbyorder.aspx?orderby=%d&channelIds=%d&count=%d&first=%d";
     @Deprecated
@@ -19,7 +19,7 @@ public interface Constants {
     String URL_SPLAH = URL_HOME + "api/member.aspx?name=splash";
 //    String URL_RANK = "http://trend.acfun.tv/api.ntr?page=bd_article&mode=rank&cid=63&ttype=1&stype=1&tdetail=2&start=%d&end=%d&timestamp=%d";
     @Deprecated
-    String URL_RANK = "http://api.acfun.com/apiserver/content/rank?channelIds=110,73,74,75&pageSize=20";
+    String URL_RANK = "http://api.acfun.tv/apiserver/content/rank?channelIds=110,73,74,75&pageSize=20";
     /**
      * 我关注的
      */
