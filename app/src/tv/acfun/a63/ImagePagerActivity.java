@@ -85,7 +85,7 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
     private TextView indexText;
 
     public static void startCacheImage(Context context, ArrayList<File> flist, int index, int aid, String title){
-        ArrayList<String> list = new ArrayList<String>(flist.size());
+        ArrayList<String> list = new ArrayList<>(flist.size());
         for(File file : flist){
             list.add(Uri.fromFile(file).toString());
         }
@@ -462,7 +462,8 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
         String path = mList.get(mCurrentImage);
         Uri uri = Uri.parse(path);
         shareIntent.setType("image/*");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("#Acfun文章区# 分享图片，%s - http://%s/a/ac%d", title, ArticleApi.getDomainRoot(getApplicationContext()), aid));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("#Acfun文章区# 分享图片，%s - http://%s/a/ac%d",
+                title, ArticleApi.getDomainRoot(getApplicationContext()), aid));
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         return shareIntent;
     }

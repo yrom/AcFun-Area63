@@ -628,11 +628,11 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             if (imgUrls != null)
                 imgUrls.clear();
             else
-                imgUrls = new ArrayList<String>();
+                imgUrls = new ArrayList<>();
             if (imageCaches != null)
                 imageCaches.clear();
             else
-                imageCaches = new ArrayList<File>();
+                imageCaches = new ArrayList<>();
         }
 
         private void addClick(Element img, String src) {

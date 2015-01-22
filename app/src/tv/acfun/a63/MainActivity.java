@@ -245,7 +245,7 @@ public class MainActivity extends ActionBarActivity implements
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mTitles = getResources().getStringArray(R.array.titles);
-        mFragments = new ArrayList<Fragment>(mTitles.length);
+        mFragments = new ArrayList<>(mTitles.length);
         int position = 0;
         if (savedInstanceState != null){
             position = savedInstanceState.getInt(KEY_CURRENT_ITEM, 0);
@@ -848,17 +848,6 @@ public class MainActivity extends ActionBarActivity implements
      */
     public static class RankListFragment extends ArticleListFragment{
 
-//        @Override
-//        protected Request<?> getRequest(String url) {
-//            
-//            return new ContentListRequest(url, listener, errorListner);
-//        }
-//
-//        @Override
-//        protected Contents loadDataFromCache(Entry entry) {
-//            return parseJson(new String(entry.data));
-//        }
-
         @Override
         protected String getPageTitle() {
             return "RankList";
@@ -875,7 +864,7 @@ public class MainActivity extends ActionBarActivity implements
         JSONObject page = rankList.getJSONObject("data").getJSONObject("page");
         JSONArray jsonArr = page.getJSONArray("list");
         
-        List<Content> contents = new ArrayList<Content>();
+        List<Content> contents = new ArrayList<>();
         for(int i=0;i<jsonArr.size();i++){
             JSONObject carr = jsonArr.getJSONObject(i);
             Content c = new Content();
@@ -1140,19 +1129,6 @@ public class MainActivity extends ActionBarActivity implements
             return parseJson(new String(entry.data));
         }
 
-//        protected Request<?> getRequest(String url) {
-//            return new FastJsonRequest<Contents>(url, Contents.class, listener, errorListner);
-//        }
-//        
-//        protected Contents loadDataFromCache(final Cache.Entry entry) {
-//            Contents contents;
-//            try {
-//                contents = JSON.parseObject(new String(entry.data), Contents.class);
-//            } catch (JSONException e) {
-//                contents = null;
-//            }
-//            return contents;
-//        }
         protected void initPage(boolean newData) {
             timeOut.setVisibility(View.GONE);
             TextView text = (TextView) footView.findViewById(R.id.list_footview_text);

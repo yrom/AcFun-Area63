@@ -31,7 +31,7 @@ public class ArrayUtil {
         return arr;
     }
     public static <E> ArrayList<E> newArrayList(){
-        return new ArrayList<E>();
+        return new ArrayList<>();
     }
     
     public static <E> boolean validate(List<E> list){
@@ -50,7 +50,7 @@ public class ArrayUtil {
     }
     
     public static ArrayList<Integer> asList(int... arr){
-        ArrayList<Integer> list = new ArrayList<Integer>(arr.length);
+        ArrayList<Integer> list = new ArrayList<>(arr.length);
         for(int i=0;i<arr.length;i++){
             list.add(Integer.valueOf(arr[i]));
         }

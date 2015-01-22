@@ -429,8 +429,8 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         
     }
 
-    SparseArray<Comment> data = new SparseArray<Comment>();
-    List<Integer> commentIdList = new ArrayList<Integer>();
+    SparseArray<Comment> data = new SparseArray<>();
+    List<Integer> commentIdList = new ArrayList<>();
     private boolean isloading;
     private boolean isreload;
     private Quote mQuoteSpan;

@@ -109,7 +109,7 @@ public class CommentsAdapter extends BaseAdapter {
         TextViewUtils.setCommentContent(holder.content, c);
         int quoteId = c.quoteId;
         holder.hasQuote = quoteId > 0;
-        List<View> quoteList = new ArrayList<View>();
+        List<View> quoteList = new ArrayList<>();
         handleQuoteList(position, convertView, holder, quoteId, quoteList);
         holder.quoteFrame.setQuoteList(quoteList);
         if (!quoteList.isEmpty()) {
@@ -172,16 +172,6 @@ public class CommentsAdapter extends BaseAdapter {
         return quoteFrame;
     }
 
-//    private OnQuoteClickListener mOnClickListener;
-//
-//    public void setOnClickListener(OnQuoteClickListener l) {
-//        mOnClickListener = l;
-//    }
-//
-//    public interface OnQuoteClickListener {
-//
-//        void onClick(View v, int position);
-//    }
 
     static class CommentViewHolder {
 

@@ -50,33 +50,6 @@ public class Comment implements Serializable {
     public void setContent(String content) {
         this.content = content;
     }
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-    public void setPostDate(String postDate) {
-        this.postDate = postDate;
-    }
-    public void setUserImg(String userImg) {
-        this.userImg = userImg;
-    }
-    public void setCid(int cid) {
-        this.cid = cid;
-    }
-    public void setQuoteId(int quoteId) {
-        this.quoteId = quoteId;
-    }
-    public void setCount(int count) {
-        this.count = count;
-    }
-    public void setUps(int ups) {
-        this.ups = ups;
-    }
-    public void setDowns(int downs) {
-        this.downs = downs;
-    }
-    public void setUserID(long userID) {
-        this.userID = userID;
-    }
     public boolean isQuoted;
     public int beQuotedPosition;
 }

@@ -76,77 +76,6 @@ public class Content {
         this.title = title;
     }
 
-
-    public String getTitleImg() {
-        return titleImg;
-    }
-
-
-    public void setTitleImg(String titleImg) {
-        this.titleImg = titleImg;
-    }
-
-
-    public String getDescription() {
-        return description;
-    }
-
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public String getUsername() {
-        return username;
-    }
-
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-
-    public long getUserId() {
-        return userId;
-    }
-
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-
-    public long getViews() {
-        return views;
-    }
-
-
-    public void setViews(long views) {
-        this.views = views;
-    }
-
-
-    public int getAid() {
-        return aid;
-    }
-
-
-    public void setAid(int aid) {
-        this.aid = aid;
-    }
-
-
-    public int getChannelId() {
-        return channelId;
-    }
-
-
-    public void setChannelId(int channelId) {
-        this.channelId = channelId;
-    }
-
-
     public int getComments() {
         return comments;
     }
@@ -157,28 +86,5 @@ public class Content {
     }
 
 
-    public long getReleaseDate() {
-        return releaseDate;
-    }
-
-
-    public void setReleaseDate(long releaseDate) {
-        this.releaseDate = releaseDate;
-    }
-
-
-//    public static Content newContent(JSONObject contentJson) throws JSONException{
-//        Content c = new Content();
-//        c.title = contentJson.getString("title");
-//        c.description = contentJson.getString("description");
-//        c.views = contentJson.getLong("views");
-//        c.titleImage = contentJson.getString("titleImg");
-//        c.aid = contentJson.getInt("aid");
-//        c.channelId = contentJson.getInt("channelId");
-//        c.comments = contentJson.getInt("comments");
-//        c.releaseDate = contentJson.getLong("releaseDate");
-//        
-//        return c;
-//    }
 
 }

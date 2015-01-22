@@ -87,7 +87,7 @@ public class Article {
     public static Article newArticle(JSONObject articleJson) throws InvalideArticleError {
         try {
             Article article = new Article();
-            article.imgUrls = new ArrayList<String>();
+            article.imgUrls = new ArrayList<>();
             // parse info
             article.title = articleJson.getString("title");
             article.postTime = articleJson.getLong("releaseDate");
@@ -99,7 +99,7 @@ public class Article {
             article.comments = articleJson.getIntValue("comments");
             article.stows = articleJson.getIntValue("stows");
             // sub contents and images
-            article.contents = new ArrayList<Article.SubContent>();
+            article.contents = new ArrayList<>();
             parseContentArray(articleJson, article);
             // channel
             article.channelId = articleJson.getIntValue("channelId");
