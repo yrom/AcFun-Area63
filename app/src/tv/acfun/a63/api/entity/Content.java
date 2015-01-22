@@ -59,14 +59,7 @@ public class Content {
     public int comments;
     public long releaseDate;
     public int stows;
-    
-    public int getStows() {
-        return stows;
-    }
-
-    public void setStows(int stows) {
-        this.stows = stows;
-    }
+    public boolean isRecommend;
 
     public String getTitle() {
         return title;

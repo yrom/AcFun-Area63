@@ -75,7 +75,7 @@ public class Article {
     public ArrayList<SubContent> contents;
     public User poster;
     public String description;
-
+    public boolean isRecommend;
     public static class SubContent {
         public String subTitle;
         public String content;

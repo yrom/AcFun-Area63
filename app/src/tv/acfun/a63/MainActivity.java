@@ -880,6 +880,7 @@ public class MainActivity extends ActionBarActivity implements
             c.comments = carr.getIntValue("comments");
             c.stows = carr.getIntValue("stows");
             c.channelId = carr.getIntValue("channelId");
+            c.isRecommend = carr.getBooleanValue("isRecommend");
             contents.add(c);
         }
         
@@ -1256,9 +1257,7 @@ public class MainActivity extends ActionBarActivity implements
                 } else if (ArticleApi.isHotArticle(art)) {
                     tagHot.setVisibility(View.VISIBLE);
                     ((ImageView) tagHot).setImageResource(Theme.isNightMode() ? R.drawable.ic_whats_hot_dark : R.drawable.ic_whats_hot);
-                }
-
-                else
+                } else
                     tagHot.setVisibility(View.GONE);
             } else {
                 TextView rank = (TextView) convertView.findViewById(R.id.rank);

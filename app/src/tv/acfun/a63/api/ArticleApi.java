@@ -165,6 +165,7 @@ public final class ArticleApi {
     }
 
     public static boolean isRecommendedArticle(Content art) {
+        if(art.isRecommend) return true;
         boolean isRecommended;
         long e = System.currentTimeMillis() - art.releaseDate;
         if (e <= AcApp._1_hour) {
