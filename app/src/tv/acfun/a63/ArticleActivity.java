@@ -364,7 +364,8 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
         if (entry != null && entry.data != null && entry.isExpired()) {
             try {
                 String json = new String(entry.data, "utf-8");
-                onResponse(Article.newArticle(JSON.parseObject(json)));
+                JSONObject articleJson = JSON.parseObject(json).getJSONObject("data").getJSONObject("fullArticle");
+                onResponse(Article.newArticle(articleJson));
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
