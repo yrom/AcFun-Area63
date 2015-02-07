@@ -17,14 +17,12 @@
 package tv.acfun.a63;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -40,7 +38,6 @@ import org.jsoup.select.Elements;
 import tv.acfun.a63.api.ArticleApi;
 import tv.acfun.a63.api.Constants;
 import tv.acfun.a63.api.entity.Article;
-import tv.acfun.a63.api.entity.Article.InvalideArticleError;
 import tv.acfun.a63.api.entity.Article.SubContent;
 import tv.acfun.a63.base.BaseWebViewActivity;
 import tv.acfun.a63.db.DB;
@@ -108,6 +105,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     private static final Pattern sLiteAreg = Pattern.compile("/v/#ac=(\\d{5,});type=article");
     private static final Pattern sLiteVreg = Pattern.compile("/v/#ac=(\\d{5,})$");
     private static final String sAppReg = "^http://www.acfun.(com|tv)/app/?$";
+    public static final int MAX_AGE = 7 * 24 * 60 * 60 * 1000;
     private static String ARTICLE_PATH;
     private static final String NAME_ARTICLE_HTML = "a63-article.html";
     public static void start(Context context, int aid, String title) {
@@ -418,15 +416,15 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 JSONObject rsp = JSON.parseObject(json);
                 int status = rsp.getIntValue("status");
                 if(status != 200){
-                    throw new InvalideArticleError();
+                    throw new Article.InvalidArticleError();
                 }
                 JSONObject articleJson = rsp.getJSONObject("data").getJSONObject("fullArticle");
                 if(articleJson == null)
-                    return Response.error(new InvalideArticleError());
+                    return Response.error(new Article.InvalidArticleError());
                 return Response.success(Article.newArticle(articleJson),
-                        HttpHeaderParser.parseCacheHeaders(response));
-            } catch(InvalideArticleError e){
-                Log.w(TAG, "Invalide Article! Need to redirect intent");
+                        Connectivity.newCache(response, MAX_AGE));
+            } catch(Article.InvalidArticleError e){
+                Log.w(TAG, "Invalid Article! Need to redirect intent");
                 return Response.error(e);
             } catch (Exception e) {
                 Log.e(TAG, "parse article error", e);
@@ -478,7 +476,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
     @Override
     public void onErrorResponse(VolleyError error) {
         setSupportProgressBarIndeterminateVisibility(false);
-        if(error instanceof InvalideArticleError){
+        if(error instanceof Article.InvalidArticleError){
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.addCategory(Intent.CATEGORY_DEFAULT);
             intent.setData(Uri.parse("av://ac"+aid));
@@ -591,11 +589,20 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 String src = img.attr("src").trim();
                 if (TextUtils.isEmpty(src))
                     continue;
-                if (src.startsWith("file"))
+                Uri parsedUri = Uri.parse(src);
+                if ("file".equals(parsedUri.getScheme()))
                     continue;
-                if (!src.startsWith("http") && src.charAt(0) == '/') {
-                    src = "http://"+ArticleApi.getDomainRoot(getApplicationContext()) + src;
+                if (parsedUri.getPath() == null) // wtf!
+                    continue;
+                if (!"http".equals(parsedUri.getScheme())) {
+                    parsedUri = parsedUri.buildUpon()
+                            .scheme("http")
+                            .authority(ArticleApi.getDomainRoot(getApplicationContext()))
+                            .build();
                 }
+                // url may have encoded path
+                parsedUri = parsedUri.buildUpon().path(parsedUri.getPath()).build();
+                src = parsedUri.toString();
                 File cache = FileUtil.generateImageCacheFile(src);
                 imageCaches.add(cache);
                 imgUrls.add(src);
@@ -641,7 +648,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                         || Integer.parseInt(img.attr("height")) < 100) {
                     return;
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             if (src.contains("emotion/images/"))
                 return;
@@ -740,22 +747,18 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                             Log.w(TAG, "retry", e);
                         }
                     }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
                     try {
                         if (in != null)
                             in.close();
-                    } catch (IOException e) {
+                    } catch (IOException ignored) {
                     }
                     try {
                         if (out != null)
                             out.close();
-                    } catch (IOException e) {
+                    } catch (IOException ignored) {
                     }
                 }
 
@@ -805,7 +808,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
 
         @android.webkit.JavascriptInterface
         public void viewImage(String url) {
-            ImagePagerActivity.startCacheImage(ArticleActivity.this, (ArrayList<File>) imageCaches, imgUrls.indexOf(url),aid,title);
+            ImagePagerActivity.startCacheImage(ArticleActivity.this,
+                    (ArrayList<File>) imageCaches,
+                    imgUrls.indexOf(url), aid, title);
         }
     }
 

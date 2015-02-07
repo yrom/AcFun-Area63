@@ -15,10 +15,13 @@
  */
 package tv.acfun.a63.api.entity;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONException;
@@ -84,13 +87,13 @@ public class Article {
     private static String TAG = "Article";
     private static Pattern imageReg = Pattern.compile("<img.+?src=[\"|'](.+?)[\"|']");
 
-    public static Article newArticle(JSONObject articleJson) throws InvalideArticleError {
+    public static Article newArticle(JSONObject articleJson) throws InvalidArticleError {
         try {
             Article article = new Article();
             article.imgUrls = new ArrayList<>();
             // parse info
             article.title = articleJson.getString("title");
-            article.postTime = articleJson.getLong("releaseDate");
+            article.postTime = articleJson.getLongValue("releaseDate");
             article.id = articleJson.getIntValue("contentId");
             article.description = articleJson.getString("description");
             article.poster = parseUser(articleJson);
@@ -105,14 +108,14 @@ public class Article {
             article.channelId = articleJson.getIntValue("channelId");
             return article;
         } catch (Throwable e) {
-            throw new InvalideArticleError(e);
+            throw new InvalidArticleError(e);
         }
 
     }
 
     static Pattern pageReg = Pattern.compile("\\[NextPage\\]([^\\[\\]]+)\\[/NextPage\\]");
     
-    private static void parseContentArray(JSONObject articleJson, Article article) throws InvalideArticleError {
+    private static void parseContentArray(JSONObject articleJson, Article article) throws InvalidArticleError {
         String fullText = articleJson.getString("txt");
         Matcher matcher = pageReg.matcher(fullText);
         int start = 0;
@@ -145,10 +148,10 @@ public class Article {
         }
     }
 
-    private static void validate(SubContent content) throws InvalideArticleError {
-        if(content.content == null) throw new InvalideArticleError();
+    private static void validate(SubContent content) throws InvalidArticleError {
+        if(content.content == null) throw new InvalidArticleError();
         if(content.content.matches(".*\\[[v|V]ideo\\]\\d+\\[/[v|V]ideo\\].*")){
-            throw new InvalideArticleError();
+            throw new InvalidArticleError();
         }
     }
 
@@ -161,14 +164,14 @@ public class Article {
         return poster;
     }
     
-    public static class InvalideArticleError extends VolleyError{
+    public static class InvalidArticleError extends VolleyError{
         private static final long serialVersionUID = 1111L;
 
-        public InvalideArticleError() {
+        public InvalidArticleError() {
             super();
         }
 
-        public InvalideArticleError(Throwable cause) {
+        public InvalidArticleError(Throwable cause) {
             super(cause);
         }
         

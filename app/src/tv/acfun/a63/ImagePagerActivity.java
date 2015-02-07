@@ -104,6 +104,7 @@ public class ImagePagerActivity extends BaseActivity implements OnPageChangeList
         aid = extras.getInt("aid");
         mList = extras.getStringArrayList(EXTRA_IMAGES);
         int index = extras.getInt(EXTRA_INDEX,0);
+        if(index < 0) index = 0;
         MobclickAgent.onEvent(this, "view_big_pic");
         setContentView(R.layout.activity_images);
         
