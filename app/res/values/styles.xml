@@ -19,7 +19,6 @@
         
         <item name="popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
         <item name="actionBarWidgetTheme">@style/Widget.Styled</item>
-		<item name="android:editTextBackground">@drawable/edit_text_holo_light</item> 
 		<item name="SwipeBackLayoutStyle">@style/Widget.Styled.SwipeBackLayout</item>
 		
 		<item name="rowBackground">@drawable/row_backgroud</item>
@@ -39,8 +38,6 @@
     </style>
 	<style name="Widget.Styled" parent="Theme.AppCompat">
         <item name="popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
-        <item name="android:popupMenuStyle">@style/Widget.Styled.PopupMenu</item>
-        
         <item name="dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
         <item name="android:dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
     </style>
