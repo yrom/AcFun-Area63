@@ -12,7 +12,6 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.+'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
 }
-
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
@@ -23,6 +22,28 @@ android {
         targetSdkVersion 21
         versionCode 35
         versionName "1.3.5"
+        resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW"
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    if(hasKeyStore()) {
+        signingConfigs {
+            release{
+                storeFile file(STORE_FILE)
+                storePassword STORE_PASSWORD
+                keyAlias KEY_ALIAS
+                keyPassword KEY_PASSWORD
+            }
+        }
+        buildTypes {
+            release {
+                minifyEnabled false
+                shrinkResources true
+                signingConfig signingConfigs.release
+            }
+        }
     }
     sourceSets {
         main {
@@ -52,4 +73,8 @@ android {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/LICENSE.txt'
     }
+}
+
+def boolean hasKeyStore(){
+    return hasProperty('STORE_FILE') && hasProperty('STORE_PASSWORD') && hasProperty('KEY_ALIAS') && hasProperty('KEY_PASSWORD');
 }
