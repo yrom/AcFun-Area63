@@ -1,20 +1,31 @@
-# To enable ProGuard in your project, edit project.properties
-# to define the proguard.config property as described in that file.
-#
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in ${sdk.dir}/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the ProGuard
-# include property in project.properties.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+-dontwarn android.webkit.WebView
+-keepattributes SourceFile,LineNumberTable
+-keepattributes Exceptions,InnerClasses
+-dontskipnonpubliclibraryclasses
+-dontskipnonpubliclibraryclassmembers
+-allowaccessmodification
+#### libs ###
+-keepclassmembers class * {
+   public <init>(android.content.Context);
+}
+-keep public class android.support.**{ public *;}
+-dontwarn android.support.**
+-keep public class org.apache.commons.httpclient.**{ public *;}
+-dontwarn org.apache.commons.httpclient.**
+-keepclassmembers class * {
+   public <init>(org.json.JSONObject);
+}
+-keep public class com.umeng.fb.ui.ThreadView {*;}
+-keep class u.aly.** {*;}
+-keep public class com.umeng.** {pubilc *;}
+-dontwarn com.umeng.**
 
-# Add any project specific keep options here:
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+-keeppackagenames org.jsoup.nodes
+### app ###
+-keepclassmembers class tv.acfun.a63.ArticleActivity$ACJSObject {
+   public *;
+}
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+-keepclassmembers class tv.acfun.a63.api.entity.**{ public <fields>;}
