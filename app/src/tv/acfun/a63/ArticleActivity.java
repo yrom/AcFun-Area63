@@ -381,10 +381,10 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 .append(article.title)
                 .append("</h1>")
                 .append("<div id=\"info\" class=\"article-info\">")
-                .append("<span class=\"article-publisher\">")
                 .append("<img src=\"")
-                .append(TextUtils.isEmpty(article.poster.avatar) ? "file:///android_asset/wen2.png" : article.poster.avatar)
+                .append(TextUtils.isEmpty(article.poster.avatar) ? "file:///android_asset/wen.png" : article.poster.avatar)
                 .append("\" >")
+                .append("<span class=\"article-publisher\">")
                 .append("<a href=\"http://").append(ArticleApi.getDomainRoot(getApplicationContext())).append("/member/user.aspx?uid=")
                 .append(article.poster.id).append("\" >")
                 .append(article.poster.name)
@@ -573,8 +573,9 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             
             for (int i = 0; i < es.size(); i++) {
                 Element e = es.get(i);
-                if("span".equals(e.nodeName()))
-                    continue;
+//                if("span".equals(e.nodeName())){
+//                    continue;
+//                }
                 e.removeAttr("style");
                 
             }

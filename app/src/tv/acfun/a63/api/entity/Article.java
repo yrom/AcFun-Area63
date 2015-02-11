@@ -73,7 +73,6 @@ public class Article {
     public int comments;
     public int stows;
     public int channelId;
-    public String channelName;
     public ArrayList<String> imgUrls;
     public ArrayList<SubContent> contents;
     public User poster;

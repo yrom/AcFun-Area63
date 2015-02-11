@@ -3,7 +3,6 @@ max-width: 95%;
 }
 body, div, a {
 	font-size: 16px;
-    padding:0 2%;
     word-wrap: break-word;
     vertical-align: baseline;
     margin:0;
@@ -70,13 +69,11 @@ h1, h2, h3, h4 ,h5, h6 {
 
 }  
 #title{
-	padding: 5% 1% 5% 2%;
-	text-align: center;
+    text-align: center;
+	padding: 1% 2%;
 	border-bottom: 1px solid #ebeced;
 }
-#info {
-text-align: center;
-}
+
 #info .article-info {
     font-size:14px;
     line-height:15px;

@@ -57,7 +57,6 @@ public class BaseWebViewActivity extends BaseActivity {
     }
     @Override
     protected final void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         ActionBarUtil.setXiaomiFilterDisplayOptions(getSupportActionBar(), false);
         setContentView(R.layout.activity_article);
@@ -111,7 +110,6 @@ public class BaseWebViewActivity extends BaseActivity {
     }
     @Override
     public void setSupportProgressBarIndeterminateVisibility(boolean visible) {
-        super.setSupportProgressBarIndeterminateVisibility(visible);
         mProgress.setVisibility(visible?View.VISIBLE:View.GONE);
         mWeb.setVisibility(visible?View.GONE:View.VISIBLE);
     }
