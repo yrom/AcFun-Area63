@@ -97,24 +97,17 @@ public class FileUtil {
      * @param url
      * @return
      */
-    public static String getUrlExt(String url){
-        
+    public static String getUrlExt(String url) {
         if (!TextUtils.isEmpty(url)) {
-//            int start = url.lastIndexOf('.');
             int start = url.lastIndexOf('/');
             int end = url.lastIndexOf('?');
             end = end <= start ? url.length() : end;
-            String ext = "";
             if (start > 0 && start < url.length() - 1) {
-                try{
-                ext = url.substring(start, end).toLowerCase(Locale.US);
-                
-                return ext.substring(ext.lastIndexOf('.'));
-                }catch (StringIndexOutOfBoundsException e) {
-                   Log.e("Util", "when get url ext : "+url,e);
-                }
+                String ext = url.substring(start, end).toLowerCase(Locale.US);
+                int dot = ext.lastIndexOf('.');
+                if (dot > 0)
+                    return ext.substring(dot);
             }
-            
         }
         return ".jpg";
     }

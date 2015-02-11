@@ -49,7 +49,7 @@ import com.android.volley.toolbox.HurlStack;
 public class Connectivity {
     private static final String DEFAULT_CACHE_DIR = "acfun";
     public static final String UA = "acfun/1.0 (Linux; U; Android "+Build.VERSION.RELEASE+"; "+Build.MODEL+"; "+Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry().toLowerCase()+") AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 ";
-    public static final Map<String,String> UA_MAP = new HashMap<String, String>();
+    public static final Map<String,String> UA_MAP = new HashMap<>();
     private static final String TAG = Connectivity.class.getSimpleName();
     static{
         UA_MAP.put("User-Agent", UA);
