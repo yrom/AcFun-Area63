@@ -23,6 +23,8 @@ android {
         versionCode 40
         versionName "1.4.0"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW"
+        manifestPlaceholders = [UMENG_APPKEY_VALUE: '523706eb56240b0db70293fe',
+                                UMENG_CHANNEL_VALUE: 'GooglePlay']
     }
     lintOptions {
         checkReleaseBuilds false
@@ -44,6 +46,24 @@ android {
                 signingConfig signingConfigs.release
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             }
+        }
+        applicationVariants.all { variant ->
+            variant.outputs.each { output ->
+                def outputFile = output.outputFile
+                if (outputFile != null && outputFile.name.endsWith('release.apk')) {
+                    def fileName = "${defaultConfig.applicationId}_${defaultConfig.versionName}_${variant.productFlavors[0].name}.apk"
+                    output.outputFile = new File(outputFile.parent, fileName)
+                    project.logger.lifecycle "Renamed output : ${output.outputFile}"
+                }
+            }
+        }
+        productFlavors{
+            XiaoMi{}
+            Meizu{}
+            GooglePlay{}
+        }
+        productFlavors.all {
+            flavor -> flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
         }
     }
     sourceSets {
