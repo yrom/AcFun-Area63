@@ -1,6 +1,5 @@
 -dontwarn android.webkit.WebView
--keepattributes SourceFile,LineNumberTable
--keepattributes Exceptions,InnerClasses
+-keepattributes SourceFile,LineNumberTable,Exceptions,InnerClasses,Signature
 -dontskipnonpubliclibraryclasses
 -dontskipnonpubliclibraryclassmembers
 -allowaccessmodification
@@ -9,21 +8,33 @@
    public <init>(android.content.Context);
 }
 -keep public class android.support.**{ public *;}
+-keep interface android.support.** { *; }
 -dontwarn android.support.**
--keep public class org.apache.commons.httpclient.**{ public *;}
+
+### apache commons httpclient ###
+-keep public class org.apache.commons.httpclient.** { public *;}
 -dontwarn org.apache.commons.httpclient.**
--keepclassmembers class * {
-   public <init>(org.json.JSONObject);
-}
--keep public class com.umeng.fb.ui.ThreadView {*;}
+
+### umeng ###
+-keepclassmembers class * { public <init>(org.json.JSONObject);}
+-keep public class com.umeng.fb.ui.ThreadView { *;}
 -keep class u.aly.** {*;}
--keep public class com.umeng.** {pubilc *;}
+-keep public class com.umeng.** { pubilc *;}
 -dontwarn com.umeng.**
 
+### jsoup ###
 -keeppackagenames org.jsoup.nodes
+-keep public class org.jsoup.** { public *;}
+
+### gif drawable ###
+-keep class pl.droidsonroids.gif.GifIOException { <init>(int);}
+-keep class pl.droidsonroids.gif.GifInfoHandle {
+    <init>(long,int,int,int);
+}
+
 ### app ###
--keepclassmembers class tv.acfun.a63.ArticleActivity$ACJSObject {
-   public *;
+-keepclassmembers class tv.acfun.a63.** {
+    @android.webkit.JavascriptInterface <methods>;
 }
 -keepclassmembers class **.R$* {
     public static <fields>;
