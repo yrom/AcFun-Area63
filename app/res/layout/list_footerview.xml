@@ -9,10 +9,11 @@
 
     <ProgressBar
         android:id="@+id/list_footview_progress"
-        style="@android:style/Widget.ProgressBar.Small"
+        style="?android:attr/progressBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"
+        android:indeterminate="false" />
 
     <TextView
         android:id="@+id/list_footview_text"

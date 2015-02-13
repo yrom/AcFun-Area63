@@ -15,7 +15,6 @@
         android:layout_height="50dp"
         android:gravity="center"
         android:layout_gravity="bottom"
-        android:text="12/20"
         android:background="@color/background_dark"
         android:textColor="#eee"
         android:textSize="18sp" />

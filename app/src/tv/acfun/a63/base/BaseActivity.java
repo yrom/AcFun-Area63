@@ -16,6 +16,7 @@
 
 package tv.acfun.a63.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,9 @@ import android.view.MenuItem;
 import com.umeng.analytics.MobclickAgent;
 
 import tv.acfun.a63.AcApp;
+import tv.acfun.a63.ArticleActivity;
+import tv.acfun.a63.ConversationActivity;
+import tv.acfun.a63.DonateActivity;
 import tv.acfun.a63.R;
 import tv.acfun.a63.SettingsActivity;
 import tv.acfun.a63.swipe.SwipeAppcompatActivity;
@@ -57,12 +61,21 @@ public class BaseActivity extends SwipeAppcompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case android.R.id.home:
-            scrollToFinishActivity();
-            return true;
-        case R.id.action_settings:
-            SettingsActivity.start(this);
-            return true;
+            case android.R.id.home:
+                scrollToFinishActivity();
+                return true;
+            case R.id.action_settings:
+                SettingsActivity.start(this);
+                return true;
+            case R.id.action_feedback:
+                startActivity(new Intent(getApplicationContext(), ConversationActivity.class));
+                return true;
+            case R.id.action_donate:
+                DonateActivity.start(this);
+                return true;
+            case R.id.action_about:
+                ArticleActivity.start(this, getString(R.string.about_url));
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

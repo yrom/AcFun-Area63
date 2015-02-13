@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -49,9 +50,14 @@ import tv.acfun.a63.util.FileUtil;
 import tv.acfun.a63.util.Theme;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -179,6 +185,7 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
             }
         });
         mWeb.setWebViewClient(new WebViewClient() {
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Matcher matcher = sAreg.matcher(url);
@@ -210,6 +217,16 @@ public class ArticleActivity extends BaseWebViewActivity implements Listener<Art
                 if(!isWebMode){
                     start(ArticleActivity.this, url);
                     return true;
+                }else{
+                    Uri uri = Uri.parse(url);
+                    if(uri.getHost() != null && !uri.getHost().contains("acfun")){
+                        try {
+                            intent.setData(uri);
+                            startActivity(intent);
+                            return true;
+                        }catch (ActivityNotFoundException ignored){
+                        }
+                    }
                 }
                 return false;
             }

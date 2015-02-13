@@ -1,54 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-	<RelativeLayout 
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:background="?attr/rowBackground"
-	    android:orientation="vertical"
-	    xmlns:android="http://schemas.android.com/apk/res/android">
-		<TextView
-		    android:id="@+id/rank"
-		    android:textSize="25sp"
-		    android:text="1"
-		    android:background="#ffbb33"
-		    android:textColor="#fff"
-		    android:textStyle="bold|italic"
-		    android:typeface="serif"
-		    android:gravity="center"
-		    android:layout_marginTop="4dp"
-		    android:layout_width="48dp"
-		    android:layout_height="48dp"
-		    />
-	    <TextView
-	        android:padding="8dp"
-	        style="@android:style/TextAppearance.Medium"
-	        android:layout_toRightOf="@id/rank"
-	        android:id="@+id/article_item_title"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:textSize="18sp" />
-	    <TextView
-	        android:paddingLeft="8dp"
-	        android:id="@+id/article_item_post_time"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignLeft="@id/article_item_title"
-	        android:layout_below="@id/article_item_title"
-	        android:singleLine="true"
-	        android:textColor="@color/text_color_gray"
-	        android:paddingRight="8dp"
-	        android:textSize="12sp" />
-	
-	    <TextView
-	        android:paddingLeft="8dp"
-	        android:paddingRight="8dp"
-	        android:paddingBottom="8dp"
-	        android:id="@+id/article_desc"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/article_item_post_time"
-	        android:layout_marginTop="4dp"
-	        android:textColor="@color/text_color_gray"
-	        android:textSize="13sp" />
-	
-	</RelativeLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/rowBackground"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/rank"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:background="#ffbb33"
+        android:gravity="center"
+        android:text="1"
+        android:textColor="#fff"
+        android:textSize="25sp"
+        android:textStyle="bold|italic"
+        android:typeface="serif" />
+
+    <TextView
+        android:id="@+id/article_item_title"
+        style="@android:style/TextAppearance.Medium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/rank"
+        android:padding="8dp"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/article_item_post_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/article_item_title"
+        android:layout_below="@id/article_item_title"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:singleLine="true"
+        android:textColor="@color/text_color_gray"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/article_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/article_item_post_time"
+        android:layout_marginTop="4dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:textColor="@color/text_color_gray"
+        android:textSize="13sp" />
+
+</RelativeLayout>

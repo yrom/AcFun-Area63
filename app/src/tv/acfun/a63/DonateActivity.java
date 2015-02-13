@@ -2,6 +2,7 @@ package tv.acfun.a63;
 
 import java.io.IOException;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -67,5 +68,12 @@ public class DonateActivity extends BaseWebViewActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void start(Activity activity){
+        Intent intent = new Intent(activity.getString(R.string.donate_action),
+                Uri.parse(activity.getString(R.string.donate_url)));
+        intent.setClass(activity.getApplicationContext(), DonateActivity.class);
+        activity.startActivity(intent);
     }
 }

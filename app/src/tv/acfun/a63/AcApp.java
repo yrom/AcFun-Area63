@@ -312,21 +312,21 @@ public class AcApp extends Application {
      * @return
      */
     public static String getCurDateTime() {
-        return getCurDateTime("yyyyMMdd-kkmmss", System.currentTimeMillis());
+        return getDateTime("yyyyMMdd-kkmmss", System.currentTimeMillis());
     }
     
     public static String getDateTime(long msec){
-        return getCurDateTime("MM月dd日 kk:mm", msec);
+        return getDateTime("yyyy-MM-dd", msec);
     }
     
     /**
-     * 获取当前日期时间
+     * 获取日期时间
      * 
      * @param format
      *            {@link android.text.format.DateFormat}
      * @return
      */
-    public static String getCurDateTime(CharSequence format, long msec) {
+    public static String getDateTime(CharSequence format, long msec) {
         return DateFormat.format(format, msec).toString();
     }
 
@@ -382,23 +382,28 @@ public class AcApp extends Application {
     public static final long _1_min = 60 * 1000;
     public static final long _1_hour = 60 * _1_min;
     public static final long _24_hour = 24 * _1_hour;
+    public static final long _7_day = 7 * _24_hour;
+    public static final long _1_month = 30 * _24_hour;
+
     public static String getPubDate(long postTime) {
+
         long delta = System.currentTimeMillis() - postTime;
-        if( delta <  _24_hour && delta >= _1_hour){
+        if( delta < _1_min){
+            return "刚刚 ";
+        } else if( delta < _1_hour) {
+            int time = (int) (delta / _1_min);
+            return time + "分钟前 ";
+        }else if( delta <  _24_hour){
             int time = (int) (delta / _1_hour);
             return time+"小时前 ";
-        } else if( delta < _1_hour && delta >= _1_min){
-            int time = (int) (delta / _1_min);
-            return time+"分钟前 ";
-        } else if( delta < _1_min){
-            return "刚刚 ";
-        } else {
+        } else if( delta < _7_day){
             int time = (int) (delta / _24_hour);
-            if(time <= 6){
-                return time+"天前 " ;
-            }else{
-                return getDateTime(postTime);
-            }
+            return time+"天前 " ;
+        }else if( delta < _1_month){
+            return getDateTime("MM-dd kk:mm", postTime);
+        }else{
+            return getDateTime(postTime);
+
         }
     }
 

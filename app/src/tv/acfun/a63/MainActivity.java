@@ -433,17 +433,25 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case android.R.id.home:
-
-            if (mDrawerLayout.isDrawerOpen(mDrawer)) {
-                mDrawerLayout.closeDrawer(mDrawer);
-            } else {
-                mDrawerLayout.openDrawer(mDrawer);
-            }
-            return true;
-        case R.id.action_settings:
-            SettingsActivity.start(this);
-            return true;
+            case android.R.id.home:
+                if (mDrawerLayout.isDrawerOpen(mDrawer)) {
+                    mDrawerLayout.closeDrawer(mDrawer);
+                } else {
+                    mDrawerLayout.openDrawer(mDrawer);
+                }
+                return true;
+            case R.id.action_settings:
+                SettingsActivity.start(this);
+                return true;
+            case R.id.action_feedback:
+                startActivity(new Intent(getApplicationContext(), ConversationActivity.class));
+                return true;
+            case R.id.action_donate:
+                DonateActivity.start(this);
+                return true;
+            case R.id.action_about:
+                ArticleActivity.start(this, getString(R.string.about_url));
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
