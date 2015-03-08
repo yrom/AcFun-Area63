@@ -1,6 +1,6 @@
 AcFun-Area63
 ============
-![icon](https://raw.github.com/yrom/AcFun-Area63/master/app/res/mipmap-xxhdpi/ic_launcher.png)
+![icon](https://raw.github.com/yrom/AcFun-Area63/master/app/icons/main/mipmap-xxhdpi/ic_launcher.png)
 Acfun 63区（文章区），来，战个痛～
 
 <del>一个"学习"Android Design的产物。。。</del>
