@@ -20,8 +20,8 @@ android {
         applicationId "tv.acfun.a63"
         minSdkVersion 9
         targetSdkVersion 21
-        versionCode 40
-        versionName "1.4.0"
+        versionCode 41
+        versionName "1.4.1"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW"
         manifestPlaceholders = [UMENG_APPKEY_VALUE: '523706eb56240b0db70293fe',
                                 UMENG_CHANNEL_VALUE: 'GooglePlay']
@@ -32,7 +32,7 @@ android {
     }
     if(hasKeyStore()) {
         signingConfigs {
-            release{
+            release {
                 storeFile file(STORE_FILE)
                 storePassword STORE_PASSWORD
                 keyAlias KEY_ALIAS
@@ -47,23 +47,27 @@ android {
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             }
         }
-        applicationVariants.all { variant ->
+    }
+
+    productFlavors{
+        XiaoMi{}
+        Meizu{}
+        GooglePlay{}
+    }
+    productFlavors.all {
+        flavor -> flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+    }
+
+    applicationVariants.all { variant ->
+        if(variant.name.endsWith('Release')){
             variant.outputs.each { output ->
                 def outputFile = output.outputFile
-                if (outputFile != null && outputFile.name.endsWith('release.apk')) {
-                    def fileName = "${defaultConfig.applicationId}_${defaultConfig.versionName}_${variant.productFlavors[0].name}.apk"
+                if (outputFile != null) {
+                    def fileName = "${defaultConfig.applicationId}_${defaultConfig.versionName}_${variant.name}.apk"
                     output.outputFile = new File(outputFile.parent, fileName)
                     project.logger.lifecycle "Renamed output : ${output.outputFile}"
                 }
             }
-        }
-        productFlavors{
-            XiaoMi{}
-            Meizu{}
-            GooglePlay{}
-        }
-        productFlavors.all {
-            flavor -> flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
         }
     }
     sourceSets {
@@ -72,11 +76,13 @@ android {
             java.srcDirs = ['src']
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
+            res.srcDirs = ['res','icons/main']
             assets.srcDirs = ['assets']
             jniLibs.srcDirs = ['libs']
         }
-
+        XiaoMi{
+            res.srcDirs = ['icons/xiaomi']
+        }
         // Move the tests to tests/java, tests/res, etc...
         instrumentTest.setRoot('tests')
 
