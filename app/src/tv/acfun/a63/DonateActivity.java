@@ -1,12 +1,14 @@
 package tv.acfun.a63;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -14,20 +16,21 @@ import android.webkit.WebViewClient;
 import tv.acfun.a63.base.BaseWebViewActivity;
 
 public class DonateActivity extends BaseWebViewActivity {
-    
+    static final String UA = "Mozilla/5.0 (Linux; Android "+ Build.VERSION.RELEASE+"; "+ Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry().toLowerCase()+"; Nexus 5 Build/JOP40D) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2307.2 Mobile Safari/537.36";
     @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
         mWeb.setWebChromeClient(new WebChromeClient());
+        mWeb.getSettings().setUserAgentString(UA);
         mWeb.setWebViewClient(new WebViewClient(){
-            
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Uri uri = Uri.parse(url);
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.addCategory(Intent.CATEGORY_DEFAULT);
                 intent.setData(uri);
-                if("alipayqr".equals(uri.getScheme())){
+                if("alipayqr".equals(uri.getScheme()) || "alipays".endsWith(uri.getScheme())) {
                     try {
                         startActivity(intent);
                         finish();
