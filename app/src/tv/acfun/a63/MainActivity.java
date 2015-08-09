@@ -1,23 +1,5 @@
 package tv.acfun.a63;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import tv.acfun.a63.api.ArticleApi;
-import tv.acfun.a63.api.Constants;
-import tv.acfun.a63.api.entity.Content;
-import tv.acfun.a63.api.entity.Contents;
-import tv.acfun.a63.api.entity.User;
-import tv.acfun.a63.db.DB;
-import tv.acfun.a63.service.KeepOnlineService;
-import tv.acfun.a63.service.PushService;
-import tv.acfun.a63.util.ActionBarUtil;
-import tv.acfun.a63.util.DensityUtil;
-import tv.acfun.a63.util.FastJsonRequest;
-import tv.acfun.a63.util.TextViewUtils;
-import tv.acfun.a63.util.Theme;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,7 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -39,6 +21,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.OnNavigationListener;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -102,6 +85,25 @@ import com.umeng.fb.model.DevReply;
 import com.umeng.fb.model.Reply;
 import com.umeng.update.UmengUpdateAgent;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import tv.acfun.a63.api.ArticleApi;
+import tv.acfun.a63.api.Constants;
+import tv.acfun.a63.api.entity.Content;
+import tv.acfun.a63.api.entity.Contents;
+import tv.acfun.a63.api.entity.User;
+import tv.acfun.a63.db.DB;
+import tv.acfun.a63.service.KeepOnlineService;
+import tv.acfun.a63.service.PushService;
+import tv.acfun.a63.util.ActionBarUtil;
+import tv.acfun.a63.util.DensityUtil;
+import tv.acfun.a63.util.FastJsonRequest;
+import tv.acfun.a63.util.TextViewUtils;
+import tv.acfun.a63.util.Theme;
+
 public class MainActivity extends ActionBarActivity implements
         OnItemClickListener, OnNavigationListener, OnClickListener {
     private static final String KEY_CURRENT_ITEM = "current_item";
@@ -126,7 +128,7 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ActionBarUtil.compatibleDeviceWithSB(this);
-        Theme.onActivityCreate(this,savedInstanceState);
+        Theme.onActivityCreate(this, savedInstanceState);
         super.onCreate(savedInstanceState);
         mUser = AcApp.getUser();
         initUmeng();
@@ -144,6 +146,24 @@ public class MainActivity extends ActionBarActivity implements
             PushService.start(this);
             KeepOnlineService.requestOnline(this, 0);
         }
+        if (!PreferenceManager.getDefaultSharedPreferences(this).contains("last_public_alert_show"))
+            showLastPublicReleaseAlert();
+    }
+
+    private void showLastPublicReleaseAlert() {
+        new AlertDialog.Builder(this)
+                .setTitle("请知悉")
+                .setMessage("由于ACFUN·北京的\"举报\"及\"侵权\"的\"控告\"，" +
+                        "您所使用的应用将是最后一个\"公开发行版\"。\n" +
+                        "\n另外，本应用从诞生起就是开源项目，作者依然还会更新Github上的代码。直到这个应用无人问津为止。\n" +
+                        "（具体请看\"关于\")\n"+
+                        "此致。")
+                .setPositiveButton("知道了",null)
+                .show();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .edit()
+                .putInt("last_public_alert_show", 1)
+                .apply();
     }
 
     private void initUmeng() {

@@ -20,8 +20,8 @@ android {
         applicationId "tv.acfun.a63"
         minSdkVersion 9
         targetSdkVersion 21
-        versionCode 41
-        versionName "1.4.1"
+        versionCode 42
+        versionName "1.4.2"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW"
         manifestPlaceholders = [UMENG_APPKEY_VALUE: '523706eb56240b0db70293fe',
                                 UMENG_CHANNEL_VALUE: 'GooglePlay']

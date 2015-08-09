@@ -92,7 +92,6 @@ public class MentionActivity extends BaseActivity implements OnClickListener, On
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.fragment_main_dummy);
-        MobclickAgent.onEvent(this, "view_mentions");
         ActionBar ab = getSupportActionBar();
         ActionBarUtil.setXiaomiFilterDisplayOptions(ab, false);
         ab.setTitle(R.string.mentions);
