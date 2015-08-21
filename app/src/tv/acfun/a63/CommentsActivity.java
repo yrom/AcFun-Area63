@@ -16,29 +16,6 @@
 
 package tv.acfun.a63;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
-import org.apache.commons.httpclient.Cookie;
-import org.apache.commons.httpclient.HttpException;
-
-import tv.acfun.a63.adapter.CommentsAdapter;
-import tv.acfun.a63.api.ArticleApi;
-import tv.acfun.a63.api.entity.Comment;
-import tv.acfun.a63.api.entity.Comments;
-import tv.acfun.a63.api.entity.User;
-import tv.acfun.a63.base.BaseActivity;
-import tv.acfun.a63.util.ActionBarUtil;
-import tv.acfun.a63.util.ArrayUtil;
-import tv.acfun.a63.util.BaseAnimationListener;
-import tv.acfun.a63.util.Connectivity;
-import tv.acfun.a63.util.CustomUARequest;
-import tv.acfun.a63.util.MemberUtils;
-import tv.acfun.a63.util.TextViewUtils;
-import tv.acfun.a63.view.EmotionView;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -47,12 +24,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.WindowCompat;
 import android.support.v7.app.ActionBar;
@@ -71,7 +48,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
@@ -108,6 +84,30 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.umeng.analytics.MobclickAgent;
 
+import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.HttpException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
+import tv.acfun.a63.adapter.CommentsAdapter;
+import tv.acfun.a63.api.ArticleApi;
+import tv.acfun.a63.api.entity.Comment;
+import tv.acfun.a63.api.entity.Comments;
+import tv.acfun.a63.api.entity.User;
+import tv.acfun.a63.base.BaseActivity;
+import tv.acfun.a63.util.ActionBarUtil;
+import tv.acfun.a63.util.ArrayUtil;
+import tv.acfun.a63.util.BaseAnimationListener;
+import tv.acfun.a63.util.Connectivity;
+import tv.acfun.a63.util.CustomUARequest;
+import tv.acfun.a63.util.MemberUtils;
+import tv.acfun.a63.util.TextViewUtils;
+import tv.acfun.a63.view.EmotionView;
+
 /**
  * @author Yrom
  * 
@@ -141,13 +141,13 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
+        supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         aid = getIntent().getIntExtra("aid", 0);
         if (aid == 0)
             return;
         setContentView(R.layout.activity_comments);
-        MobclickAgent.onEvent(this, "view_comment", "ac" + aid);
+        MobclickAgent.onEvent(this, "view_comment");
         ActionBar ab = getSupportActionBar();
 
         ab.setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_trans));
@@ -157,7 +157,6 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         initCommentsBar();
         initList();
         requestData(1, true);
-        handleKeyboardStatus();
     }
 
     private void initList() {
@@ -226,30 +225,16 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         mList.setAdapter(mAdapter);
     }
 
-    private void handleKeyboardStatus() {
-        final View activityRootView = findViewById(R.id.content_frame);
-        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                    @Override
-                    public void onGlobalLayout() {
-                        Rect r = new Rect();
-                        // r will be populated with the coordinates of your view
-                        // that
-                        // area still visible.
-                        activityRootView.getWindowVisibleDisplayFrame(r);
-
-                        int heightDiff = activityRootView.getRootView().getHeight()
-                                - (r.bottom - r.top);
-                        isInputShow = heightDiff > 100; // FIXME: may be a
-                                                        // larger number
-                    }
-                });
-    }
 
     private boolean isInputShow;
     private View mCommentBar;
-
+    private ResultReceiver mIMResultRecevier = new ResultReceiver(null){
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            isInputShow = (resultCode == InputMethodManager.RESULT_SHOWN
+                    || resultCode == InputMethodManager.RESULT_UNCHANGED_SHOWN);
+        }
+    };
     private void initCommentsBar() {
         mCommentBar = findViewById(R.id.comments_bar);
         
@@ -262,6 +247,16 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         }
         mBtnSend = (ImageButton) findViewById(R.id.comments_send_btn);
         mCommentText = (EditText) findViewById(R.id.comments_edit);
+        mCommentText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    mKeyboard.showSoftInput(v, InputMethodManager.SHOW_FORCED, mIMResultRecevier);
+                } else {
+                    mKeyboard.hideSoftInputFromWindow(v.getWindowToken(), 0, mIMResultRecevier);
+                }
+            }
+        });
         mBtnEmotion = findViewById(R.id.comments_emotion_btn);
         mEmotionGrid = (GridView) findViewById(R.id.emotions);
         mBtnSend.setOnClickListener(this);
@@ -446,12 +441,12 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
             requestData(pageIndex, true);
             break;
         case R.id.comments_send_btn:
-            mKeyboard.hideSoftInputFromWindow(mEmotionGrid.getWindowToken(), 0);
+            mKeyboard.hideSoftInputFromWindow(mCommentText.getWindowToken(), 0, mIMResultRecevier);
             postComment();
             break;
         case R.id.comments_emotion_btn:
             if (isInputShow) {
-                mKeyboard.hideSoftInputFromWindow(mEmotionGrid.getWindowToken(), 0);
+                mKeyboard.hideSoftInputFromWindow(mCommentText.getWindowToken(), 0, mIMResultRecevier);
                 if (mEmotionGrid.getVisibility() != View.VISIBLE)
                     mEmotionGrid.postDelayed(new Runnable() {
 
@@ -539,6 +534,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        Log.w(TAG, Log.getStackTraceString(error));
         if (pageIndex > 1) {
             isreload = true;
             mFootview.findViewById(R.id.list_footview_progress).setVisibility(View.GONE);
@@ -708,8 +704,10 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
 
     @Override
     public void onBackPressed() {
-        if (isInputShow)
-            mKeyboard.hideSoftInputFromWindow(mEmotionGrid.getWindowToken(), 0);
+        if (mEmotionGrid.isShown())
+            mEmotionGrid.setVisibility(View.GONE);
+        else if (isInputShow)
+            mKeyboard.hideSoftInputFromWindow(mEmotionGrid.getWindowToken(), 0, mIMResultRecevier);
         else
             super.onBackPressed();
     }
@@ -756,11 +754,15 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (isInputShow) {
+            mKeyboard.hideSoftInputFromWindow(mCommentText.getWindowToken(), 0);
+        }
         AcApp.cancelAllRequest(TAG);
         if (mAdapter != null) {
             mAdapter.setData(null, null);
             mAdapter = null;
         }
+        mIMResultRecevier = null;
 
     }
 
