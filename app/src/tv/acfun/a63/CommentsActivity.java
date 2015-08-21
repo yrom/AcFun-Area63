@@ -401,8 +401,8 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
                 String json = new String(response.data,
                         HttpHeaderParser.parseCharset(response.headers));
                 JSONObject parseObject = JSON.parseObject(json);
-                Comments comments = JSON.toJavaObject(parseObject, Comments.class);
-                JSONObject commentContentArr = parseObject.getJSONObject("commentContentArr");
+                Comments comments = parseObject.getObject("data", Comments.class);
+                JSONObject commentContentArr = parseObject.getJSONObject("data").getJSONObject("commentContentArr");
                 comments.commentArr = parseContentAttr(commentContentArr);
                 return Response.success(comments, cache(response));
             } catch (Exception e) {
