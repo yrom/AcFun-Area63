@@ -7,9 +7,9 @@ dependencies {
     compile project(':lib-byakugallery')
     compile 'org.jsoup:jsoup:1.8.1'
     compile 'com.alibaba:fastjson:1.1.45.android'
-    compile 'com.android.support:appcompat-v7:21.0.3@aar'
+    compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1@aar'
-    compile 'com.mcxiaoke.volley:library:1.0.+'
+    compile 'com.mcxiaoke.volley:library:1.0.17'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
 }
 android {
@@ -20,8 +20,8 @@ android {
         applicationId "tv.acfun.a63"
         minSdkVersion 9
         targetSdkVersion 21
-        versionCode 42
-        versionName "1.4.2"
+        versionCode 43
+        versionName "1.4.3"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW"
         manifestPlaceholders = [UMENG_APPKEY_VALUE: '523706eb56240b0db70293fe',
                                 UMENG_CHANNEL_VALUE: 'GooglePlay']
