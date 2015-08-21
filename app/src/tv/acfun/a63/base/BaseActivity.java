@@ -62,7 +62,7 @@ public class BaseActivity extends SwipeAppcompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                scrollToFinishActivity();
+                finish();
                 return true;
             case R.id.action_settings:
                 SettingsActivity.start(this);
