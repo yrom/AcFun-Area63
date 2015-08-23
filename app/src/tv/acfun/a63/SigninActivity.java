@@ -83,13 +83,16 @@ public class SigninActivity extends BaseActivity {
         private String response;
         private User user;
         private ProgressDialog dialog;
+        String username;
+        String password;
         @Override
         protected void onPreExecute() {
-            
+            username = mNameView.getText().toString();
+            password = mPwdView.getText().toString();
             dialog = new ProgressDialog(SigninActivity.this);
             dialog.setCanceledOnTouchOutside(false);
             dialog.setCancelable(false);
-            dialog.setMessage("登录...");
+            dialog.setMessage("登录中...请耐心等待");
             dialog.show();
         }
         
@@ -97,7 +100,8 @@ public class SigninActivity extends BaseActivity {
         protected Boolean doInBackground(Void... params) {
             
             try {
-                HashMap<String, Object> map = MemberUtils.login(ArticleApi.getDomainRoot(getApplicationContext()), mNameView.getText().toString(), mPwdView.getText().toString());
+
+                HashMap<String, Object> map = MemberUtils.login(ArticleApi.getDomainRoot(getApplicationContext()), username, password);
                 if((Boolean)map.get("success")){
                     user = (User) map.get("user");
                     user.savedTime = System.currentTimeMillis();
@@ -124,6 +128,7 @@ public class SigninActivity extends BaseActivity {
         }
         @Override
         protected void onPostExecute(Boolean result) {
+            dialog.dismiss();
             if(result.booleanValue()){
                 MobclickAgent.onEvent(SigninActivity.this, "sign_in");
                 Intent data = new Intent();
@@ -136,7 +141,6 @@ public class SigninActivity extends BaseActivity {
                 mNameView.setError(response);
                 AcApp.showToast(response);
             }
-            dialog.dismiss();
         }
         
     }
