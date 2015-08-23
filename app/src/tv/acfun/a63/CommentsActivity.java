@@ -572,7 +572,7 @@ public class CommentsActivity extends BaseActivity implements OnClickListener,
         }
         ArrayUtil.putAll(response.commentArr, data);
         commentIdList.addAll(ArrayUtil.asList(response.commentList));
-        hasNextPage = response.nextPage > response.page;
+        hasNextPage = response.totalPage > response.page;
         if (data != null && data.size() > 0) {
             mAdapter.setData(data, commentIdList);
             mAdapter.notifyDataSetChanged();
